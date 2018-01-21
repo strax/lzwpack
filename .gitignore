@@ -1,0 +1,6 @@
+doc/
+!doc/.vscode
+!doc/*.pdf
+!doc/*.tex
+!doc/*.bib
+!doc/*.md
