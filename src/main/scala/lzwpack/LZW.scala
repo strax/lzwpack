@@ -31,7 +31,7 @@ object LZW {
     }
   }
 
-  def compress[F[_]](implicit alphabet: Alphabet[Char]): Pipe[F, Char, Int] = {
+  def compress[F[_]](implicit alphabet: Alphabet[Char]): Pipe[F, Char, Code] = {
     def go(in: Stream[F, Char], buffer: Block, dict: Dict[Block]): Pull[F, Int, Dict[Block]] = {
       in.pull.uncons1.flatMap {
         case Some((head, tail)) =>
@@ -54,15 +54,15 @@ object LZW {
     in => go(in, Nil, Dict.init(alphabet.pure[List])).stream
   }
 
-  def decompress[F[_]](maxBitsPerCode: Int = 12)(implicit alphabet: Alphabet[Char]): Pipe[F, Code, Block] = {
-    def go(in: Stream[F, Code], conjecture: Block, dict: Dict[Block]): Pull[F, Block, Unit] = {
+  def decompress[F[_]](maxBitsPerCode: Int = 12)(implicit alphabet: Alphabet[Char]): Pipe[F, Code, Char] = {
+    def go(in: Stream[F, Code], conjecture: Block, dict: Dict[Block]): Pull[F, Char, Unit] = {
       in.pull.uncons1.flatMap {
         case Some((0, _)) => Pull.done
         case Some((code, tail)) =>
           infer(code, conjecture, dict) match {
             case (dict, block) => {
               println(s"Solved block '$block' for code $code with $conjecture")
-              Pull.output1(block) >> go(tail, block, dict)
+              Pull.output(Segment.seq(block)) >> go(tail, block, dict)
             }
           }
         case None =>

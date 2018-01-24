@@ -19,7 +19,7 @@ class LZWSpec extends UnitSpec {
 
     it("decodes a compressed string correctly") {
       val input = Stream.emits(List(20, 15, 2, 5, 15, 18, 14, 15, 20, 27, 29, 31, 36, 30, 32, 34, 0))
-      assertResult("TOBEORNOTTOBEORTOBEORNOT")(input.through(decompress(12)).toList.flatten.mkString)
+      assertResult("TOBEORNOTTOBEORTOBEORNOT")(input.through(decompress(12)).toList.mkString)
     }
   }
 }
