@@ -24,7 +24,11 @@ case class Dict[A](entries: Map[A, Code], headIndex: Int) {
     * Returns the code associated with the given chunk.
     * @throws java.util.NoSuchElementException if this dictionary does not contain the given chunk
     */
-  def get(a: A): Int = entries(a)
+  def get(a: A): Code = entries(a)
+
+  def reverseGet(code: Code): Option[A] = entries.find {
+    case (_, other) => code == other
+  }.map(_._1)
 }
 
 /**

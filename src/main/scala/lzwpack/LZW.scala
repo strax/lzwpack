@@ -17,6 +17,16 @@ object LZW {
     }
   }
 
+  def infer(code: Code, conjecture: String, dict: Dict[String]): (Dict[String], String) = {
+    val block = dict.reverseGet(code).get
+    if (!conjecture.isEmpty) {
+      println(s"Adding $conjecture + $block to dictionary")
+      (dict.add(conjecture + block.head), block)
+    } else {
+      (dict, block)
+    }
+  }
+
   def compress[F[_]](implicit alphabet: Alphabet[Char]): Pipe[F, Char, Int] = {
     def go(in: Stream[F, Char], buffer: String, dict: Dict[String]): Pull[F, Int, Dict[String]] = {
       in.pull.uncons1.flatMap {
@@ -37,6 +47,24 @@ object LZW {
       }
     }
     println(s"Using alphabet ${alphabet}")
+    in => go(in, "", Dict.init[String](alphabet.map(_.toString))).stream
+  }
+
+  def decompress[F[_]](maxBitsPerCode: Int = 12)(implicit alphabet: Alphabet[Char]): Pipe[F, Code, String] = {
+    def go(in: Stream[F, Code], conjecture: String, dict: Dict[String]): Pull[F, String, Unit] = {
+      in.pull.uncons1.flatMap {
+        case Some((0, _)) => Pull.done
+        case Some((code, tail)) =>
+          infer(code, conjecture, dict) match {
+            case (dict, block) => {
+              println(s"Solved block '$block' for code $code with $conjecture")
+              Pull.output1(block) >> go(tail, block, dict)
+            }
+          }
+        case None =>
+          Pull.done
+      }
+    }
     in => go(in, "", Dict.init[String](alphabet.map(_.toString))).stream
   }
 }
