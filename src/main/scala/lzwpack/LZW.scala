@@ -17,6 +17,7 @@ object LZW {
       val newIndex = headIndex + 1
       Dict(entries + (a -> newIndex), newIndex)
     }
+    def get(a: A): Int = entries(a)
   }
   object Dict {
     def empty[A] = Dict(Map.empty[A, Code], 0)
@@ -25,7 +26,8 @@ object LZW {
 
   type Alphabet[A] = List[A]
   object Alphabet {
-    def string(s: String): Alphabet[Char] = s.toList
+    def apply[A](seq: Seq[A]) = seq.toList
+    def from(s: String): Alphabet[Char] = s.toList
 
     implicit val Alphanumeric: Alphabet[Char] = (('0' to '9') ++ ('a' to 'z') ++ ('A' to 'Z')).toList
     implicit val AllChars: Alphabet[Char] = (Char.MinValue to Char.MaxValue).toList
@@ -39,11 +41,11 @@ object LZW {
     def pure[F[_]](implicit F: Applicative[F]): Alphabet[F[A]] = a.map(F.pure)
   }
 
-  def emit(block: String, dict: Dict[String]): Option[(Dict[String], Code)] = {
-    if (dict.contains(block)) {
+  def emit(head: Char, tail: String, dict: Dict[String]): Option[(Dict[String], Code)] = {
+    if (dict.contains(tail + head)) {
       None
     } else {
-      Some(dict.add(block)).map(d => (d, d.headIndex))
+      Some(dict.add(tail + head)).map(d => (d, dict.get(tail)))
     }
   }
 
@@ -51,24 +53,21 @@ object LZW {
     def go(in: Stream[F, Char], buffer: String, dict: Dict[String]): Pull[F, Int, Dict[String]] = {
       in.pull.uncons1.flatMap {
         case Some((head, tail)) =>
-          emit(buffer + head, dict) match {
+          emit(head, buffer, dict) match {
             case Some((dict, code)) => {
-              println(s"Emitting code $code for head '${buffer + head}'")
-              Pull.output1(code) >> go(tail, "", dict)
+              println(s"Emitting code $code for $buffer + $head")
+              Pull.output1(code) >> go(tail, head.toString, dict)
             }
             case None => {
-              println(s"'${buffer + head}' was found in dict, next buffer is '${buffer + head}'")
+              println(s"'${buffer + head}' was found in dict, next tail is '${buffer + head}'")
               go(tail, buffer + head, dict)
             }
           }
         case None =>
-          Pull.pure(dict)
+          // Output the code for the current buffer
+          Pull.output(Segment(dict.get(buffer), 0)) >> Pull.pure(dict)
       }
     }
-    in => {
-      println("Compressing...")
-      println(s"Alphabet is ${alphabet.map(_.toString)}")
-      go(in, "", Dict.init[String](alphabet.map(_.toString))).stream
-    }
+    in => go(in, "", Dict.init[String](alphabet.map(_.toString))).stream
   }
 }

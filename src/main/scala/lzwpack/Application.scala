@@ -7,13 +7,13 @@ import fs2.Chunk
 object Application {
   import LZW._
 
-  val TestData: String = "DEAD BEEF IS THE BESTEST BECAUSE DETOX"
+  val TestData: String = "TOBEORNOTTOBEORTOBEORNOT"
 
   def main(args: Array[String]): Unit = {
     println(s"input: ${TestData}")
     val vec = fs2.Stream
       .emits(TestData)
-      .through(compress(Alphabet.string("ABCDEFGHIJKLMNOPQRSTUVWXYZ ")))
+      .through(compress(('A' to 'Z').toList))
       .covary[IO]
       .compile
       .toVector.unsafeRunSync()
