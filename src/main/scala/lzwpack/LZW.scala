@@ -2,29 +2,73 @@ package lzwpack
 
 import cats._
 import cats.data._
-import cats.implicits._
+
+import Implicits._
+
+import fs2._
 
 object LZW {
-  case class CompressionState(tail: List[Char], dictionary: Map[Seq[Char], Int], i: Int)
+  // A code represents a reference to some known input sequence.
+  type Code = Int
 
-  object CompressionState {
-    val ByteAlphabet: Seq[Char] = ('A' to 'Z')
-    def initialDict[A](alphabet: Seq[A]) = alphabet.map(Seq(_)).zip(Stream.from(1)).toMap
-    def empty = CompressionState(Nil, initialDict(ByteAlphabet), 28)
+  case class Dict[A](entries: Map[A, Code], headIndex: Int) {
+    def contains(a: A): Boolean = entries.contains(a)
+    def add(a: A): Dict[A] = {
+      val newIndex = headIndex + 1
+      Dict(entries + (a -> newIndex), newIndex)
+    }
+  }
+  object Dict {
+    def empty[A] = Dict(Map.empty[A, Code], 0)
+    def init[A](alphabet: Alphabet[A]): Dict[A] = alphabet.foldLeft(empty[A])((z, a) => z.add(a))
   }
 
-  def process(state: CompressionState, head: Char): (CompressionState, Int) = state match {
-    case CompressionState(tail, dictionary, i) =>
-      val block = head :: tail
-      println(s"Current chunk to check: ${block.mkString}")
-      if (dictionary.contains(head :: tail)) {
-        (CompressionState(head :: tail, dictionary, i), 0)
-      } else {
-        println(s"Unindexed chunk ${block.mkString}")
-        (CompressionState(List(head), dictionary.updated(head :: tail, i), i+1), i.toByte)
+  type Alphabet[A] = List[A]
+  object Alphabet {
+    def string(s: String): Alphabet[Char] = s.toList
+
+    implicit val Alphanumeric: Alphabet[Char] = (('0' to '9') ++ ('a' to 'z') ++ ('A' to 'Z')).toList
+    implicit val AllChars: Alphabet[Char] = (Char.MinValue to Char.MaxValue).toList
+    // Instead of bytes (8-bit signed integers), we represent byte values by their unsigned int (32-bit) representation.
+    implicit val AllBytes: Alphabet[Int] = (0 to 255).toList
+  }
+  implicit class AlphabetOps[A](a: Alphabet[A]) {
+    /**
+      * Lifts this alphabet into an alphabet of applicative functors.
+      */
+    def pure[F[_]](implicit F: Applicative[F]): Alphabet[F[A]] = a.map(F.pure)
+  }
+
+  def emit(block: String, dict: Dict[String]): Option[(Dict[String], Code)] = {
+    if (dict.contains(block)) {
+      None
+    } else {
+      Some(dict.add(block)).map(d => (d, d.headIndex))
+    }
+  }
+
+  def compress[F[_]](implicit alphabet: Alphabet[Char]): Pipe[F, Char, Int] = {
+    def go(in: Stream[F, Char], buffer: String, dict: Dict[String]): Pull[F, Int, Dict[String]] = {
+      in.pull.uncons1.flatMap {
+        case Some((head, tail)) =>
+          emit(buffer + head, dict) match {
+            case Some((dict, code)) => {
+              println(s"Emitting code $code for head '${buffer + head}'")
+              Pull.output1(code) >> go(tail, "", dict)
+            }
+            case None => {
+              println(s"'${buffer + head}' was found in dict, next buffer is '${buffer + head}'")
+              go(tail, buffer + head, dict)
+            }
+          }
+        case None =>
+          Pull.pure(dict)
       }
+    }
+    in => {
+      println("Compressing...")
+      println(s"Alphabet is ${alphabet.map(_.toString)}")
+      go(in, "", Dict.init[String](alphabet.map(_.toString))).stream
+    }
   }
-
-  def compress(input: Stream[Char]): (CompressionState, Stream[Int]) =
-    input.traverse(h => State((s: CompressionState) => process(s, h))).run(CompressionState.empty).value
 }
