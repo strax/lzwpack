@@ -1,8 +1,6 @@
 package lzwpack
 
-import Implicits._
 import cats.effect.IO
-import fs2.Chunk
 
 object Application {
   import LZW._
@@ -13,7 +11,7 @@ object Application {
     println(s"input: ${TestData}")
     val vec = fs2.Stream
       .emits(TestData)
-      .through(compress(('A' to 'Z').toList))
+      .through(compress(Alphabet(TestData)))
       .covary[IO]
       .compile
       .toVector.unsafeRunSync()
