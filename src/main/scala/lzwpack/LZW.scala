@@ -3,6 +3,8 @@ package lzwpack
 import cats._
 import fs2._
 
+import scala.collection.immutable.{List}
+
 object LZW {
   /**
     * A {@see Code} represents the outputted code for a given input subsequence.
@@ -54,7 +56,7 @@ object LZW {
     *
     * @todo Implement Set
     */
-  type Alphabet[A] = Set[A]
+  type Alphabet[A] = List[A]
 
   /**
     * Companion object for {@see Alphabet}.
@@ -63,7 +65,7 @@ object LZW {
     /**
       * Returns a new alphabet of type {@tparam A} from an input sequence
       */
-    def apply[A](seq: Seq[A]) = seq.toSet
+    def apply[A: Ordering](seq: Seq[A]): Alphabet[A] = seq.toList
 
     implicit val Alphanumeric: Alphabet[Char] = Alphabet(('0' to '9') ++ ('a' to 'z') ++ ('A' to 'Z'))
     implicit val AllChars: Alphabet[Char] = Alphabet(Char.MinValue to Char.MaxValue)
