@@ -3,8 +3,6 @@ package lzwpack
 import org.scalatest._
 
 class DictSpec extends UnitSpec {
-  import LZW.Dict
-
   describe("empty") {
     it("returns a Dict which contains no elements") {
       assert(Dict.empty.entries.size == 0)

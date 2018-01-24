@@ -1,88 +1,8 @@
 package lzwpack
 
-import cats._
 import fs2._
 
-import scala.collection.immutable.{List}
-
 object LZW {
-  /**
-    * A {@see Code} represents the outputted code for a given input subsequence.
-    */
-  type Code = Int
-
-  /**
-    * A dictionary contains unique codes for given chunks in the input
-    *
-    * @todo Change Map to custom trie
-    */
-  case class Dict[A](entries: Map[A, Code], headIndex: Int) {
-    /**
-      * Returns a boolean determining if this dictionary contains a given chunk
-      */
-    def contains(a: A): Boolean = entries.contains(a)
-
-    /**
-      * Adds a new chunk to the dictionary
-      * @return a new dictionary with the inserted element
-      */
-    def add(a: A): Dict[A] = {
-      val newIndex = headIndex + 1
-      Dict(entries + (a -> newIndex), newIndex)
-    }
-
-    /**
-      * Returns the code associated with the given chunk.
-      * @throws java.util.NoSuchElementException if this dictionary does not contain the given chunk
-      */
-    def get(a: A): Int = entries(a)
-  }
-
-  /**
-    * Companion object for {@see Dict}
-    */
-  object Dict {
-    def empty[A] = Dict(Map.empty[A, Code], 0)
-
-    /**
-      * Initializes a new dictionary with the given alphabet.
-      * In LZW, the dictionary always contains codes for the whole alphabet before compression / decompression.
-      */
-    def init[A](alphabet: Alphabet[A]): Dict[A] = alphabet.foldLeft(empty[A])((z, a) => z.add(a))
-  }
-
-  /**
-    * An alphabet for a given input S is the set of possible members an input sequence can be composed from.
-    *
-    * @todo Implement Set
-    */
-  type Alphabet[A] = List[A]
-
-  /**
-    * Companion object for {@see Alphabet}.
-    */
-  object Alphabet {
-    /**
-      * Returns a new alphabet of type {@tparam A} from an input sequence
-      */
-    def apply[A: Ordering](seq: Seq[A]): Alphabet[A] = seq.toList
-
-    implicit val Alphanumeric: Alphabet[Char] = Alphabet(('0' to '9') ++ ('a' to 'z') ++ ('A' to 'Z'))
-    implicit val AllChars: Alphabet[Char] = Alphabet(Char.MinValue to Char.MaxValue)
-    // Instead of bytes (8-bit signed integers), we represent byte values by their unsigned int (32-bit) representation.
-    implicit val AllBytes: Alphabet[Int] = Alphabet(0 to 255)
-  }
-
-  /**
-    * Extension methods for {@see Alphabet}.
-    */
-  implicit class AlphabetOps[A](a: Alphabet[A]) {
-    /**
-      * Lifts this alphabet into an alphabet of {@tparam F}s that are applicative functors.
-      */
-    def pure[F[_]](implicit F: Applicative[F]): Alphabet[F[A]] = a.map(F.pure)
-  }
-
   /**
     * Processes the given block (given as head and tail) and returns a tuple of a potentially changed
     * dictionary and an Option indicating whether to emit a code to the output.

@@ -3,8 +3,6 @@ package lzwpack
 import org.scalatest._
 
 class AlphabetSpec extends UnitSpec {
-  import LZW.Alphabet
-
   describe("apply") {
     it("returns the alphabet for an input string") {
       assert(Alphabet("ABC") == List('A', 'B', 'C'))
