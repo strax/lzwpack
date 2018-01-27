@@ -8,8 +8,10 @@ class BitPackingSpec extends UnitSpec {
 
   describe("pack") {
     it("packs numbers efficiently to bytes") {
-      assertResult(List(0xAD, 0xF3, 0xF5, 0x1)) {
-        Stream.emits(List(0x1,0x2,0x5,0x6,0x9,0xFAF,0)).through(pack).toList.unsigned
+      val sequence = List((b"100001", 10), (b"111111111111111", 16), (b"1001", 6), (b"0", 0))
+
+      assertResult(List(0x21, 0xfc, 0xff, 0x25)) {
+        Stream.emits(sequence).through(pack).toList.unsigned
       }
     }
   }
