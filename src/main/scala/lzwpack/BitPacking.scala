@@ -1,7 +1,6 @@
 package lzwpack
 
 import fs2.{Pipe, Segment}
-import Implicits._
 
 /**
   * Packs a stream of bits into a byte sequence so that a byte can contain multiple bit sequences.

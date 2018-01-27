@@ -1,7 +1,6 @@
 package lzwpack
 
 import fs2._
-import Implicits._
 
 class BitPackingSpec extends UnitSpec {
   import BitPacking._

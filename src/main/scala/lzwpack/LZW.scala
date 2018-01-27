@@ -1,23 +1,29 @@
 package lzwpack
 
+import java.nio.charset.Charset
+
 import fs2._
-import cats._
-import cats.implicits._
+
 
 object LZW {
-  type Block = List[Char]
+  import cats._
+  import cats.implicits._
+
+  type Block = List[Byte]
+  type Output = (Code, Int)
 
   /**
     * Processes the given block (given as head and tail) and returns a tuple of a potentially changed
     * dictionary and an Option indicating whether to emit a code to the output.
     */
-  private def emit(head: Char, tail: Block, dict: Dict[Block]): (Dict[Block], Option[List[Code]], Block) = {
-    println(s"Input is ${head.toInt}")
-    if (head == 0) return (dict, Some(List(dict.get(tail), 0)), List())
-    if (dict.contains(tail :+ head)) {
-      (dict, None, tail :+ head)
+  private def emit(head: Byte, tail: Block, dict: Dict[Block]): (Dict[Block], Option[List[Output]], Block) = {
+    if (head == 0) return (dict, Some(List((dict.get(tail), dict.headIndex.bitLength), (0, 0))), List())
+    val block = tail :+ head
+    if (dict.contains(block)) {
+      (dict, None, block)
     } else {
-      (dict.add(tail :+ head), Some(List(dict.get(tail))), List(head))
+      System.err.println(show"${block} \t ${block.asString} \t\t create ${(dict.headIndex + 1).hex} \t\t emit ${(dict.get(tail)).hex} ${dict.get(tail).bin(dict.headIndex.bitLength)} (${dict.headIndex.bitLength} bits)")
+      (dict.add(block), Some(List((dict.get(tail), dict.headIndex.bitLength))), List(head))
     }
   }
 
@@ -34,7 +40,7 @@ object LZW {
 
   type CodecF[I, O] = (I, Block, Dict[Block]) => (Dict[Block], Option[Seq[O]], Block)
 
-  private def codec[F[_], I, O](f: CodecF[I, O])(implicit alphabet: Alphabet[Char], N: Numeric[I]): Pipe[F, I, O] = {
+  private def codec[F[_], I, O](f: CodecF[I, O])(implicit alphabet: Alphabet[Byte], N: Numeric[I]): Pipe[F, I, O] = {
     def go(stream: Stream[F, I], buffer: Block, dict: Dict[Block]): Pull[F, O, Unit] = {
       stream.pull.uncons1.flatMap {
         case Some((head, tail)) =>
@@ -54,6 +60,6 @@ object LZW {
     in => go(in, Nil, Dict.init(alphabet.pure[List])).stream
   }
 
-  def compress[F[_]](implicit alphabet: Alphabet[Char]) = codec[F, Char, Code](emit)
-  def decompress[F[_]](implicit alphabet: Alphabet[Char]) = codec[F, Code, Char](infer)
+  def compress[F[_]](implicit alphabet: Alphabet[Byte]) = codec[F, Byte, (Code, Int)](emit)
+  def decompress[F[_]](implicit alphabet: Alphabet[Byte]) = codec[F, Code, Byte](infer)
 }

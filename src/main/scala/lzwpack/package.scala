@@ -2,7 +2,7 @@ import cats.Applicative
 
 import scala.collection.immutable.List
 
-package object lzwpack {
+package object lzwpack extends Implicits {
   /**
     * A {@see Code} represents the outputted code for a given input subsequence.
     */
