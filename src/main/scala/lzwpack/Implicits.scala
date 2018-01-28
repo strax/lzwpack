@@ -1,9 +1,10 @@
 package lzwpack
 
 import java.lang.{Byte => JavaByte}
-import java.nio.charset.Charset
+import java.nio.charset.{CodingErrorAction}
 
-import cats.Show
+import cats._
+import cats.implicits._
 
 import scala.io.Codec
 
@@ -12,7 +13,12 @@ import scala.io.Codec
   * so all the implicits can be imported with <code>import Implicits._</code>.
   */
 trait Implicits {
-  implicit val codec: Codec = Codec.ISO8859.decodingReplaceWith(".")
+  implicit val codec: Codec = {
+    Codec.ISO8859
+      .decodingReplaceWith(".")
+      .onUnmappableCharacter(CodingErrorAction.REPLACE)
+      .onMalformedInput(CodingErrorAction.REPLACE)
+  }
 
   implicit class ByteOps(b: Byte) {
     /**
@@ -34,7 +40,11 @@ trait Implicits {
 
   implicit class ByteListOps(bs: List[Byte]) {
     def unsigned: List[Int] = bs map (_.unsigned)
-    def asString: String = new String(bs.toArray, implicitly[Codec].charSet)
+    def asString(implicit codec: Codec): String = {
+      val decoder = codec.decoder
+      val buffer = java.nio.ByteBuffer.wrap(bs.toArray)
+      decoder.decode(buffer).toString
+    }
   }
 
   implicit val byteListShow: Show[List[Byte]] = bs => bs.map(_ formatted "%02X").mkString(" ")

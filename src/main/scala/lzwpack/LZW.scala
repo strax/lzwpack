@@ -12,18 +12,30 @@ object LZW {
   type Block = List[Byte]
   type Output = (Code, Int)
 
+  private def debug(input: List[Byte], dict: Dict[Block], indexed: Option[Int], emitted: Int): Unit = {
+    val msg = show"${input} \t ${input.asString} \t\t create ${indexed.fold("<none>")(_.hex)} \t\t emit ${emitted.hex} ${emitted.bin(dict.headIndex.bitLength)} (${dict.headIndex.bitLength} bits)"
+    System.err.println(msg)
+  }
+
   /**
     * Processes the given block (given as head and tail) and returns a tuple of a potentially changed
     * dictionary and an Option indicating whether to emit a code to the output.
     */
   private def emit(head: Byte, tail: Block, dict: Dict[Block]): (Dict[Block], Option[List[Output]], Block) = {
-    if (head == 0) return (dict, Some(List((dict.get(tail), dict.headIndex.bitLength), (0, 0))), List())
-    val block = tail :+ head
-    if (dict.contains(block)) {
-      (dict, None, block)
+    val input = tail :+ head
+
+    val emitLength = dict.headIndex.bitLength
+    if (head == 0) {
+      val code = dict.get(tail)
+      debug(input, dict, None, code)
+      return (dict, Some(List((code, emitLength), (0, 0))), List())
+    }
+    if (dict.contains(input)) {
+      (dict, None, input)
     } else {
-      System.err.println(show"${block} \t ${block.asString} \t\t create ${(dict.headIndex + 1).hex} \t\t emit ${(dict.get(tail)).hex} ${dict.get(tail).bin(dict.headIndex.bitLength)} (${dict.headIndex.bitLength} bits)")
-      (dict.add(block), Some(List((dict.get(tail), dict.headIndex.bitLength))), List(head))
+      val code = dict.get(tail)
+      debug(input, dict, Some(dict.headIndex + 1), code)
+      (dict.add(input), Some(List((code, emitLength))), List(head))
     }
   }
 
@@ -38,9 +50,9 @@ object LZW {
     }
   }
 
-  type CodecF[I, O] = (I, Block, Dict[Block]) => (Dict[Block], Option[Seq[O]], Block)
+  type CodecF[I, O] = (I, Block, Dict[Block]) => (Dict[Block], Option[List[O]], Block)
 
-  private def codec[F[_], I, O](f: CodecF[I, O])(implicit alphabet: Alphabet[Byte], N: Numeric[I]): Pipe[F, I, O] = {
+  private def codec[F[_], I, O: Show](f: CodecF[I, O])(implicit alphabet: Alphabet[Byte], N: Numeric[I], S: Show[List[O]]): Pipe[F, I, O] = {
     def go(stream: Stream[F, I], buffer: Block, dict: Dict[Block]): Pull[F, O, Unit] = {
       stream.pull.uncons1.flatMap {
         case Some((head, tail)) =>
@@ -52,7 +64,7 @@ object LZW {
           }
         case None =>
           f(N.zero, buffer, dict)._2.fold(Pull.done.covaryOutput[O])(output => {
-            println(s"Compression ending, final block $output")
+            println(show"Compression ending, final block ${S.show(output)}")
             Pull.output(Segment.seq(output))
           })
       }
