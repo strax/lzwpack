@@ -33,6 +33,8 @@ case class Dict[A](entries: Map[A, Code], headIndex: Int) {
   def reverseGet(code: Code): Option[A] = entries.find {
     case (_, other) => code == other
   }.map(_._1)
+
+  private[Dict] def inc: Dict[A] = Dict(this.entries, this.headIndex + 1)
 }
 
 /**
@@ -45,5 +47,5 @@ object Dict {
     * Initializes a new dictionary with the given alphabet.
     * In LZW, the dictionary always contains codes for the whole alphabet before compression / decompression.
     */
-  def init[A](alphabet: Alphabet[A]): Dict[A] = alphabet.foldLeft(empty[A])((z, a) => z.add(a))
+  def init[A](alphabet: Alphabet[A]): Dict[A] = alphabet.foldLeft(empty[A])((z, a) => z.add(a)).add(0)
 }
