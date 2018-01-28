@@ -20,6 +20,10 @@ case class Dict[A](entries: Map[A, Code], headIndex: Int) {
     Dict(entries + (a -> newIndex), newIndex)
   }
 
+  def nextIndex: Int = headIndex + 1
+
+  def codeSize: Int = headIndex.bitLength
+
   /**
     * Returns the code associated with the given chunk.
     * @throws java.util.NoSuchElementException if this dictionary does not contain the given chunk

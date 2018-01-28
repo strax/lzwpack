@@ -14,11 +14,11 @@ object Application {
     println(s"input: ${TestData}")
     implicit val F = implicitly[Sync[IO]]
 
-    fs2.io.file.readAll(Paths.get("input.txt"), 4028)
+/*    fs2.io.file.readAll(Paths.get("input.txt"), 4028)
       .through(compress(Alphabet.AllBytes))
       .through(pack)
       .through(fs2.io.file.writeAll(Paths.get("output.txt")))
       .compile
-      .drain.unsafeRunSync()
+      .drain.unsafeRunSync()*/
   }
 }
