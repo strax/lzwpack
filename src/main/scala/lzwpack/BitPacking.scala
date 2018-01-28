@@ -6,10 +6,10 @@ import fs2.{Pipe, Segment}
   * Packs a stream of bits into a byte sequence so that a byte can contain multiple bit sequences.
   */
 object BitPacking {
-  case class Buffer(data: Int, size: Int) {
+  private[BitPacking] case class Buffer(data: Int, size: Int) {
     def available = 8 - size
   }
-  object Buffer {
+  private[BitPacking] object Buffer {
     def empty: Buffer = Buffer(0, 0)
   }
 
@@ -20,19 +20,19 @@ object BitPacking {
     *
     * @return a {@see Segment} with an overflow buffer result
     */
-  def appendToByte(n: Int, buffer: Buffer, codeWidth: Int): Segment[Byte, Buffer] = {
-    if (codeWidth == 0) return Segment(buffer.data.toByte).asResult(buffer)
+  def appendToByte(buffer: Buffer)(code: Code, codeSize: Int): Segment[Byte, Buffer] = {
+    if (codeSize == 0) return Segment(buffer.data.toByte).asResult(buffer)
     // Put as many bits as possible to the byte in buffer
-    val nextBuffer = ((n << buffer.size) ^ buffer.data) & 0xFF
-    val insertedBits = Math.min(8 - buffer.size, codeWidth)
-    val remainingBits = codeWidth - insertedBits
+    val nextBuffer = ((code << buffer.size) ^ buffer.data) & 0xFF
+    val insertedBits = Math.min(8 - buffer.size, codeSize)
+    val overflowSize = codeSize - insertedBits
 
     // Test if the the buffer is full
-    if (remainingBits > 0) {
+    if (overflowSize > 0) {
       // Put the remaining bits from the input into the overflow buffer
-      val overflowBuffer = (n >>> insertedBits)
+      val overflow = code >>> insertedBits
       // First chunk is full, so emit it; start to accumulate with second byte.
-      Segment(nextBuffer.toByte).flatMapResult(_ => appendToByte(overflowBuffer, Buffer.empty, remainingBits))
+      Segment(nextBuffer.toByte).flatMapResult(_ => appendToByte(Buffer.empty)(overflow, overflowSize))
     } else {
       // First chunk is possibly not full, so don't emit it and try to accumulate more
       Segment.pure(Buffer(nextBuffer, buffer.size + insertedBits))
@@ -46,7 +46,7 @@ object BitPacking {
     in => in.scanSegments(Buffer.empty) {
       case (buffer, segment) =>
         segment.flatMapAccumulate(buffer) {
-          case (buffer, (code, width)) => appendToByte(code, buffer, width)
+          case (buffer, (code, codeSize)) => appendToByte(buffer)(code, codeSize)
         } mapResult (_._2)
     }
   }
