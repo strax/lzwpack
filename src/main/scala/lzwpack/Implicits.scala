@@ -1,7 +1,7 @@
 package lzwpack
 
 import java.lang.{Byte => JavaByte}
-import java.nio.charset.{CodingErrorAction}
+import java.nio.charset.{Charset, CodingErrorAction}
 
 import cats._
 import cats.implicits._
@@ -13,12 +13,7 @@ import scala.io.Codec
   * so all the implicits can be imported with <code>import Implicits._</code>.
   */
 trait Implicits {
-  implicit val codec: Codec = {
-    Codec.ISO8859
-      .decodingReplaceWith(".")
-      .onUnmappableCharacter(CodingErrorAction.REPLACE)
-      .onMalformedInput(CodingErrorAction.REPLACE)
-  }
+  implicit lazy val ASCII: Charset = Charset.forName("US-ASCII")
 
   implicit class ByteOps(b: Byte) {
     /**
@@ -33,15 +28,20 @@ trait Implicits {
       */
     def bitLength: Int = if(n == 0) 0 else Math.floor(Math.log(n) / Math.log(2)).toInt + 1
 
-    def bin(size: Int = 8): String = n.toBinaryString.reverse.padTo(size, "0").reverse.mkString
+    def bin: String = bin(JavaByte.SIZE)
+    def bin(size: Int): String = n.toBinaryString.reverse.padTo(size, "0").reverse.mkString
 
     def hex: String = n formatted "0x%02X"
   }
 
   implicit class ByteListOps(bs: List[Byte]) {
     def unsigned: List[Int] = bs map (_.unsigned)
-    def asString(implicit codec: Codec): String = {
-      val decoder = codec.decoder
+    def asString(implicit charset: Charset): String = {
+      val decoder = charset
+        .newDecoder
+        .replaceWith(".")
+        .onUnmappableCharacter(CodingErrorAction.REPLACE)
+        .onMalformedInput(CodingErrorAction.REPLACE)
       val buffer = java.nio.ByteBuffer.wrap(bs.toArray)
       decoder.decode(buffer).toString
     }
