@@ -38,6 +38,7 @@ object BitPacking {
       * @return an array of values
       */
     def drain(chunkSize: Int): Array[Int] = {
+      assert(chunkSize > 0)
       val chunkCount = size / chunkSize
       val values = new Array[Int](chunkCount)
 

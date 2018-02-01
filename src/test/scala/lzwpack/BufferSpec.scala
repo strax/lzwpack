@@ -4,7 +4,7 @@ import cats.Eq
 import cats.kernel.laws.discipline.MonoidTests
 import cats.tests.CatsSuite
 import BitPacking._
-import org.scalacheck.{Arbitrary, Gen}
+import org.scalacheck._
 
 class BufferSpec extends UnitSpec {
   describe("buffer()") {
@@ -51,6 +51,16 @@ class BufferSpec extends UnitSpec {
       val buf = buffer(b"00000011110000111110111010")
       val values = buf.drain(4)
       assert(values sameElements Array(0xa, 0xb, 0xf, 0, 0xf))
+    }
+
+    it("returns an empty array if the given bit size is larger than the buffer's size") {
+      assert(buffer(b"10").drain(4).isEmpty)
+    }
+
+    it("asserts that the bit size is positive") {
+      val buf = buffer(b"10")
+      assertThrows[AssertionError](buf.drain(0))
+      assertThrows[AssertionError](buf.drain(-1))
     }
   }
 }
