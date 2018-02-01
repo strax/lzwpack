@@ -45,6 +45,14 @@ class BufferSpec extends UnitSpec {
       assert(ba.size == 12)
     }
   }
+
+  describe("Buffer#drain") {
+    it("returns as much values with the given bit size as possible from the buffer") {
+      val buf = buffer(b"00000011110000111110111010")
+      val values = buf.drain(4)
+      assert(values sameElements Array(0xa, 0xb, 0xf, 0, 0xf))
+    }
+  }
 }
 
 class BufferLawTests extends CatsSuite {
