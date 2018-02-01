@@ -50,6 +50,6 @@ trait Implicits {
   implicit val byteListShow: Show[List[Byte]] = bs => bs.map(_ formatted "%02X").mkString(" ")
 
   implicit class StringOps(sc: StringContext) {
-    def b(): Int = Integer.parseUnsignedInt(sc.parts.mkString, 2)
+    def b(_args: Any*): Int = Integer.parseUnsignedInt(sc.parts.mkString, 2)
   }
 }
