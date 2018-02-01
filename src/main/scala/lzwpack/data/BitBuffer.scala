@@ -4,26 +4,26 @@ import lzwpack._
 import cats._
 import cats.implicits._
 
-case class Buffer private[data](data: Int, size: Int) {
+case class BitBuffer private[data](data: Int, size: Int) {
   def available = 8 - size
 
   /**
     * Reads n bits from input and returns a tuple of (read bits, remaining bits).
     */
-  def read(bits: Int): (Int, Buffer) = {
+  def read(bits: Int): (Int, BitBuffer) = {
     if (bits > size) throw new IndexOutOfBoundsException(s"Tried to read $bits bits from a buffer with $size bits")
     val mask = (1 << bits) - 1
     val read = data & mask
     val rest = data >>> bits
-    (read, Buffer(rest, size - bits))
+    (read, BitBuffer(rest, size - bits))
   }
 
   /**
     * Returns a new buffer that contains this buffer preceded by the other buffer.
     */
-  def prepend(other: Buffer): Buffer = {
+  def prepend(other: BitBuffer): BitBuffer = {
     val bb = other.data
-    Buffer((bb << size) ^ data, other.size + size)
+    BitBuffer((bb << size) ^ data, other.size + size)
   }
 
   /**
@@ -37,7 +37,7 @@ case class Buffer private[data](data: Int, size: Int) {
     val values = new Array[Int](chunkCount)
 
     @annotation.tailrec
-    def go(i: Int, buffer: Buffer): Unit = {
+    def go(i: Int, buffer: BitBuffer): Unit = {
       if (i < chunkCount) {
         buffer.read(chunkSize) match {
           case (value, rest) =>
@@ -54,20 +54,20 @@ case class Buffer private[data](data: Int, size: Int) {
 }
 
 trait BufferInstances {
-  implicit object BufferMonoid extends Monoid[Buffer] {
-    override def empty: Buffer = Buffer.empty
+  implicit object BufferMonoid extends Monoid[BitBuffer] {
+    override def empty: BitBuffer = BitBuffer.empty
 
-    override def combine(a: Buffer, b: Buffer): Buffer = b prepend a
+    override def combine(a: BitBuffer, b: BitBuffer): BitBuffer = b prepend a
   }
 
-  implicit object BufferShow extends Show[Buffer] {
-    override def show(buf: Buffer): String = show"${buf.data.bin(buf.size)} (n=${buf.size})"
+  implicit object BufferShow extends Show[BitBuffer] {
+    override def show(buf: BitBuffer): String = show"${buf.data.bin(buf.size)} (n=${buf.size})"
   }
 }
 
-object Buffer {
-  def apply(b: Byte): Buffer = Buffer(b.unsigned, 8)
-  def apply(data: Int): Buffer = Buffer(data, data.bitLength)
+object BitBuffer {
+  def apply(b: Byte): BitBuffer = BitBuffer(b.unsigned, 8)
+  def apply(data: Int): BitBuffer = BitBuffer(data, data.bitLength)
 
-  def empty: Buffer = Buffer(0, 0)
+  def empty: BitBuffer = BitBuffer(0, 0)
 }

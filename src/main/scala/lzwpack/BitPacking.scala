@@ -5,7 +5,7 @@ import cats._
 import cats.data._
 import cats.implicits._
 import cats.syntax._
-import lzwpack.data.Buffer
+import lzwpack.data.BitBuffer
 
 /**
   * Packs a stream of bits into a byte sequence so that a byte can contain multiple bit sequences.
@@ -20,7 +20,7 @@ object BitPacking {
     *
     * @return a {@see Segment} with an overflow buffer result
     */
-  def appendToByte(buffer: Buffer)(code: Code, codeSize: Int): Segment[Byte, Buffer] = {
+  def appendToByte(buffer: BitBuffer)(code: Code, codeSize: Int): Segment[Byte, BitBuffer] = {
     if (codeSize == 0) return Segment(buffer.data.toByte).asResult(buffer)
     // Put as many bits as possible to the byte in buffer
     val nextBuffer = ((code << buffer.size) ^ buffer.data) & 0xFF
@@ -32,10 +32,10 @@ object BitPacking {
       // Put the remaining bits from the input into the overflow buffer
       val overflow = code >>> insertedBits
       // First chunk is full, so emit it; start to accumulate with second byte.
-      Segment(nextBuffer.toByte).flatMapResult(_ => appendToByte(Buffer.empty)(overflow, overflowSize))
+      Segment(nextBuffer.toByte).flatMapResult(_ => appendToByte(BitBuffer.empty)(overflow, overflowSize))
     } else {
       // First chunk is possibly not full, so don't emit it and try to accumulate more
-      Segment.pure(Buffer(nextBuffer, buffer.size + insertedBits))
+      Segment.pure(BitBuffer(nextBuffer, buffer.size + insertedBits))
     }
   }
 
@@ -43,7 +43,7 @@ object BitPacking {
     * Returns a new {@see Pipe} that packs input tuples of code and its binary length in bits, across byte boundaries.
     */
   def pack[F[_]]: Pipe[F, (Code, Int), Byte] = {
-    in => in.scanSegments(Buffer.empty) {
+    in => in.scanSegments(BitBuffer.empty) {
       case (buffer, segment) =>
         segment.flatMapAccumulate(buffer) {
           case (buffer, (code, codeSize)) => appendToByte(buffer)(code, codeSize)
@@ -52,13 +52,13 @@ object BitPacking {
   }
 
   def unpack[F[_]](implicit alphabet: Alphabet[Byte]): Pipe[F, Byte, Code] = {
-    def go(stream: Stream[F, Byte], state: (Int, Buffer)): Pull[F, Code, Unit] = state match {
+    def go(stream: Stream[F, Byte], state: (Int, BitBuffer)): Pull[F, Code, Unit] = state match {
       case (counter, buf) =>
         val bytesToRead = ((counter.bitLength - buf.size) / 8) + 1
 
         stream.pull.unconsN(bytesToRead).flatMap {
           case Some((bytes, rest)) =>
-            val (_, product) = bytes.fold(buf)((acc, b) => acc prepend Buffer(b)).force.run
+            val (_, product) = bytes.fold(buf)((acc, b) => acc prepend BitBuffer(b)).force.run
             val (code, newBuffer) = product.read(counter.bitLength)
             System.err.println(show"[unpack]\t${counter.hex}: buffer ${product}\t\tread ${code.bin(counter.bitLength)}\t\temit ${code.hex}\t\tbuffer ${newBuffer}")
             Pull.output1(code) >> go(rest, (counter + 1, newBuffer))
@@ -73,6 +73,6 @@ object BitPacking {
             Pull.outputChunk(Chunk.array(values)) >> Pull.done
         }
     }
-    in => go(in, (alphabet.size + 2, Buffer.empty)).stream
+    in => go(in, (alphabet.size + 2, BitBuffer.empty)).stream
   }
 }
