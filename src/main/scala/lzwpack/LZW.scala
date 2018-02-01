@@ -50,6 +50,7 @@ object LZW {
     }
 
     if (code == 0) return (CompressionState(state.dict, Bytes.empty), None)
+    System.err.println(show"[infer]\t\tread ${code.hex}")
     val block = state.dict.reverseGet(code).get
     if (!state.buffered.isEmpty) {
       // println(s"Adding ${state.buffered ++ block.take(1)} to dictionary")

@@ -16,6 +16,9 @@ object Alphabet {
   // Instead of bytes (8-bit signed integers), we represent byte values by their unsigned int (32-bit) representation.
   implicit val AllBytes: Alphabet[Byte] = Alphabet(1 to 255).map(_.toByte)
 
+  // This alphabet is compatible with compress(1) tool as we reserve a code outside the dictionary
+  implicit val Compress: Alphabet[Byte] = AllBytes :+ (0: Byte)
+
   /**
     * Extension methods for {@see Alphabet}.
     */

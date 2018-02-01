@@ -9,8 +9,9 @@ object Application {
   import BitPacking._
 
   def main(args: Array[String]): Unit = {
+    import Alphabet.Compress
+
     implicit val F = implicitly[Sync[IO]]
-    implicit val alphabet: Alphabet[Byte] = Alphabet.AllBytes
 
 //    fs2.io.file.readAll(Paths.get("input.txt"), 4028)
 //      .through(compress(Alphabet.AllBytes))
