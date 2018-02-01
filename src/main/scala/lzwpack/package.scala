@@ -8,6 +8,13 @@ package object lzwpack extends Implicits {
     */
   type Code = Int
 
+  type Bytes = List[Byte]
+
+  object Bytes {
+    def apply(b: Byte): Bytes = List(b)
+    def empty: Bytes = List()
+  }
+
   /**
     * An alphabet for a given input S is the set of possible members an input sequence can be composed from.
     *

@@ -9,12 +9,6 @@ object LZW {
   import cats._
   import cats.implicits._
 
-  type Bytes = List[Byte]
-  object Bytes {
-    def apply(b: Byte): Bytes = List(b)
-    def empty: Bytes = List()
-  }
-
   type Output = Code
 
   case class CompressionState(dict: Dict[Bytes], buffered: Bytes)
