@@ -3,8 +3,8 @@ package lzwpack
 import cats.effect.IO
 import fs2._
 
-class BitPackingSpec extends UnitSpec {
-  import BitPacking._
+class FormatSpec extends UnitSpec {
+  import Format._
 
   describe("pack") {
     it("packs numbers efficiently to bytes") {

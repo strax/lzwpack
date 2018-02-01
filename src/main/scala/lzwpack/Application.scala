@@ -6,7 +6,7 @@ import cats.effect.{IO, Sync}
 
 object Application {
   import LZW._
-  import BitPacking._
+  import Format._
 
   def main(args: Array[String]): Unit = {
     import Alphabet.Compress
