@@ -10,7 +10,7 @@ import lzwpack.data.BitBuffer
 /**
   * Packs a stream of bits into a byte sequence so that a byte can contain multiple bit sequences.
   */
-object Format {
+object Format extends Debugging {
 
 
   /**
@@ -52,22 +52,25 @@ object Format {
   }
 
   def unpack[F[_]](implicit alphabet: Alphabet[Byte]): Pipe[F, Byte, Code] = {
+    implicit val tag = Tag("unpack")
+
     def go(stream: Stream[F, Byte], state: (Int, BitBuffer)): Pull[F, Code, Unit] = state match {
       case (counter, buf) =>
-        val bytesToRead = ((counter.bitLength - buf.size) / 8) + 1
+        val bitLength = counter.bitLength
+        val bytesToRead = ((bitLength - buf.size) / 8) + 1
 
         stream.pull.unconsN(bytesToRead).flatMap {
           case Some((bytes, rest)) =>
             val (_, product) = bytes.fold(buf)((acc, b) => acc prepend BitBuffer(b)).force.run
-            val (code, newBuffer) = product.read(counter.bitLength)
-            System.err.println(show"[unpack]\t${counter.hex}: buffer ${product}\t\tread ${code.bin(counter.bitLength)}\t\temit ${code.hex}\t\tbuffer ${newBuffer}")
+            val (code, newBuffer) = product.read(bitLength)
+            debug(show"${counter.hex}: buffer $product", s"read ${code.bin(bitLength)}", s"emit ${code.hex}", show"buffer $newBuffer")
             Pull.output1(code) >> go(rest, (counter + 1, newBuffer))
           case None =>
-            val values = buf.drain(counter.bitLength)
+            val values = buf.drain(bitLength)
             for {
               value <- values
             } yield {
-              System.err.println(show"[unpack]\tread EOF\t\temit ${value.hex}")
+              debug("read EOF", s"emit ${value.hex}")
             }
 
             Pull.outputChunk(Chunk.array(values)) >> Pull.done

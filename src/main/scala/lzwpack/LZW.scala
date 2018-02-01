@@ -5,7 +5,7 @@ import java.nio.charset.Charset
 import fs2._
 
 
-object LZW {
+object LZW extends Debugging {
   import cats._
   import cats.implicits._
 
@@ -20,44 +20,53 @@ object LZW {
     * @todo Refactor: can remove Option from output type?
     */
   private def emit(state: CompressionState, head: Byte): (CompressionState, Option[List[Code]]) = {
+    implicit val tag = Tag("emit")
+
     val input = state.buffered :+ head
     val dict = state.dict
 
-    def debug(indexed: Option[Int], emitted: Int): Unit = {
-      val msg = show"[emit]\t\tread $input  ${input.asString} \t\t index ${indexed.fold("<none>")(_.hex)} \t\t emit ${emitted.hex} ${emitted.bin(dict.headIndex.bitLength)} (${dict.headIndex.bitLength} bits)"
-      System.err.println(msg)
+    def debugRound(indexed: Option[Int], emitted: Int): Unit = {
+      this.debug(
+        show"read $input ${input.asString}",
+        "index " + indexed.fold("<none>")(_.hex),
+        show"emit ${emitted.hex} ${emitted.bin(dict.headIndex.bitLength)} (${dict.headIndex.bitLength} bits)"
+      )
     }
 
     if (head == 0) {
       val code = dict.get(state.buffered)
-      debug(None, code)
-      System.err.println(s"[emit]\t\temit ${0.hex}  <EOF>")
+      debugRound(None, code)
+      this.debug(s"emit ${0.hex}  <EOF>")
       return (CompressionState(dict, Bytes.empty), Some(List(code, 0)))
     }
     if (dict.contains(input)) {
       (CompressionState(dict, input), None)
     } else {
       val code = dict.get(state.buffered)
-      debug(Some(dict.nextIndex), code)
+      debugRound(Some(dict.nextIndex), code)
       (CompressionState(dict.add(input), Bytes(head)), Some(List(code)))
     }
   }
 
   private def infer(state: CompressionState, code: Code): (CompressionState, Option[Bytes]) = {
-    def debug(indexed: Option[Bytes], emit: Bytes): Unit = {
-      val msg = show"[infer]\t\tread ${code.hex}\t\temit $emit  ${emit.asString}\t\tindex ${indexed.fold("<none>")(bs => show"${state.dict.nextIndex.hex}  ${bs.asString}")}"
-      System.err.println(msg)
+    implicit val tag = Tag("infer")
+
+    def debugRound(indexed: Option[Bytes], emit: Bytes): Unit = {
+      debug(
+        s"read ${code.hex}",
+        show"emit $emit  ${emit.asString}",
+        "index " + indexed.fold("<none>")(bs => show"${state.dict.nextIndex.hex}  ${bs.asString}")
+      )
     }
 
     if (code == 0) return (CompressionState(state.dict, Bytes.empty), None)
-    System.err.println(show"[infer]\t\tread ${code.hex}")
     val block = state.dict.reverseGet(code).get
     if (!state.buffered.isEmpty) {
       // println(s"Adding ${state.buffered ++ block.take(1)} to dictionary")
-      debug(Some(state.buffered ++ block.take(1)), block)
+      debugRound(Some(state.buffered ++ block.take(1)), block)
       (CompressionState(state.dict.add(state.buffered ++ block.take(1)), block), Some(block))
     } else {
-      debug(None, block)
+      debugRound(None, block)
       (CompressionState(state.dict, block), Some(block))
     }
   }
@@ -65,6 +74,8 @@ object LZW {
   type CodecF[I, O] = (CompressionState, I) => (CompressionState, Option[List[O]])
 
   private def codec[F[_], I, O](op: String = "codec")(f: => CodecF[I, O])(implicit alphabet: Alphabet[Byte], N: Numeric[I]): Pipe[F, I, O] = {
+    implicit val tag = Tag("codec")
+
     def go(stream: Stream[F, I], state: CompressionState): Pull[F, O, Unit] = {
       stream.pull.uncons1.flatMap {
         case Some((head, tail)) =>
@@ -83,9 +94,9 @@ object LZW {
     }
     in => {
       val dict = Dict.init(alphabet.pure[List])
-      System.err.println(show"mode: $op")
-      System.err.println(show"using alphabet ${alphabet.head.hex} ${alphabet.head.bin} – ${alphabet.last.unsigned.hex} ${alphabet.last.unsigned.bin} (${alphabet.size} elements)")
-      System.err.println(show"code index at ${dict.headIndex.hex}")
+      debug(s"mode: $op")
+      debug(show"using alphabet ${alphabet.head.hex} ${alphabet.head.bin} – ${alphabet.last.unsigned.hex} ${alphabet.last.unsigned.bin} (${alphabet.size} elements)")
+      debug(show"code index at ${dict.headIndex.hex}")
       go(in, CompressionState(dict, Bytes.empty)).stream
     }
   }
