@@ -4,6 +4,8 @@ import lzwpack._
 import cats._
 import cats.implicits._
 
+import scala.util.Try
+
 case class BitBuffer(private[data] val data: Int, size: Int) {
   assert(size >= 0)
 
@@ -14,6 +16,8 @@ case class BitBuffer(private[data] val data: Int, size: Int) {
     if (bits > size) throw new IndexOutOfBoundsException(s"Tried to read $bits bits from a buffer with $size bits")
     (drop(bits), take(bits).toInt)
   }
+
+  def readOption(bits: Int): Option[(BitBuffer, Int)] = Try(read(bits)).toOption
 
   def readByte: (BitBuffer, Byte) = read(8).map(_.toByte)
 
