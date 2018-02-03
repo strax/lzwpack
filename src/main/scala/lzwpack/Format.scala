@@ -37,15 +37,13 @@ object Format extends Debugging {
 
   def unpack[F[_]](implicit alphabet: Alphabet[Byte]): Pipe[F, Byte, Code] = stream => {
     stream.map(BitBuffer(_)).scanSegments(UnpackState(BitBuffer.empty, alphabet.size + 2)) { case (state, segment) =>
-        def drain(acc: Segment[Code, UnpackState]): Segment[Code, UnpackState] = {
-          acc flatMapResult { state =>
-            state.readCode match {
-              case Some((nextState, code)) => drain(Segment(code).asResult(nextState))
-              case None => Segment.pure(state)
-            }
+        def drain(state: UnpackState): Segment[Code, UnpackState] = {
+          state.readCode match {
+            case Some((nextState, code)) => Segment(code).append(drain(nextState)).mapResult(_._2)
+            case None => Segment.pure(state)
           }
         }
-        combinedBuffer(segment)(state.buffer) flatMapResult (bb => drain(Segment.pure(UnpackState(bb, state.counter))))
+        combinedBuffer(segment)(state.buffer) flatMapResult (bb => drain(UnpackState(bb, state.counter)))
     }
   }
 }
