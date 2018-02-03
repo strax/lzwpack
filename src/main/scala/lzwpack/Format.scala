@@ -45,6 +45,7 @@ object Format extends Debugging {
     stream.map(BitBuffer(_)).scanSegments(UnpackState(BitBuffer.empty, firstIndex)) { case (state, segment) =>
         def drain(state: UnpackState): Segment[Code, UnpackState] =
           unpackSegment(state).flatMapResult(_.fold(Segment.pure[Code, UnpackState](state))(drain))
+
         combinedBuffer(segment)(state.buffer) flatMapResult (bb => drain(state.set(bb)))
     }
   }
