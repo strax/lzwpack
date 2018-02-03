@@ -2,6 +2,7 @@ package lzwpack
 
 import fs2.{Chunk, Pipe, Pull, Segment, Stream}
 import cats.implicits._
+import cats.kernel.Monoid
 import lzwpack.data.BitBuffer
 
 /**
@@ -12,13 +13,11 @@ object Format extends Debugging {
     * Returns a new {@see Pipe} that packs input tuples of code and its binary length in bits, across byte boundaries.
     */
   def pack[F[_]]: Pipe[F, (Code, Int), Byte] = {
-    in => in.map(BitBuffer.tupled).scanSegments(BitBuffer.empty) {
-      case (buffer, segment) =>
-        segment.flatMapAccumulate(buffer) {
-          case (a, b) => a ++ b match {
-            case (buffer_, bytes) => Segment.array(bytes.map(_.toByte)).asResult(buffer_)
-          }
-        } mapResult(_._2)
+    in => in.scanSegments(BitBuffer.empty) { case (buffer, segment) =>
+      segment.map(BitBuffer.tupled).fold(buffer)(_ ++ _) flatMapResult { case (_, buffer_) =>
+        val (rest, bytes) = buffer_.drain(8)
+        Segment.array(bytes.map(_.toByte)).asResult(rest)
+      }
     }
   }
 
