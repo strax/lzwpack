@@ -16,9 +16,9 @@ object Format extends Debugging {
     * Returns a new {@see Pipe} that packs input tuples of code and its binary length in bits, across byte boundaries.
     */
   def pack[F[_]]: Pipe[F, (Code, Int), Byte] = stream => {
-    stream.scanSegments(BitBuffer.empty) { case (buffer, segment) =>
-      segment.map(BitBuffer.tupled).fold(buffer)(_ ++ _) flatMapResult { case (_, buffer_) =>
-        val (rest, bytes) = buffer_.drain(8)
+    stream.map(BitBuffer.tupled).scanSegments(BitBuffer.empty) { case (buffer, segment) =>
+      combinedBuffer(segment)(buffer) flatMapResult { buffer =>
+        val (rest, bytes) = buffer.drain(8)
         Segment.array(bytes.map(_.toByte)).asResult(rest)
       }
     }
@@ -26,24 +26,26 @@ object Format extends Debugging {
 
   case class UnpackState(buffer: BitBuffer, counter: Int) {
     def codeSize: Int = counter.bitLength
-    def run(f: UnpackState => BitBuffer): UnpackState = UnpackState(f(this), counter)
-    def readCode: Option[(UnpackState, Code)] = buffer.readOption(codeSize).map {
-      case (bb, code) => (UnpackState(bb, counter + 1), code)
-    }
+    def set(bb: BitBuffer) = UnpackState(bb, counter)
+  }
+
+  def unpack1(state: UnpackState): Option[(UnpackState, Code)] = state.buffer.readOption(state.codeSize).map {
+    case (bb, code) => (UnpackState(bb, state.counter + 1), code)
+  }
+
+  def unpackSegment(state: UnpackState): Segment[Code, Option[UnpackState]] = unpack1(state).fold(Segment.pure[Code, Option[UnpackState]](None)) {
+    case (state_, code) => Segment(code).asResult(Some(state_))
   }
 
   def combinedBuffer(segment: Segment[BitBuffer, _])(init: BitBuffer = BitBuffer.empty): Segment[Nothing, BitBuffer] =
     segment.fold(init)(_ ++ _).mapResult(_._2)
 
   def unpack[F[_]](implicit alphabet: Alphabet[Byte]): Pipe[F, Byte, Code] = stream => {
-    stream.map(BitBuffer(_)).scanSegments(UnpackState(BitBuffer.empty, alphabet.size + 2)) { case (state, segment) =>
-        def drain(state: UnpackState): Segment[Code, UnpackState] = {
-          state.readCode match {
-            case Some((nextState, code)) => Segment(code).append(drain(nextState)).mapResult(_._2)
-            case None => Segment.pure(state)
-          }
-        }
-        combinedBuffer(segment)(state.buffer) flatMapResult (bb => drain(UnpackState(bb, state.counter)))
+    val firstIndex = alphabet.size + 2
+    stream.map(BitBuffer(_)).scanSegments(UnpackState(BitBuffer.empty, firstIndex)) { case (state, segment) =>
+        def drain(state: UnpackState): Segment[Code, UnpackState] =
+          unpackSegment(state).flatMapResult(_.fold(Segment.pure[Code, UnpackState](state))(drain))
+        combinedBuffer(segment)(state.buffer) flatMapResult (bb => drain(state.set(bb)))
     }
   }
 }
