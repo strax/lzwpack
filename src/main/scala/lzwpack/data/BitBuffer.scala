@@ -4,24 +4,30 @@ import lzwpack._
 import cats._
 import cats.implicits._
 
-case class BitBuffer private[data](data: Int, size: Int) {
-  def available = 8 - size
+case class BitBuffer(private[data] val data: Int, size: Int) {
+  assert(size >= 0)
 
   /**
     * Reads n bits from input and returns a tuple of (read bits, remaining bits).
     */
-  def read(bits: Int): (Int, BitBuffer) = {
+  def read(bits: Int): (BitBuffer, Int) = {
     if (bits > size) throw new IndexOutOfBoundsException(s"Tried to read $bits bits from a buffer with $size bits")
-    val mask = (1 << bits) - 1
-    val read = data & mask
-    val rest = data >>> bits
-    (read, BitBuffer(rest, size - bits))
+    (drop(bits), take(bits).toInt)
   }
 
   def drop(n: Int): BitBuffer = {
     val tail = data >>> n
     BitBuffer(tail, Math.max(size - n, 0))
   }
+
+  def take(n: Int): BitBuffer = {
+    val mask = (1 << n) - 1
+    val head = data & mask
+    BitBuffer(head, Math.min(size, n))
+  }
+
+  def toInt: Int = data
+  def toByte: Byte = data.toByte
 
   /**
     * Returns a new buffer that contains this buffer preceded by the other buffer.
@@ -45,7 +51,7 @@ case class BitBuffer private[data](data: Int, size: Int) {
     def go(i: Int, buffer: BitBuffer): Unit = {
       if (i < chunkCount) {
         buffer.read(chunkSize) match {
-          case (value, rest) =>
+          case (rest, value) =>
             values(i) = value
             if (rest.data > 0) go(i + 1, rest)
           case _ =>
@@ -61,7 +67,6 @@ case class BitBuffer private[data](data: Int, size: Int) {
 trait BufferInstances {
   implicit object BufferMonoid extends Monoid[BitBuffer] {
     override def empty: BitBuffer = BitBuffer.empty
-
     override def combine(a: BitBuffer, b: BitBuffer): BitBuffer = a append b
   }
 
@@ -70,9 +75,11 @@ trait BufferInstances {
   }
 }
 
-object BitBuffer extends ((Int, Int) => BitBuffer) {
-  def apply(b: Byte): BitBuffer = BitBuffer(b.unsigned, 8)
-  def apply(data: Int): BitBuffer = BitBuffer(data, data.bitLength)
+object BitBuffer {
+  @inline def apply(b: Byte): BitBuffer = BitBuffer(b.unsigned, 8)
+  @inline def apply(data: Int): BitBuffer = BitBuffer(data, data.bitLength)
+
+  def tupled(t: (Int, Int)): BitBuffer = BitBuffer(t._1, t._2)
 
   def empty: BitBuffer = BitBuffer(0, 0)
 }

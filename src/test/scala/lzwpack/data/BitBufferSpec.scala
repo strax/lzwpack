@@ -21,11 +21,11 @@ class BitBufferSpec extends UnitSpec {
     val buf = BitBuffer(0xfef) // 0b111111101111, 12 bits
 
     it("returns an unsigned int that contains the read bits") {
-      assert(buf.read(4)._1 == 0xf)
+      assert(buf.read(4)._2 == 0xf)
     }
 
     it("returns a new buffer with the remaining bits") {
-      val remainder = buf.read(4)._2
+      val remainder = buf.read(4)._1
       assert(remainder.size == 12 - 4)
       assert(remainder.data == (buf.data >> 4))
     }
@@ -49,8 +49,13 @@ class BitBufferSpec extends UnitSpec {
       assert(values sameElements Array(0xa, 0xb, 0xf, 0, 0xf))
     }
 
-    it("returns an empty array if the given bit size is larger than the buffer's size") {
-      assert(BitBuffer(b"10").drain(4)._2.isEmpty)
+    it("extracts no elements if the given bit size is larger than the buffer's size") {
+      val buf = BitBuffer(b"10")
+      inside(buf.drain(4)) {
+        case (buf_, values) =>
+          assert(buf == buf_)
+          assert(values.isEmpty)
+      }
     }
 
     it("asserts that the bit size is positive") {

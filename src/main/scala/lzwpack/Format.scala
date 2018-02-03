@@ -33,7 +33,7 @@ object Format extends Debugging {
         stream.pull.unconsN(bytesToRead).flatMap {
           case Some((bytes, rest)) =>
             val (_, product) = bytes.fold(buf)((acc, b) => acc append BitBuffer(b)).force.run
-            val (code, newBuffer) = product.read(bitLength)
+            val (newBuffer, code) = product.read(bitLength)
             debug(show"${counter.hex}: buffer $product", s"read ${code.bin(bitLength)}", s"emit ${code.hex}", show"buffer $newBuffer")
             Pull.output1(code) >> go(rest, (counter + 1, newBuffer))
           case None =>
