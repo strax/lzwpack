@@ -26,34 +26,26 @@ object Format extends Debugging {
 
   case class UnpackState(buffer: BitBuffer, counter: Int) {
     def codeSize: Int = counter.bitLength
-    def map(f: BitBuffer => BitBuffer): UnpackState = UnpackState(f(buffer), counter)
+    def run(f: UnpackState => BitBuffer): UnpackState = UnpackState(f(this), counter)
     def readCode: Option[(UnpackState, Code)] = buffer.readOption(codeSize).map {
       case (bb, code) => (UnpackState(bb, counter + 1), code)
     }
   }
 
-  def combinedBuffer(segment: Segment[BitBuffer, _])(init: BitBuffer = BitBuffer.empty): Segment[BitBuffer, Unit] =
-    segment.fold(init)(_ ++ _) flatMapResult { case (_, bb) => Segment(bb) }
+  def combinedBuffer(segment: Segment[BitBuffer, _])(init: BitBuffer = BitBuffer.empty): Segment[Nothing, BitBuffer] =
+    segment.fold(init)(_ ++ _).mapResult(_._2)
 
-  def unpack[F[_]](implicit alphabet: Alphabet[Byte]): Pipe[F, Byte, Code] = {
-    implicit val tag = Tag("unpack")
-
-    def go(stream: Stream[F, Byte], state: (Int, BitBuffer)): Pull[F, Code, Unit] = state match {
-      case (counter, buf) =>
-        val bitLength = counter.bitLength
-        val bytesToRead = ((bitLength - buf.size) / 8) + 1
-
-        stream.pull.unconsN(bytesToRead).flatMap {
-          case Some((bytes, rest)) =>
-            val (_, product) = bytes.map(BitBuffer(_)).fold(buf)(_ ++ _).force.run
-            val (newBuffer, code) = product.read(bitLength)
-            debug(show"${counter.hex}: buffer $product", s"read ${code.bin(bitLength)}", s"emit ${code.hex}", show"buffer $newBuffer")
-            Pull.output1(code) >> go(rest, (counter + 1, newBuffer))
-          case None =>
-            val (_, values) = buf.drain(bitLength)
-            Pull.output(Segment.array(values))
+  def unpack[F[_]](implicit alphabet: Alphabet[Byte]): Pipe[F, Byte, Code] = stream => {
+    stream.map(BitBuffer(_)).scanSegments(UnpackState(BitBuffer.empty, alphabet.size + 2)) { case (state, segment) =>
+        def drain(acc: Segment[Code, UnpackState]): Segment[Code, UnpackState] = {
+          acc flatMapResult { state =>
+            state.readCode match {
+              case Some((nextState, code)) => drain(Segment(code).asResult(nextState))
+              case None => Segment.pure(state)
+            }
+          }
         }
+        combinedBuffer(segment)(state.buffer) flatMapResult (bb => drain(Segment.pure(UnpackState(bb, state.counter))))
     }
-    in => go(in, (alphabet.size + 2, BitBuffer.empty)).stream
   }
 }
