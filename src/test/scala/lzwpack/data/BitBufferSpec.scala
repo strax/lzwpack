@@ -31,26 +31,26 @@ class BitBufferSpec extends UnitSpec {
     }
   }
 
-  describe("prepend") {
+  describe("append") {
     val a = BitBuffer(b"10101010")
     val b = BitBuffer(b"1111")
 
-    it("prepends the given bytes to the receiver") {
-      val ba = a.prepend(b)
-      assert(ba.data == b"111110101010")
-      assert(ba.size == 12)
+    it("append the given bytes to the receiver") {
+      val ab = a.append(b)
+      assert(ab.data == b"111110101010")
+      assert(ab.size == 12)
     }
   }
 
   describe("drain") {
     it("returns as much values with the given bit size as possible from the buffer") {
       val buf = BitBuffer(b"00000011110000111110111010")
-      val values = buf.drain(4)
+      val (_, values) = buf.drain(4)
       assert(values sameElements Array(0xa, 0xb, 0xf, 0, 0xf))
     }
 
     it("returns an empty array if the given bit size is larger than the buffer's size") {
-      assert(BitBuffer(b"10").drain(4).isEmpty)
+      assert(BitBuffer(b"10").drain(4)._2.isEmpty)
     }
 
     it("asserts that the bit size is positive") {

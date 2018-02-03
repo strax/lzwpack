@@ -6,7 +6,6 @@ scalaVersion := "2.12.4"
 
 scalacOptions += "-Ypartial-unification"
 scalacOptions += "-language:higherKinds"
-scalacOptions += "-Xlog-implicits"
 
 resolvers += Resolver.sonatypeRepo("releases")
 

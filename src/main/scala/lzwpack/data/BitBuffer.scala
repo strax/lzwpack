@@ -18,10 +18,15 @@ case class BitBuffer private[data](data: Int, size: Int) {
     (read, BitBuffer(rest, size - bits))
   }
 
+  def drop(n: Int): BitBuffer = {
+    val tail = data >>> n
+    BitBuffer(tail, Math.max(size - n, 0))
+  }
+
   /**
     * Returns a new buffer that contains this buffer preceded by the other buffer.
     */
-  def prepend(other: BitBuffer): BitBuffer = {
+  def append(other: BitBuffer): BitBuffer = {
     val bb = other.data
     BitBuffer((bb << size) ^ data, other.size + size)
   }
@@ -31,7 +36,7 @@ case class BitBuffer private[data](data: Int, size: Int) {
     * @param chunkSize the size of each read value in bytes
     * @return an array of values
     */
-  def drain(chunkSize: Int): Array[Int] = {
+  def drain(chunkSize: Int): (BitBuffer, Array[Int]) = {
     assert(chunkSize > 0)
     val chunkCount = size / chunkSize
     val values = new Array[Int](chunkCount)
@@ -49,7 +54,7 @@ case class BitBuffer private[data](data: Int, size: Int) {
     }
 
     go(0, this)
-    values
+    (drop(chunkCount * chunkSize), values)
   }
 }
 
@@ -57,7 +62,7 @@ trait BufferInstances {
   implicit object BufferMonoid extends Monoid[BitBuffer] {
     override def empty: BitBuffer = BitBuffer.empty
 
-    override def combine(a: BitBuffer, b: BitBuffer): BitBuffer = b prepend a
+    override def combine(a: BitBuffer, b: BitBuffer): BitBuffer = a append b
   }
 
   implicit object BufferShow extends Show[BitBuffer] {
@@ -65,7 +70,7 @@ trait BufferInstances {
   }
 }
 
-object BitBuffer {
+object BitBuffer extends ((Int, Int) => BitBuffer) {
   def apply(b: Byte): BitBuffer = BitBuffer(b.unsigned, 8)
   def apply(data: Int): BitBuffer = BitBuffer(data, data.bitLength)
 
