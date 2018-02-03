@@ -15,10 +15,10 @@ object Format extends Debugging {
     in => in.map(BitBuffer.tupled).scanSegments(BitBuffer.empty) {
       case (buffer, segment) =>
         segment.flatMapAccumulate(buffer) {
-          case (a, b) => (a |+| b).drain(8) match {
+          case (a, b) => a ++ b match {
             case (buffer_, bytes) => Segment.array(bytes.map(_.toByte)).asResult(buffer_)
           }
-        } mapResult (_._2)
+        } mapResult(_._2)
     }
   }
 

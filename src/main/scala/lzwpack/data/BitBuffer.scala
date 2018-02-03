@@ -15,6 +15,8 @@ case class BitBuffer(private[data] val data: Int, size: Int) {
     (drop(bits), take(bits).toInt)
   }
 
+  def readByte: (BitBuffer, Byte) = read(8).map(_.toByte)
+
   def drop(n: Int): BitBuffer = {
     val tail = data >>> n
     BitBuffer(tail, Math.max(size - n, 0))
@@ -36,6 +38,8 @@ case class BitBuffer(private[data] val data: Int, size: Int) {
     val bb = other.data
     BitBuffer((bb << size) ^ data, other.size + size)
   }
+
+  def ++(other: BitBuffer): BitBuffer = this append other
 
   /**
     * Extracts as many values from this buffer as possible. Trailing zero-filled chunks are discarded.
