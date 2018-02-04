@@ -30,7 +30,7 @@ case class Dict[A](entries: Map[A, Code], headIndex: Int) {
     */
   def get(a: A): Code = entries(a)
 
-  def reverseGet(code: Code): Option[A] = entries.find {
+  def findKey(code: Code): Option[A] = entries.find {
     case (_, other) => code == other
   }.map(_._1)
 

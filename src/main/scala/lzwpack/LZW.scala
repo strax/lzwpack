@@ -3,6 +3,7 @@ package lzwpack
 import java.nio.charset.Charset
 
 import fs2._
+import lzwpack.data.BitBuffer
 
 
 object LZW extends Debugging {
@@ -13,101 +14,67 @@ object LZW extends Debugging {
 
   case class CompressionState(dict: Dict[Bytes], buffered: Bytes)
 
+  private def makeBitBuffer(code: Code, dict: Dict[_]) = BitBuffer(code, dict.nextIndex.bitLength)
+
   /**
     * Processes the given block (given as head and tail) and returns a tuple of a potentially changed
     * dictionary and an Option indicating whether to emit a code to the output.
     *
     * @todo Refactor: can remove Option from output type?
     */
-  private def emit(state: CompressionState, head: Byte): (CompressionState, Option[List[Code]]) = {
-    implicit val tag = Tag("emit")
-
-    val input = state.buffered :+ head
+  private def emit(state: CompressionState, head: Option[Byte]): (CompressionState, Option[BitBuffer]) = {
     val dict = state.dict
 
-    def debugRound(indexed: Option[Int], emitted: Int): Unit = {
-      this.debug(
-        show"read $input ${input.asString}",
-        "index " + indexed.fold("<none>")(_.hex),
-        show"emit ${emitted.hex} ${emitted.bin(dict.headIndex.bitLength)} (${dict.headIndex.bitLength} bits)"
-      )
-    }
-
-    if (head == 0) {
-      val code = dict.get(state.buffered)
-      debugRound(None, code)
-      this.debug(s"emit ${0.hex}  <EOF>")
-      return (CompressionState(dict, Bytes.empty), Some(List(code, 0)))
-    }
-    if (dict.contains(input)) {
-      (CompressionState(dict, input), None)
-    } else {
-      val code = dict.get(state.buffered)
-      debugRound(Some(dict.nextIndex), code)
-      (CompressionState(dict.add(input), Bytes(head)), Some(List(code)))
+    head match {
+      case None =>
+        val code = dict.get(state.buffered)
+        (CompressionState(dict, Bytes.empty), Some(makeBitBuffer(code, dict)))
+      case Some(byte) if dict.contains(state.buffered :+ byte) =>
+        (CompressionState(dict, state.buffered :+ byte), None)
+      case Some(byte) =>
+        val code = dict.get(state.buffered)
+        (CompressionState(dict.add(state.buffered :+ byte), Bytes(byte)), Some(makeBitBuffer(code, dict)))
     }
   }
 
-  private def infer(state: CompressionState, code: Code): (CompressionState, Option[Bytes]) = {
-    implicit val tag = Tag("infer")
-
-    def debugRound(indexed: Option[Bytes], emit: Bytes): Unit = {
-      debug(
-        s"read ${code.hex}",
-        show"emit $emit  ${emit.asString}",
-        "index " + indexed.fold("<none>")(bs => show"${state.dict.nextIndex.hex}  ${bs.asString}")
-      )
-    }
-
-    if (code == 0) return (CompressionState(state.dict, Bytes.empty), None)
-    val block = state.dict.reverseGet(code).get
-    if (!state.buffered.isEmpty) {
-      // println(s"Adding ${state.buffered ++ block.take(1)} to dictionary")
-      debugRound(Some(state.buffered ++ block.take(1)), block)
-      (CompressionState(state.dict.add(state.buffered ++ block.take(1)), block), Some(block))
-    } else {
-      debugRound(None, block)
-      (CompressionState(state.dict, block), Some(block))
-    }
+  private def infer(state: CompressionState, code: Option[Code]): (CompressionState, Option[Bytes]) = code match {
+    case None => (CompressionState(state.dict, Bytes.empty), None)
+    case Some(code) =>
+      val block = state.dict.findKey(code).get
+      if (!state.buffered.isEmpty) {
+        // New dictionary entry is conjecture + first byte of the current key
+        (CompressionState(state.dict.add(state.buffered ++ block.take(1)), block), Some(block))
+      } else {
+        (CompressionState(state.dict, block), Some(block))
+      }
   }
 
-  type CodecF[I, O] = (CompressionState, I) => (CompressionState, Option[List[O]])
+  type CodecF[I, O] = (CompressionState, Option[I]) => (CompressionState, Option[O])
 
-  private def codec[F[_], I, O](op: String = "codec")(f: => CodecF[I, O])(implicit alphabet: Alphabet[Byte], N: Numeric[I]): Pipe[F, I, O] = {
-    implicit val tag = Tag("codec")
-
+  private def codec[F[_], I, O](f: => CodecF[I, O])(implicit alphabet: Alphabet[Byte]): Pipe[F, I, O] = {
     def go(stream: Stream[F, I], state: CompressionState): Pull[F, O, Unit] = {
       stream.pull.uncons1.flatMap {
         case Some((head, tail)) =>
-          f(state, head) match {
+          f(state, Some(head)) match {
             case (s, Some(output)) =>
-              Pull.output(Segment.seq(output)) >> go(tail, s)
+              Pull.output(Segment(output)) >> go(tail, s)
             case (s, None) =>
-              Pull.done >> go(tail, s)
+              go(tail, s)
           }
         case None =>
-          f(state, N.zero)._2.fold(Pull.done.covaryOutput[O])(output => {
-            // println(show"Compression ending, final block ${S.show(output)}")
-            Pull.output(Segment.seq(output))
+          f(state, None)._2.fold(Pull.done.covaryOutput[O])(output => {
+            Pull.output1(output)
           })
       }
     }
     in => {
       val dict = Dict.init(alphabet.pure[List])
-      debug(s"mode: $op")
-      debug(show"using alphabet ${alphabet.head.hex} ${alphabet.head.bin} – ${alphabet.last.unsigned.hex} ${alphabet.last.unsigned.bin} (${alphabet.size} elements)")
-      debug(show"code index at ${dict.headIndex.hex}")
       go(in, CompressionState(dict, Bytes.empty)).stream
     }
   }
 
-  private def makeOutput(s: (CompressionState, Option[List[Int]])) = s match {
-    case (state, Some(emits)) => (state, Some(emits.map((_, state.dict.codeSize))))
-    case (state, None) => (state, None)
-  }
+  def flatten[F[_], O](s: Stream[F, Seq[O]]) = s.flatMap(bs => Stream.emits(bs))
 
-  def compress[F[_]](implicit alphabet: Alphabet[Byte]) = codec[F, Byte, (Code, Int)](op = "compress") {
-    case (state, input) => makeOutput(emit(state, input))
-  }
-  def decompress[F[_]](implicit alphabet: Alphabet[Byte]) = codec[F, Code, Byte](op = "decompress")(infer)
+  def compress[F[_]](implicit alphabet: Alphabet[Byte]) = codec[F, Byte, BitBuffer](emit)
+  def decompress[F[_]](implicit alphabet: Alphabet[Byte]) = codec[F, Code, Bytes](infer).andThen(flatten)
 }
