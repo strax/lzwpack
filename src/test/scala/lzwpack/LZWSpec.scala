@@ -44,4 +44,10 @@ class LZWSpec extends UnitSpec {
       stream.through(decompress).toList should contain theSameElementsInOrderAs uncompressed
     }
   }
+
+  describe("compress and decompress") {
+    it("returns the uncompressed data") {
+      val data = List(13, 10, 13, 10)
+    }
+  }
 }

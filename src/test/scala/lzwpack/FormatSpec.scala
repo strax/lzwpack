@@ -2,13 +2,19 @@ package lzwpack
 
 import cats.effect.IO
 import fs2._
+import lzwpack.data.BitBuffer
 
 class FormatSpec extends UnitSpec {
   import Format._
 
   describe("pack") {
     it("packs numbers efficiently to bytes") {
-      val sequence = List((b"100001", 10), (b"111111111111111", 16), (b"1001", 6), (b"0", 0))
+      val sequence = List(
+        BitBuffer(b"100001", 10),
+        BitBuffer(b"111111111111111", 16),
+        BitBuffer(b"1001", 6),
+        BitBuffer(b"0", 0)
+      )
 
       assertResult(List(0x21, 0xfc, 0xff, 0x25)) {
         Stream.emits(sequence).through(pack).toList.unsigned

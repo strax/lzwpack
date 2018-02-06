@@ -13,14 +13,14 @@ object Application {
 
     implicit val F = implicitly[Sync[IO]]
 
-//    fs2.io.file.readAll(Paths.get("input.txt"), 4028)
-//      .through(compress(Alphabet.AllBytes))
+//    fs2.io.file.readAll(Paths.get("fixtures/input.txt"), 4028)
+//      .through(compress)
 //      .through(pack)
-//      .through(fs2.io.file.writeAll(Paths.get("output.txt")))
+//      .through(fs2.io.file.writeAll(Paths.get("fixtures/output.txt")))
 //      .compile
 //      .drain.unsafeRunSync()
 
-    fs2.io.file.readAll(Paths.get("fixtures/output.txt"), 4028)
+    fs2.io.file.readAll(Paths.get("fixtures/output.txt"), 3)
       .through(unpack)
       .through(decompress)
       .bufferAll

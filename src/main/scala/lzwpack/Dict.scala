@@ -47,7 +47,6 @@ object Dict {
     * Initializes a new dictionary with the given alphabet.
     * In LZW, the dictionary always contains codes for the whole alphabet before compression / decompression.
     */
-  def init[A](alphabet: Alphabet[A]): Dict[A] =
-    alphabet.foldLeft(empty[A])((z, a) => z.add(a))
+  def init[A](alphabet: Alphabet[A]): Dict[A] = alphabet.foldLeft(empty[A])((z, a) => z.add(a))
 }
 

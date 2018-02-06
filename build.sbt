@@ -16,6 +16,7 @@ libraryDependencies += "com.chuusai" %% "shapeless" % "2.3.3"
 libraryDependencies += "com.github.scopt" %% "scopt" % "3.7.0"
 libraryDependencies += "co.fs2" %% "fs2-core" % "0.10.0-RC1"
 libraryDependencies += "co.fs2" %% "fs2-io" % "0.10.0-RC1"
+libraryDependencies += "com.lihaoyi" %% "pprint" % "0.5.3"
 
 libraryDependencies += "org.scalactic" %% "scalactic" % "3.0.4"
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.4" % "test"

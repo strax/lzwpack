@@ -7,6 +7,8 @@ import lzwpack.data.BitBuffer
 
 
 object LZW extends Debugging {
+  class CompressionException(cause: String) extends RuntimeException(cause)
+
   import cats._
   import cats.implicits._
 
@@ -28,24 +30,46 @@ object LZW extends Debugging {
     head match {
       case None =>
         val code = dict.get(state.buffered)
-        (CompressionState(dict, Bytes.empty), Some(makeBitBuffer(code, dict)))
+        val bb = makeBitBuffer(code, dict)
+        // println(show"(emit) EOF, out $bb")
+        (CompressionState(dict, Bytes.empty), Some(bb))
       case Some(byte) if dict.contains(state.buffered :+ byte) =>
+        // println(show"(emit) Skip ${byte.hex}, buffer ${(state.buffered :+ byte)}")
         (CompressionState(dict, state.buffered :+ byte), None)
       case Some(byte) =>
-        val code = dict.get(state.buffered)
-        (CompressionState(dict.add(state.buffered :+ byte), Bytes(byte)), Some(makeBitBuffer(code, dict)))
+        val nextDict = dict.add(state.buffered :+ byte)
+        val code = nextDict.get(state.buffered)
+        // println(show"(emit) In ${byte.hex}, coded ${(state.buffered :+ byte)} -> ${nextDict.headIndex}, out ${code}")
+        (CompressionState(nextDict, Bytes(byte)), Some(makeBitBuffer(code, dict)))
     }
   }
 
   private def infer(state: CompressionState, code: Option[Code]): (CompressionState, Option[Bytes]) = code match {
-    case None => (CompressionState(state.dict, Bytes.empty), None)
+    case None =>
+      println(show"(infer) EOF, buffer ${state.buffered}")
+      (CompressionState(state.dict, Bytes.empty), None)
     case Some(code) =>
-      val block = state.dict.findKey(code).get
-      if (!state.buffered.isEmpty) {
-        // New dictionary entry is conjecture + first byte of the current key
-        (CompressionState(state.dict.add(state.buffered ++ block.take(1)), block), Some(block))
-      } else {
-        (CompressionState(state.dict, block), Some(block))
+      state.dict.findKey(code) match {
+        case None =>
+          // Handle cases where the code is not yet inferred by the decoder;
+          // if the previous value is xω then we can infer the next code to be xωx
+          val i = state.dict.nextIndex
+          // println(show"(infer) Lookup $i -> ?")
+          val inferred = state.buffered ++ state.buffered.take(1)
+          // println(show"(infer) Inferred $i <- $inferred")
+          // println(show"(infer) Out $inferred")
+          (CompressionState(state.dict.add(inferred), inferred), Some(inferred))
+        case Some(block) =>
+          if (!state.buffered.isEmpty) {
+            // New dictionary entry is conjecture + first byte of the current key
+            // println(show"(infer) Lookup ${code} -> $block")
+            // println(show"(infer) Inferred ${state.dict.nextIndex} <- ${(state.buffered ++ block.take(1))}")
+            // println(show"(infer) Out ${block}")
+            (CompressionState(state.dict.add(state.buffered ++ block.take(1)), block), Some(block))
+          } else {
+            // println(show"(infer) Out ${block}")
+            (CompressionState(state.dict, block), Some(block))
+          }
       }
   }
 

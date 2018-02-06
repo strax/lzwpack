@@ -1,4 +1,5 @@
 import cats.Applicative
+import fs2.Pipe
 
 import scala.collection.immutable.List
 
@@ -26,4 +27,10 @@ package object lzwpack extends Implicits {
     * Defines an implicit conversion to include Alphabet's methods by default.
     */
   implicit def alphabetOps[A](a: Alphabet[A]): Alphabet.Ops[A] = Alphabet.Ops(a)
+
+  def compressAdaptive[F[_]](implicit alphabet: Alphabet[Byte]): Pipe[F, Byte, Byte] =
+    stream => stream.through(LZW.compress).through(Format.pack)
+
+  def decompressAdaptive[F[_]](implicit alphabet: Alphabet[Byte]): Pipe[F, Byte, Byte] =
+    stream => stream.through(Format.unpack).through(LZW.decompress)
 }

@@ -2,6 +2,7 @@ package lzwpack.data
 
 import lzwpack._
 import cats._
+import cats.implicits._
 import java.lang.{Long => JavaLong}
 
 import scala.util.Try
