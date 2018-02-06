@@ -24,12 +24,12 @@ class FormatSpec extends UnitSpec {
 
   describe("unpack") {
     it("unpacks numbers from a byte stream") {
-      // Let's use a 3-character alphabet. Then our own codes will start at 0x05 == 0b101, so we should
-      // read 3-bit values at first
-      implicit val alphabet: Alphabet[Byte] = Alphabet(List(1,2,3))
+      // Let's use a 3-character alphabet (excluding a reserved control character).
+      // Then our own codes will start at 0x05 == 0b101, so we should read 3-bit values at first
+      implicit val alphabet: Alphabet[Byte] = Alphabet(List(1,2,3,0))
       val input: List[Byte] = List(
-        b"11110101", // First byte: 0b101, 0b110 and 0b10 (part of 0b111)
-        b"01010001", // Second byte: 0b1 (continuation), 0b1000 (switch to 4 bits), 0b010 (part of 0b0100)
+        b"11110101", // First byte: 0b101, 0b110 and 0b11 (part of 0b111)
+        b"10100001", // Second byte: 0b01 (continuation, switch to 4 bits), 0b1000, 0b010 (part of 0b0100)
         b"00001100"  // Third byte: 0b0 (continuation), 0b110
       ).map(_.toByte)
 

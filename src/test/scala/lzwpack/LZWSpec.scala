@@ -18,7 +18,7 @@ class LZWSpec extends UnitSpec {
     0x02 -> 5,
     0x05 -> 5,
     0x0F -> 5,
-    0x12 -> 6,
+    0x12 -> 5,
     0x0E -> 6,
     0x0F -> 6,
     0x14 -> 6,

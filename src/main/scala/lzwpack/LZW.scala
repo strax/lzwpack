@@ -16,7 +16,7 @@ object LZW extends Debugging {
 
   case class CompressionState(dict: Dict[Bytes], buffered: Bytes)
 
-  private def makeBitBuffer(code: Code, dict: Dict[_]) = BitBuffer(code, dict.nextIndex.bitLength)
+  private def makeBitBuffer(code: Code, dict: Dict[_]) = BitBuffer(code, dict.headIndex.bitLength)
 
   /**
     * Processes the given block (given as head and tail) and returns a tuple of a potentially changed
@@ -31,43 +31,35 @@ object LZW extends Debugging {
       case None =>
         val code = dict.get(state.buffered)
         val bb = makeBitBuffer(code, dict)
-        // println(show"(emit) EOF, out $bb")
         (CompressionState(dict, Bytes.empty), Some(bb))
+
       case Some(byte) if dict.contains(state.buffered :+ byte) =>
-        // println(show"(emit) Skip ${byte.hex}, buffer ${(state.buffered :+ byte)}")
         (CompressionState(dict, state.buffered :+ byte), None)
+
       case Some(byte) =>
         val nextDict = dict.add(state.buffered :+ byte)
         val code = nextDict.get(state.buffered)
-        // println(show"(emit) In ${byte.hex}, coded ${(state.buffered :+ byte)} -> ${nextDict.headIndex}, out ${code}")
         (CompressionState(nextDict, Bytes(byte)), Some(makeBitBuffer(code, dict)))
     }
   }
 
   private def infer(state: CompressionState, code: Option[Code]): (CompressionState, Option[Bytes]) = code match {
     case None =>
-      println(show"(infer) EOF, buffer ${state.buffered}")
       (CompressionState(state.dict, Bytes.empty), None)
+
     case Some(code) =>
       state.dict.findKey(code) match {
         case None =>
           // Handle cases where the code is not yet inferred by the decoder;
           // if the previous value is xω then we can infer the next code to be xωx
-          val i = state.dict.nextIndex
-          // println(show"(infer) Lookup $i -> ?")
           val inferred = state.buffered ++ state.buffered.take(1)
-          // println(show"(infer) Inferred $i <- $inferred")
-          // println(show"(infer) Out $inferred")
           (CompressionState(state.dict.add(inferred), inferred), Some(inferred))
+
         case Some(block) =>
           if (!state.buffered.isEmpty) {
             // New dictionary entry is conjecture + first byte of the current key
-            // println(show"(infer) Lookup ${code} -> $block")
-            // println(show"(infer) Inferred ${state.dict.nextIndex} <- ${(state.buffered ++ block.take(1))}")
-            // println(show"(infer) Out ${block}")
             (CompressionState(state.dict.add(state.buffered ++ block.take(1)), block), Some(block))
           } else {
-            // println(show"(infer) Out ${block}")
             (CompressionState(state.dict, block), Some(block))
           }
       }
@@ -82,13 +74,14 @@ object LZW extends Debugging {
           f(state, Some(head)) match {
             case (s, Some(output)) =>
               Pull.output(Segment(output)) >> go(tail, s)
+
             case (s, None) =>
               go(tail, s)
           }
+
         case None =>
           f(state, None) match {
-            case (state, output) =>
-              // pprint.pprintln(state, height = Int.MaxValue)
+            case (_, output) =>
               output.fold(Pull.done.covaryOutput[O])(Pull.output1(_))
           }
       }

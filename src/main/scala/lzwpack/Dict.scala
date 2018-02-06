@@ -22,7 +22,7 @@ case class Dict[A](entries: Map[A, Code], headIndex: Int) {
 
   def nextIndex: Int = headIndex + 1
 
-  def codeSize: Int = Math.min(headIndex.bitLength, MaxCodeSize)
+  def codeSize: Int = Math.max(headIndex.bitLength, MaxCodeSize)
 
   /**
     * Returns the code associated with the given chunk.

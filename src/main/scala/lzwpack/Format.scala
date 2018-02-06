@@ -23,29 +23,29 @@ object Format extends Debugging {
   }
 
   case class UnpackState(buffer: BitBuffer, counter: Int) {
-    def codeSize: Int = Math.min((counter + 1).bitLength, MaxCodeSize)
+    def codeSize: Int = Math.min((counter).bitLength, MaxCodeSize)
     def set(bb: BitBuffer) = UnpackState(bb, counter)
   }
 
-  def unpack1(state: UnpackState): Option[(UnpackState, Code)] = state.buffer.readOption(state.codeSize).map {
-    case (bb, code) => {
-      // println(s"(unpack1) Unpack ${state.buffer} -> ${code}")
+  def unpack1(state: UnpackState): Option[(UnpackState, Code)] = {
+    state.buffer.readOption(state.codeSize).map { case (bb, code) =>
       (UnpackState(bb, state.counter + 1), code)
     }
   }
 
-  def unpackSegment(state: UnpackState): Segment[Code, Option[UnpackState]] = unpack1(state).fold(Segment.pure[Code, Option[UnpackState]](None)) {
-    case (state_, code) => Segment(code).asResult(Some(state_))
-  }
+  def unpackSegment(state: UnpackState): Segment[Code, Option[UnpackState]] =
+    unpack1(state).fold(Segment.pure[Code, Option[UnpackState]](None)) { case (state_, code) =>
+      Segment(code).asResult(Some(state_))
+    }
 
   def combinedBuffer(segment: Segment[BitBuffer, _])(init: BitBuffer = BitBuffer.empty): Segment[Nothing, BitBuffer] =
     segment.fold(init)(_ ++ _).mapResult(_._2)
 
   def unpack[F[_]](implicit alphabet: Alphabet[Byte]): Pipe[F, Byte, Code] = stream => {
-    val firstIndex = alphabet.size + 1
     stream
+      .buffer(4)
       .map(b => BitBuffer(b))
-      .scanSegments(UnpackState(BitBuffer.empty, firstIndex)) { case (state, segment) =>
+      .scanSegments(UnpackState(BitBuffer.empty, alphabet.size)) { case (state, segment) =>
         def drain(state: UnpackState): Segment[Code, UnpackState] = {
           unpackSegment(state).flatMapResult(_.fold(Segment.pure[Code, UnpackState](state))(drain))
         }
