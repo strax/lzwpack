@@ -1,6 +1,6 @@
 package lzwpack
 
-import java.lang.{Byte => JavaByte}
+import java.lang.{Byte => JavaByte, Long => JavaLong}
 import java.nio.charset.{Charset, CodingErrorAction}
 
 import cats._
@@ -22,13 +22,10 @@ trait Implicits {
     def unsigned: Int = JavaByte.toUnsignedInt(b)
   }
 
-  implicit class IntOps(n: Int) {
-    /**
-      * Returns the bit count (from the most significant bit) of a given unsigned 32-bit integer.
-      */
-    def bitLength: Int = if(n == 0) 0 else Math.floor(Math.log(n) / Math.log(2)).toInt + 1
+  implicit class LongOps(n: Long) {
+    def bitLength: Int = if(n == 0L) 0 else Math.floor(Math.log(n) / Math.log(2)).toInt + 1
 
-    def bin: String = bin(JavaByte.SIZE)
+    def bin: String = bin(JavaLong.SIZE)
     def bin(size: Int): String = n.toBinaryString.reverse.padTo(size, "0").reverse.mkString
 
     def hex: String = n formatted "0x%02X"

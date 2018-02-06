@@ -2,18 +2,18 @@ package lzwpack.data
 
 import lzwpack._
 import cats._
-import cats.implicits._
+import java.lang.{Long => JavaLong}
 
 import scala.util.Try
 
-case class BitBuffer(private[data] val data: Int, size: Int) {
+case class BitBuffer(private[data] val data: Long, size: Int) {
   assert(size >= 0)
 
   /**
     * Reads n bits from input and returns a tuple of (read bits, remaining bits).
     */
-  def read(bits: Int): (BitBuffer, Int) = {
-    if (bits > size) throw new IndexOutOfBoundsException(s"Tried to read $bits bits from a buffer with $size bits")
+  def read(bits: Int, allowFewer: Boolean = false): (BitBuffer, Int) = {
+    if (!allowFewer && bits > size) throw new IndexOutOfBoundsException(s"Tried to read $bits bits from a buffer with $size bits")
     (drop(bits), take(bits).toInt)
   }
 
@@ -32,13 +32,14 @@ case class BitBuffer(private[data] val data: Int, size: Int) {
     BitBuffer(head, Math.min(size, n))
   }
 
-  def toInt: Int = data
+  def toInt: Int = data.toInt
   def toByte: Byte = data.toByte
 
   /**
     * Returns a new buffer that contains this buffer preceded by the other buffer.
     */
   def append(other: BitBuffer): BitBuffer = {
+    assert(other.size + size < JavaLong.SIZE)
     val bb = other.data
     BitBuffer((bb << size) ^ data, other.size + size)
   }
@@ -70,6 +71,8 @@ case class BitBuffer(private[data] val data: Int, size: Int) {
     go(0, this)
     (drop(chunkCount * chunkSize), values)
   }
+
+  override def toString(): String = s"BitBuffer(${data.bin(size)}, $size bits)"
 }
 
 trait BufferInstances {
@@ -78,9 +81,7 @@ trait BufferInstances {
     override def combine(a: BitBuffer, b: BitBuffer): BitBuffer = a append b
   }
 
-  implicit object BufferShow extends Show[BitBuffer] {
-    override def show(buf: BitBuffer): String = show"${buf.data.bin(buf.size)} (n=${buf.size})"
-  }
+  implicit val bitBufferShow: Show[BitBuffer] = Show.fromToString[BitBuffer]
 }
 
 object BitBuffer {
