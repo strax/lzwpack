@@ -86,9 +86,11 @@ object LZW extends Debugging {
               go(tail, s)
           }
         case None =>
-          f(state, None)._2.fold(Pull.done.covaryOutput[O])(output => {
-            Pull.output1(output)
-          })
+          f(state, None) match {
+            case (state, output) =>
+              // pprint.pprintln(state, height = Int.MaxValue)
+              output.fold(Pull.done.covaryOutput[O])(Pull.output1(_))
+          }
       }
     }
     in => {

@@ -2,19 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c9dc0df1-f4e1-4eda-aaa0-c6825889e15d" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/sbt__com_lihaoyi_fansi_2_12_0_2_4_jar.xml" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/sbt__com_lihaoyi_pprint_2_12_0_5_2_jar.xml" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules/lzwpack.iml" afterPath="$PROJECT_DIR$/.idea/modules/lzwpack.iml" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/build.sbt" afterPath="$PROJECT_DIR$/build.sbt" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/lzwpack/Application.scala" afterPath="$PROJECT_DIR$/src/main/scala/lzwpack/Application.scala" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/lzwpack/Dict.scala" afterPath="$PROJECT_DIR$/src/main/scala/lzwpack/Dict.scala" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/lzwpack/Format.scala" afterPath="$PROJECT_DIR$/src/main/scala/lzwpack/Format.scala" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/lzwpack/LZW.scala" afterPath="$PROJECT_DIR$/src/main/scala/lzwpack/LZW.scala" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/lzwpack/data/BitBuffer.scala" afterPath="$PROJECT_DIR$/src/main/scala/lzwpack/data/BitBuffer.scala" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/lzwpack/package.scala" afterPath="$PROJECT_DIR$/src/main/scala/lzwpack/package.scala" />
-      <change beforePath="$PROJECT_DIR$/src/test/scala/lzwpack/FormatSpec.scala" afterPath="$PROJECT_DIR$/src/test/scala/lzwpack/FormatSpec.scala" />
-      <change beforePath="$PROJECT_DIR$/src/test/scala/lzwpack/LZWSpec.scala" afterPath="$PROJECT_DIR$/src/test/scala/lzwpack/LZWSpec.scala" />
+      <change beforePath="$PROJECT_DIR$/src/test/scala/lzwpack/IntegrationTest.scala" afterPath="$PROJECT_DIR$/src/test/scala/lzwpack/IntegrationTest.scala" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <ignored path="$PROJECT_DIR$/target/" />
@@ -36,147 +29,123 @@
     <favorites_list name="lzwpack" />
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.5">
-      <split-first>
-        <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file leaf-file-name="Format.scala" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/src/main/scala/lzwpack/Format.scala">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="161">
-                  <caret line="7" column="0" lean-forward="true" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
-                  <folding>
-                    <element signature="e#17#49#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="FormatSpec.scala" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/src/test/scala/lzwpack/FormatSpec.scala">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="69">
-                  <caret line="5" column="0" lean-forward="true" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="Implicits.scala" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/src/main/scala/lzwpack/Implicits.scala">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="322">
-                  <caret line="14" column="17" lean-forward="true" selection-start-line="14" selection-start-column="17" selection-end-line="14" selection-end-column="17" />
-                  <folding>
-                    <element signature="e#17#70#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="Alphabet.scala" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/src/main/scala/lzwpack/Alphabet.scala">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="437">
-                  <caret line="19" column="63" lean-forward="false" selection-start-line="19" selection-start-column="63" selection-end-line="19" selection-end-column="63" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="LZW.scala" pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/src/main/scala/lzwpack/LZW.scala">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="650">
-                  <caret line="58" column="0" lean-forward="false" selection-start-line="58" selection-start-column="0" selection-end-line="59" selection-end-column="49" />
-                  <folding>
-                    <element signature="e#17#48#0" expanded="true" />
-                    <element signature="e#205#218#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="LZWSpec.scala" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/src/test/scala/lzwpack/LZWSpec.scala">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="1058">
-                  <caret line="49" column="37" lean-forward="false" selection-start-line="49" selection-start-column="37" selection-end-line="49" selection-end-column="37" />
-                  <folding>
-                    <element signature="e#17#38#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="IntegrationTest.scala" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/src/test/scala/lzwpack/IntegrationTest.scala">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="253">
-                  <caret line="13" column="26" lean-forward="false" selection-start-line="13" selection-start-column="26" selection-end-line="13" selection-end-column="26" />
-                  <folding>
-                    <element signature="e#17#43#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="Fixtures.scala" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/src/test/scala/lzwpack/Fixtures.scala">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="138">
-                  <caret line="10" column="83" lean-forward="false" selection-start-line="10" selection-start-column="83" selection-end-line="10" selection-end-column="83" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="Application.scala" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/src/main/scala/lzwpack/Application.scala">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="621">
-                  <caret line="30" column="3" lean-forward="false" selection-start-line="30" selection-start-column="3" selection-end-line="30" selection-end-column="3" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="Dict.scala" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/src/main/scala/lzwpack/Dict.scala">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="303">
-                  <caret line="18" column="32" lean-forward="true" selection-start-line="18" selection-start-column="32" selection-end-line="18" selection-end-column="32" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-        </leaf>
-      </split-first>
-      <split-second>
-        <leaf>
-          <file leaf-file-name="FormatSpec.scala" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/src/test/scala/lzwpack/FormatSpec.scala">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="275">
-                  <caret line="15" column="26" lean-forward="true" selection-start-line="15" selection-start-column="26" selection-end-line="15" selection-end-column="26" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="BitBuffer.scala" pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/src/main/scala/lzwpack/data/BitBuffer.scala">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="69">
-                  <caret line="4" column="23" lean-forward="false" selection-start-line="4" selection-start-column="23" selection-end-line="4" selection-end-column="23" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-        </leaf>
-      </split-second>
-    </splitter>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file leaf-file-name="Format.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/scala/lzwpack/Format.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="565">
+              <caret line="51" column="0" lean-forward="true" selection-start-line="51" selection-start-column="0" selection-end-line="51" selection-end-column="0" />
+              <folding>
+                <element signature="e#17#49#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Implicits.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/scala/lzwpack/Implicits.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="183">
+              <caret line="14" column="17" lean-forward="false" selection-start-line="14" selection-start-column="17" selection-end-line="14" selection-end-column="17" />
+              <folding>
+                <element signature="e#17#70#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="CompressHeader.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/scala/lzwpack/CompressHeader.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="207">
+              <caret line="9" column="49" lean-forward="false" selection-start-line="9" selection-start-column="45" selection-end-line="9" selection-end-column="49" />
+              <folding>
+                <element signature="e#17#40#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="LZW.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/scala/lzwpack/LZW.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="76">
+              <caret line="73" column="3" lean-forward="true" selection-start-line="73" selection-start-column="3" selection-end-line="73" selection-end-column="3" />
+              <folding>
+                <element signature="e#17#48#0" expanded="true" />
+                <element signature="e#205#218#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="package.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/scala/lzwpack/package.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="138">
+              <caret line="6" column="22" lean-forward="false" selection-start-line="6" selection-start-column="22" selection-end-line="6" selection-end-column="22" />
+              <folding>
+                <element signature="e#0#23#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="FormatSpec.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/test/scala/lzwpack/FormatSpec.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="781">
+              <caret line="36" column="9" lean-forward="false" selection-start-line="36" selection-start-column="9" selection-end-line="36" selection-end-column="9" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Fixtures.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/test/scala/lzwpack/Fixtures.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="92">
+              <caret line="8" column="6" lean-forward="false" selection-start-line="8" selection-start-column="6" selection-end-line="8" selection-end-column="6" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="LZWSpec.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/test/scala/lzwpack/LZWSpec.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="276">
+              <caret line="24" column="14" lean-forward="true" selection-start-line="24" selection-start-column="14" selection-end-line="24" selection-end-column="14" />
+              <folding>
+                <element signature="e#17#38#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Dict.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/scala/lzwpack/Dict.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="221">
+              <caret line="28" column="59" lean-forward="true" selection-start-line="28" selection-start-column="59" selection-end-line="28" selection-end-column="59" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="IntegrationTest.scala" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/test/scala/lzwpack/IntegrationTest.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="460">
+              <caret line="22" column="123" lean-forward="false" selection-start-line="22" selection-start-column="123" selection-end-line="22" selection-end-column="123" />
+              <folding>
+                <element signature="e#17#65#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -230,18 +199,19 @@
         <option value="$PROJECT_DIR$/src/test/scala/lzwpack/data/BitBufferSpec.scala" />
         <option value="$PROJECT_DIR$/doc/viikkoraportti3.md" />
         <option value="$PROJECT_DIR$/README.md" />
-        <option value="$PROJECT_DIR$/src/main/scala/lzwpack/package.scala" />
-        <option value="$PROJECT_DIR$/src/test/scala/lzwpack/FormatSpec.scala" />
         <option value="$PROJECT_DIR$/build.sbt" />
         <option value="$PROJECT_DIR$/src/main/scala/lzwpack/Application.scala" />
         <option value="$PROJECT_DIR$/src/test/scala/lzwpack/LZWSpec.scala" />
         <option value="$PROJECT_DIR$/src/test/scala/lzwpack/Fixtures.scala" />
-        <option value="$PROJECT_DIR$/src/test/scala/lzwpack/IntegrationTest.scala" />
-        <option value="$PROJECT_DIR$/src/main/scala/lzwpack/Format.scala" />
         <option value="$PROJECT_DIR$/src/main/scala/lzwpack/Implicits.scala" />
-        <option value="$PROJECT_DIR$/src/main/scala/lzwpack/Dict.scala" />
         <option value="$PROJECT_DIR$/src/main/scala/lzwpack/data/BitBuffer.scala" />
+        <option value="$PROJECT_DIR$/src/test/scala/lzwpack/FormatSpec.scala" />
+        <option value="$PROJECT_DIR$/src/main/scala/lzwpack/Dict.scala" />
+        <option value="$PROJECT_DIR$/src/main/scala/lzwpack/Format.scala" />
+        <option value="$PROJECT_DIR$/src/main/scala/lzwpack/CompressHeader.scala" />
+        <option value="$PROJECT_DIR$/src/main/scala/lzwpack/package.scala" />
         <option value="$PROJECT_DIR$/src/main/scala/lzwpack/LZW.scala" />
+        <option value="$PROJECT_DIR$/src/test/scala/lzwpack/IntegrationTest.scala" />
       </list>
     </option>
   </component>
@@ -384,28 +354,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
-      <pane id="PackagesPane">
-        <subPane>
-          <expand>
-            <path>
-              <item name="lzwpack" type="58d84e3e:PackageViewProjectNode" />
-              <item name="lzwpack" type="616d4139:PackageViewModuleNode" />
-            </path>
-            <path>
-              <item name="lzwpack" type="58d84e3e:PackageViewProjectNode" />
-              <item name="lzwpack" type="616d4139:PackageViewModuleNode" />
-              <item name="lzwpack" type="1f31426a:PackageElementNode" />
-            </path>
-            <path>
-              <item name="lzwpack" type="58d84e3e:PackageViewProjectNode" />
-              <item name="lzwpack-build" type="616d4139:PackageViewModuleNode" />
-            </path>
-          </expand>
-          <select />
-        </subPane>
-      </pane>
-      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -464,10 +412,32 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
+      <pane id="Scratches" />
+      <pane id="PackagesPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="lzwpack" type="58d84e3e:PackageViewProjectNode" />
+              <item name="lzwpack" type="616d4139:PackageViewModuleNode" />
+            </path>
+            <path>
+              <item name="lzwpack" type="58d84e3e:PackageViewProjectNode" />
+              <item name="lzwpack" type="616d4139:PackageViewModuleNode" />
+              <item name="lzwpack" type="1f31426a:PackageElementNode" />
+            </path>
+            <path>
+              <item name="lzwpack" type="58d84e3e:PackageViewProjectNode" />
+              <item name="lzwpack-build" type="616d4139:PackageViewModuleNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="SearchEverywhereHistoryKey" value="dict&#9;FILE&#9;file:///Users/sami/Projects/lzwpack/src/main/scala/lzwpack/Dict.scala&#10;implicits&#9;FILE&#9;file:///Users/sami/Projects/lzwpack/src/main/scala/lzwpack/Implicits.scala&#10;bitbuffer&#9;FILE&#9;file:///Users/sami/Projects/lzwpack/src/main/scala/lzwpack/data/BitBuffer.scala&#10;formatspec&#9;FILE&#9;file:///Users/sami/Projects/lzwpack/src/test/scala/lzwpack/FormatSpec.scala&#10;fixtures&#9;FILE&#9;file:///Users/sami/Projects/lzwpack/src/test/scala/lzwpack/Fixtures.scala&#10;format&#9;FILE&#9;file:///Users/sami/Projects/lzwpack/src/main/scala/lzwpack/Format.scala&#10;alice&#9;FILE&#9;file:///Users/sami/Projects/lzwpack/fixtures/alice29.txt&#10;alphabet&#9;FILE&#9;file:///Users/sami/Projects/lzwpack/src/main/scala/lzwpack/Alphabet.scala&#10;bitbuff&#9;FILE&#9;file:///Users/sami/Projects/lzwpack/src/main/scala/lzwpack/data/BitBuffer.scala&#10;build.sbt&#9;FILE&#9;file:///Users/sami/Projects/lzwpack/build.sbt&#10;readme&#9;FILE&#9;file:///Users/sami/Projects/lzwpack/README.md&#10;sbt&#9;FILE&#9;file:///Users/sami/Projects/lzwpack/build.sbt&#10;bitbufferspec&#9;FILE&#9;file:///Users/sami/Projects/lzwpack/src/test/scala/lzwpack/data/BitBufferSpec.scala&#10;application&#9;FILE&#9;file:///Users/sami/Projects/lzwpack/src/main/scala/lzwpack/Application.scala&#10;segment&#9;null&#9;null&#10;cats.data.State&#9;null&#9;null&#10;lzw&#9;FILE&#9;file:///Users/sami/Projects/lzwpack/src/main/scala/lzwpack/LZW.scala&#10;bitpackingspec&#9;FILE&#9;file:///Users/sami/Projects/lzwpack/src/test/scala/lzwpack/BitPackingSpec.scala" />
+    <property name="SearchEverywhereHistoryKey" value="formatspec&#9;FILE&#9;file:///Users/sami/Projects/lzwpack/src/test/scala/lzwpack/FormatSpec.scala&#10;format&#9;FILE&#9;file:///Users/sami/Projects/lzwpack/src/main/scala/lzwpack/Format.scala&#10;integration&#9;FILE&#9;file:///Users/sami/Projects/lzwpack/src/test/scala/lzwpack/IntegrationTest.scala&#10;dict&#9;FILE&#9;file:///Users/sami/Projects/lzwpack/src/main/scala/lzwpack/Dict.scala&#10;implicits&#9;FILE&#9;file:///Users/sami/Projects/lzwpack/src/main/scala/lzwpack/Implicits.scala&#10;bitbuffer&#9;FILE&#9;file:///Users/sami/Projects/lzwpack/src/main/scala/lzwpack/data/BitBuffer.scala&#10;fixtures&#9;FILE&#9;file:///Users/sami/Projects/lzwpack/src/test/scala/lzwpack/Fixtures.scala&#10;alice&#9;FILE&#9;file:///Users/sami/Projects/lzwpack/fixtures/alice29.txt&#10;alphabet&#9;FILE&#9;file:///Users/sami/Projects/lzwpack/src/main/scala/lzwpack/Alphabet.scala&#10;bitbuff&#9;FILE&#9;file:///Users/sami/Projects/lzwpack/src/main/scala/lzwpack/data/BitBuffer.scala&#10;build.sbt&#9;FILE&#9;file:///Users/sami/Projects/lzwpack/build.sbt&#10;readme&#9;FILE&#9;file:///Users/sami/Projects/lzwpack/README.md&#10;sbt&#9;FILE&#9;file:///Users/sami/Projects/lzwpack/build.sbt&#10;bitbufferspec&#9;FILE&#9;file:///Users/sami/Projects/lzwpack/src/test/scala/lzwpack/data/BitBufferSpec.scala&#10;application&#9;FILE&#9;file:///Users/sami/Projects/lzwpack/src/main/scala/lzwpack/Application.scala&#10;segment&#9;null&#9;null&#10;cats.data.State&#9;null&#9;null&#10;lzw&#9;FILE&#9;file:///Users/sami/Projects/lzwpack/src/main/scala/lzwpack/LZW.scala&#10;bitpackingspec&#9;FILE&#9;file:///Users/sami/Projects/lzwpack/src/test/scala/lzwpack/BitPackingSpec.scala" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="$USER_HOME$/.nodenv/shims/node" />
@@ -493,7 +463,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="ScalaTest.Unit tests">
+  <component name="RunManager" selected="ScalaTest.IntegrationTest">
     <configuration default="true" type="Applet" factoryName="Applet">
       <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
       <option name="WIDTH" value="0" />
@@ -593,10 +563,10 @@
       <setting name="path" value="lzwpack.data.BitBufferSpec" />
       <setting name="testName" value="drain extracts no elements if the given bit size is larger than the buffer's size" />
     </configuration>
-    <configuration name="FormatSpec.pack packs numbers efficiently to bytes" type="ScalaTestRunConfiguration" factoryName="ScalaTest" temporary="true">
+    <configuration name="IntegrationTest" type="ScalaTestRunConfiguration" factoryName="ScalaTest" temporary="true">
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
       <module name="lzwpack" />
-      <setting name="path" value="lzwpack.FormatSpec" />
+      <setting name="path" value="lzwpack.IntegrationTest" />
       <setting name="vmparams" value="" />
       <setting name="params" value="" />
       <setting name="workingDirectory" value="file://$PROJECT_DIR$" />
@@ -605,9 +575,8 @@
       <setting name="useSbt" value="false" />
       <setting name="useUiWithSbt" value="false" />
       <envs />
-      <setting name="testKind" value="Test name" />
-      <setting name="path" value="lzwpack.FormatSpec" />
-      <setting name="testName" value="pack packs numbers efficiently to bytes" />
+      <setting name="testKind" value="Class" />
+      <setting name="path" value="lzwpack.IntegrationTest" />
     </configuration>
     <configuration name="IntegrationTest.compression and decompression equals to the identity function" type="ScalaTestRunConfiguration" factoryName="ScalaTest" temporary="true">
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
@@ -707,19 +676,19 @@
       <item index="0" class="java.lang.String" itemvalue="Application.Main" />
       <item index="1" class="java.lang.String" itemvalue="sbt Task.Code coverage" />
       <item index="2" class="java.lang.String" itemvalue="ScalaTest.Unit tests" />
-      <item index="3" class="java.lang.String" itemvalue="ScalaTest.FormatSpec.pack packs numbers efficiently to bytes" />
-      <item index="4" class="java.lang.String" itemvalue="ScalaTest.BitBufferSpec.append append the given bytes to the receiver" />
-      <item index="5" class="java.lang.String" itemvalue="ScalaTest.BitBufferSpec.drain extracts no elements if the given bit size is larger than the buffer's size" />
-      <item index="6" class="java.lang.String" itemvalue="ScalaTest.LZWSpec.compress encodes an input string correctly" />
-      <item index="7" class="java.lang.String" itemvalue="ScalaTest.IntegrationTest.compression and decompression equals to the identity function" />
+      <item index="3" class="java.lang.String" itemvalue="ScalaTest.BitBufferSpec.append append the given bytes to the receiver" />
+      <item index="4" class="java.lang.String" itemvalue="ScalaTest.BitBufferSpec.drain extracts no elements if the given bit size is larger than the buffer's size" />
+      <item index="5" class="java.lang.String" itemvalue="ScalaTest.LZWSpec.compress encodes an input string correctly" />
+      <item index="6" class="java.lang.String" itemvalue="ScalaTest.IntegrationTest.compression and decompression equals to the identity function" />
+      <item index="7" class="java.lang.String" itemvalue="ScalaTest.IntegrationTest" />
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="ScalaTest.IntegrationTest.compression and decompression equals to the identity function" />
-        <item index="1" class="java.lang.String" itemvalue="ScalaTest.LZWSpec.compress encodes an input string correctly" />
-        <item index="2" class="java.lang.String" itemvalue="ScalaTest.BitBufferSpec.drain extracts no elements if the given bit size is larger than the buffer's size" />
-        <item index="3" class="java.lang.String" itemvalue="ScalaTest.BitBufferSpec.append append the given bytes to the receiver" />
-        <item index="4" class="java.lang.String" itemvalue="ScalaTest.FormatSpec.pack packs numbers efficiently to bytes" />
+        <item index="0" class="java.lang.String" itemvalue="ScalaTest.IntegrationTest" />
+        <item index="1" class="java.lang.String" itemvalue="ScalaTest.IntegrationTest.compression and decompression equals to the identity function" />
+        <item index="2" class="java.lang.String" itemvalue="ScalaTest.LZWSpec.compress encodes an input string correctly" />
+        <item index="3" class="java.lang.String" itemvalue="ScalaTest.BitBufferSpec.drain extracts no elements if the given bit size is larger than the buffer's size" />
+        <item index="4" class="java.lang.String" itemvalue="ScalaTest.BitBufferSpec.append append the given bytes to the receiver" />
       </list>
     </recent_temporary>
   </component>
@@ -791,48 +760,47 @@
       <workItem from="1517432925746" duration="11663000" />
       <workItem from="1517483971387" duration="24472000" />
       <workItem from="1517514026125" duration="72149000" />
-      <workItem from="1517939196270" duration="1147000" />
+      <workItem from="1517939196270" duration="4959000" />
     </task>
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="IntegrationTest_compression_and_decompression_equals_to_the_identity_function - 2018.02.04 at 19h 36m 21s.xml">
+    <history-entry file="IntegrationTest - 2018.02.06 at 21h 09m 02s.xml">
+      <configuration name="IntegrationTest" configurationId="ScalaTestRunConfiguration" />
+    </history-entry>
+    <history-entry file="IntegrationTest - 2018.02.06 at 21h 09m 28s.xml">
+      <configuration name="IntegrationTest" configurationId="ScalaTestRunConfiguration" />
+    </history-entry>
+    <history-entry file="IntegrationTest_compression_and_decompression_equals_to_the_identity_function - 2018.02.06 at 21h 06m 32s.xml">
       <configuration name="IntegrationTest.compression and decompression equals to the identity function" configurationId="ScalaTestRunConfiguration" />
     </history-entry>
-    <history-entry file="IntegrationTest_compression_and_decompression_equals_to_the_identity_function - 2018.02.04 at 19h 36m 35s.xml">
+    <history-entry file="IntegrationTest_compression_and_decompression_equals_to_the_identity_function - 2018.02.06 at 21h 07m 06s.xml">
       <configuration name="IntegrationTest.compression and decompression equals to the identity function" configurationId="ScalaTestRunConfiguration" />
     </history-entry>
-    <history-entry file="IntegrationTest_compression_and_decompression_equals_to_the_identity_function - 2018.02.04 at 19h 37m 19s.xml">
+    <history-entry file="IntegrationTest_compression_and_decompression_equals_to_the_identity_function - 2018.02.06 at 21h 07m 35s.xml">
       <configuration name="IntegrationTest.compression and decompression equals to the identity function" configurationId="ScalaTestRunConfiguration" />
     </history-entry>
-    <history-entry file="IntegrationTest_compression_and_decompression_equals_to_the_identity_function - 2018.02.04 at 19h 38m 47s.xml">
-      <configuration name="IntegrationTest.compression and decompression equals to the identity function" configurationId="ScalaTestRunConfiguration" />
-    </history-entry>
-    <history-entry file="IntegrationTest_compression_and_decompression_equals_to_the_identity_function - 2018.02.04 at 19h 39m 06s.xml">
-      <configuration name="IntegrationTest.compression and decompression equals to the identity function" configurationId="ScalaTestRunConfiguration" />
-    </history-entry>
-    <history-entry file="IntegrationTest_compression_and_decompression_equals_to_the_identity_function - 2018.02.04 at 19h 40m 26s.xml">
-      <configuration name="IntegrationTest.compression and decompression equals to the identity function" configurationId="ScalaTestRunConfiguration" />
-    </history-entry>
-    <history-entry file="IntegrationTest_compression_and_decompression_equals_to_the_identity_function - 2018.02.06 at 19h 49m 24s.xml">
-      <configuration name="IntegrationTest.compression and decompression equals to the identity function" configurationId="ScalaTestRunConfiguration" />
-    </history-entry>
-    <history-entry file="Unit_tests - 2018.02.06 at 19h 49m 35s.xml">
+    <history-entry file="Unit_tests - 2018.02.06 at 20h 21m 53s.xml">
       <configuration name="Unit tests" configurationId="ScalaTestRunConfiguration" />
     </history-entry>
-    <history-entry file="Unit_tests - 2018.02.06 at 19h 50m 30s.xml">
+    <history-entry file="Unit_tests - 2018.02.06 at 20h 52m 03s.xml">
       <configuration name="Unit tests" configurationId="ScalaTestRunConfiguration" />
     </history-entry>
-    <history-entry file="Unit_tests - 2018.02.06 at 19h 57m 41s.xml">
+    <history-entry file="Unit_tests - 2018.02.06 at 20h 53m 29s.xml">
+      <configuration name="Unit tests" configurationId="ScalaTestRunConfiguration" />
+    </history-entry>
+    <history-entry file="Unit_tests - 2018.02.06 at 20h 59m 19s.xml">
+      <configuration name="Unit tests" configurationId="ScalaTestRunConfiguration" />
+    </history-entry>
+    <history-entry file="Unit_tests - 2018.02.06 at 21h 06m 10s.xml">
       <configuration name="Unit tests" configurationId="ScalaTestRunConfiguration" />
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="273852000" />
+    <option name="totallyTimeSpent" value="277664000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="22" width="2560" height="1368" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -842,12 +810,13 @@
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32918552" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3369992" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32918552" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3369992" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32914376" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.1904762" sideWeight="0.49272728" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="sbt-shell-toolwindow" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.20581304" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.19023034" sideWeight="0.49272728" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="sbt-shell-toolwindow" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.20581304" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32918552" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -862,7 +831,6 @@
       <window_info id="Documentation" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="FLOATING" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" x="0" y="22" width="1580" height="879" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Problems" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32918552" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
     <layout-to-restore>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -979,13 +947,6 @@
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_92.jdk/Contents/Home/src.zip!/java/io/Bits.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-488">
-          <caret line="23" column="3" lean-forward="true" selection-start-line="23" selection-start-column="3" selection-end-line="23" selection-end-column="3" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/scala/lzwpack/Process.scala" />
     <entry file="uml://JAVA/java.nio">
       <provider selected="true" editor-type-id="UmlEditorProvider">
@@ -1612,13 +1573,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/scala/lzwpack/UnitSpec.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="92">
-          <caret line="4" column="39" lean-forward="false" selection-start-line="4" selection-start-column="32" selection-end-line="4" selection-end-column="39" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/test/scala/lzwpack/DictSpec.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="253">
@@ -1630,13 +1584,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="391">
           <caret line="20" column="0" lean-forward="false" selection-start-line="20" selection-start-column="0" selection-end-line="20" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/scala/lzwpack/Debugging.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="207">
-          <caret line="9" column="34" lean-forward="false" selection-start-line="9" selection-start-column="34" selection-end-line="9" selection-end-column="34" />
+          <folding>
+            <element signature="e#22#36#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -1644,6 +1594,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="46">
           <caret line="2" column="45" lean-forward="false" selection-start-line="2" selection-start-column="45" selection-end-line="2" selection-end-column="45" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -1665,6 +1616,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="162">
           <caret line="1786" column="20" lean-forward="false" selection-start-line="1786" selection-start-column="20" selection-end-line="1786" selection-end-column="20" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -1683,6 +1635,7 @@
         <state split_layout="SPLIT">
           <first_editor relative-caret-position="299">
             <caret line="13" column="60" lean-forward="false" selection-start-line="13" selection-start-column="60" selection-end-line="13" selection-end-column="60" />
+            <folding />
           </first_editor>
           <second_editor />
         </state>
@@ -1712,6 +1665,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="107">
           <caret line="26" column="37" lean-forward="false" selection-start-line="26" selection-start-column="37" selection-end-line="26" selection-end-column="37" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -1719,16 +1673,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/scala/lzwpack/package.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="433">
-          <caret line="34" column="49" lean-forward="false" selection-start-line="34" selection-start-column="49" selection-end-line="34" selection-end-column="49" />
-          <folding>
-            <element signature="e#0#23#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1761,93 +1705,131 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/scala/lzwpack/Fixtures.scala">
+    <entry file="file://$PROJECT_DIR$/src/main/scala/lzwpack/data/BitBuffer.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="195">
+          <caret line="15" column="17" lean-forward="true" selection-start-line="15" selection-start-column="17" selection-end-line="15" selection-end-column="17" />
+          <folding>
+            <element signature="e#22#38#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/scala/lzwpack/Debugging.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="207">
+          <caret line="9" column="34" lean-forward="false" selection-start-line="9" selection-start-column="34" selection-end-line="9" selection-end-column="34" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/scala/lzwpack/UnitSpec.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="92">
+          <caret line="4" column="39" lean-forward="false" selection-start-line="4" selection-start-column="32" selection-end-line="4" selection-end-column="39" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/scala/lzwpack/Alphabet.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="357">
+          <caret line="19" column="63" lean-forward="false" selection-start-line="19" selection-start-column="63" selection-end-line="19" selection-end-column="63" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/scala/lzwpack/package.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="138">
-          <caret line="10" column="83" lean-forward="false" selection-start-line="10" selection-start-column="83" selection-end-line="10" selection-end-column="83" />
-          <folding />
+          <caret line="6" column="22" lean-forward="false" selection-start-line="6" selection-start-column="22" selection-end-line="6" selection-end-column="22" />
+          <folding>
+            <element signature="e#0#23#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/test/scala/lzwpack/LZWSpec.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1058">
-          <caret line="49" column="37" lean-forward="false" selection-start-line="49" selection-start-column="37" selection-end-line="49" selection-end-column="37" />
+        <state relative-caret-position="276">
+          <caret line="24" column="14" lean-forward="true" selection-start-line="24" selection-start-column="14" selection-end-line="24" selection-end-column="14" />
           <folding>
             <element signature="e#17#38#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/scala/lzwpack/Alphabet.scala">
+    <entry file="file://$PROJECT_DIR$/src/test/scala/lzwpack/FormatSpec.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="437">
-          <caret line="19" column="63" lean-forward="false" selection-start-line="19" selection-start-column="63" selection-end-line="19" selection-end-column="63" />
+        <state relative-caret-position="781">
+          <caret line="36" column="9" lean-forward="false" selection-start-line="36" selection-start-column="9" selection-end-line="36" selection-end-column="9" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/scala/lzwpack/IntegrationTest.scala">
+    <entry file="file://$PROJECT_DIR$/src/test/scala/lzwpack/Fixtures.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="253">
-          <caret line="13" column="26" lean-forward="false" selection-start-line="13" selection-start-column="26" selection-end-line="13" selection-end-column="26" />
-          <folding>
-            <element signature="e#17#43#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="92">
+          <caret line="8" column="6" lean-forward="false" selection-start-line="8" selection-start-column="6" selection-end-line="8" selection-end-column="6" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/scala/lzwpack/Dict.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="221">
+          <caret line="28" column="59" lean-forward="true" selection-start-line="28" selection-start-column="59" selection-end-line="28" selection-end-column="59" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/scala/lzwpack/Implicits.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="322">
-          <caret line="14" column="17" lean-forward="true" selection-start-line="14" selection-start-column="17" selection-end-line="14" selection-end-column="17" />
+        <state relative-caret-position="183">
+          <caret line="14" column="17" lean-forward="false" selection-start-line="14" selection-start-column="17" selection-end-line="14" selection-end-column="17" />
           <folding>
             <element signature="e#17#70#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/scala/lzwpack/FormatSpec.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="69">
-          <caret line="5" column="0" lean-forward="true" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/scala/lzwpack/Format.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="161">
-          <caret line="7" column="0" lean-forward="true" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
+        <state relative-caret-position="565">
+          <caret line="51" column="0" lean-forward="true" selection-start-line="51" selection-start-column="0" selection-end-line="51" selection-end-column="0" />
           <folding>
             <element signature="e#17#49#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/scala/lzwpack/Dict.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="303">
-          <caret line="18" column="32" lean-forward="true" selection-start-line="18" selection-start-column="32" selection-end-line="18" selection-end-column="32" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/scala/lzwpack/data/BitBuffer.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="69">
-          <caret line="4" column="23" lean-forward="false" selection-start-line="4" selection-start-column="23" selection-end-line="4" selection-end-column="23" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/scala/lzwpack/LZW.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="650">
-          <caret line="58" column="0" lean-forward="false" selection-start-line="58" selection-start-column="0" selection-end-line="59" selection-end-column="49" />
+        <state relative-caret-position="76">
+          <caret line="73" column="3" lean-forward="true" selection-start-line="73" selection-start-column="3" selection-end-line="73" selection-end-column="3" />
           <folding>
             <element signature="e#17#48#0" expanded="true" />
             <element signature="e#205#218#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/scala/lzwpack/CompressHeader.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="207">
+          <caret line="9" column="49" lean-forward="false" selection-start-line="9" selection-start-column="45" selection-end-line="9" selection-end-column="49" />
+          <folding>
+            <element signature="e#17#40#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/scala/lzwpack/IntegrationTest.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="460">
+          <caret line="22" column="123" lean-forward="false" selection-start-line="22" selection-start-column="123" selection-end-line="22" selection-end-column="123" />
+          <folding>
+            <element signature="e#17#65#0" expanded="true" />
           </folding>
         </state>
       </provider>

@@ -6,3 +6,4 @@ doc/
 !doc/*.md
 target
 project/target
+tmp
