@@ -7,6 +7,7 @@ doc/
 target
 project/target
 tmp
+coverage
 
 # IDEA project files
 .idea/**/workspace.xml
