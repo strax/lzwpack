@@ -5,6 +5,8 @@ import java.nio.charset.Charset
 import fs2._
 import lzwpack.data.BitBuffer
 
+import scala.reflect.ClassTag
+
 
 object LZW extends Debugging {
   class CompressionException(cause: String) extends RuntimeException(cause)
@@ -67,7 +69,7 @@ object LZW extends Debugging {
 
   type CodecF[I, O] = (CompressionState, Option[I]) => (CompressionState, Option[O])
 
-  private def codec[F[_], I, O](dict: Dict[Bytes])(f: => CodecF[I, O]): Pipe[F, I, O] = {
+  private def codec[DictT[_]: MakeDict, F[_], I, O](f: => CodecF[I, O])(implicit alphabet: Alphabet[Byte]): Pipe[F, I, O] = {
     def go(stream: Stream[F, I], state: CompressionState): Pull[F, O, Unit] = {
       stream.pull.uncons1.flatMap {
         case Some((head, tail)) =>
@@ -86,19 +88,16 @@ object LZW extends Debugging {
           }
       }
     }
-    stream => go(stream, CompressionState(dict, Bytes.empty)).stream
+    stream => go(stream, CompressionState(makeDict[DictT], Bytes.empty)).stream
   }
 
   def flatten[F[_], O](s: Stream[F, Seq[O]]) = s.flatMap(bs => Stream.emits(bs))
 
-  def makeCompressionDict(implicit alphabet: Alphabet[Byte]): Dict[Bytes] =
-    CompressionDict.fromAlphabet(alphabet.pure[List])
+  def makeDict[T[_]: MakeDict](implicit alphabet: Alphabet[Byte]) =
+    implicitly[MakeDict[T]].fromAlphabet(alphabet.pure[List])
 
-  def makeDecompressionDict(implicit alphabet: Alphabet[Byte]): Dict[Bytes] =
-    DecompressionDict.fromAlphabet(alphabet.pure[List])
-
-  def compress[F[_]](implicit alphabet: Alphabet[Byte]) =
-    codec[F, Byte, BitBuffer](makeCompressionDict)(emit)
+  def compress[F[_]](implicit alphabet: Alphabet[Byte]): Pipe[F, Byte, BitBuffer] =
+    codec[CompressionDict, F, Byte, BitBuffer](emit)
   def decompress[F[_]](implicit alphabet: Alphabet[Byte]) =
-    codec[F, Code, Bytes](makeDecompressionDict)(infer).andThen(flatten)
+    codec[DecompressionDict, F, Code, Bytes](infer).andThen(flatten)
 }

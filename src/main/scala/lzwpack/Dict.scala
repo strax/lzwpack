@@ -40,12 +40,13 @@ trait Dict[K] {
   def size: Int
 }
 
-trait MakeDict { self =>
+/**
+  * The [[MakeDict]] trait provides generic dictionary constructors; given a [[MakeDict[T]] we can construct
+  * an empty T[A] or a T[A] that contains the given alphabet.
+  */
+trait MakeDict[T[_]] {
   def empty[A]: Dict[A]
   def fromAlphabet[A](alphabet: Alphabet[A]): Dict[A] = alphabet.foldLeft(empty[A])((z, a) => z.add(a))
-
-  @deprecated
-  def init[A]: Alphabet[A] => Dict[A] = fromAlphabet[A]
 }
 
 /**
@@ -64,7 +65,7 @@ case class CompressionDict[K](map: Map[K, Code], currentCode: Int) extends Dict[
   override def size: Code = map.size
 }
 
-object CompressionDict extends MakeDict {
+object CompressionDict extends MakeDict[CompressionDict] {
   def empty[K]: Dict[K] = CompressionDict(Map.empty[K, Code], 0)
 }
 
@@ -87,6 +88,13 @@ case class DecompressionDict[K](map: Map[Code, K], currentCode: Int) extends Dic
   def getOption(key: K): Option[Code] = map find { case (_, k) => k == key } map (_._1)
 }
 
-object DecompressionDict extends MakeDict {
+object DecompressionDict extends MakeDict[DecompressionDict] {
   override def empty[K]: Dict[K] = DecompressionDict(Map.empty[Code, K], 0)
+}
+
+// Provide implicit MakeDict instances to support generic Dict creation
+// The MakeDict instances are also companion objects to provide nicer syntax when calling concrete instances
+trait DictInstances {
+  implicit val makeCompressionDict: MakeDict[CompressionDict] = CompressionDict
+  implicit val makeDecompressionDict: MakeDict[DecompressionDict] = DecompressionDict
 }
