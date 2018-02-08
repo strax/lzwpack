@@ -8,22 +8,22 @@ class FormatSpec extends UnitSpec {
   import Format._
 
   describe("pack") {
-    it("packs numbers efficiently to bytes") {
+    it("packs variable-width bit buffers into bytes in MSB order") {
       val sequence = List(
-        BitBuffer(b"100001", 10),
-        BitBuffer(b"111111111111111", 16),
-        BitBuffer(b"1001", 6),
+        BitBuffer(b"0000100001", 10),
+        BitBuffer(b"01111111 11111111", 16),
+        BitBuffer(b"001001", 6),
         BitBuffer(b"0", 0)
       )
 
-      assertResult(List(0x21, 0xfc, 0xff, 0x25)) {
+      assertResult(List(b"00100001", b"111111 00", b"111111 11", b"0 001001 01")) {
         Stream.emits(sequence).through(pack).toList.unsigned
       }
     }
   }
 
   describe("unpack") {
-    it("unpacks numbers from a byte stream") {
+    it("unpacks LZW-packed byte stream into unsigned integers") {
       // Let's use a 5-character alphabet (excluding a reserved control character).
       // Then our own codes will start at 0x06 == 0b110, so we should read 4 3-bit values at first, then switch
       // to 4 bytes
