@@ -16,7 +16,7 @@ object LZW extends Debugging {
 
   case class CompressionState(dict: Dict[Bytes], buffered: Bytes)
 
-  private def makeBitBuffer(code: Code, dict: Dict[_]) = BitBuffer(code, dict.headIndex.bitLength)
+  private def makeBitBuffer(code: Code, dict: Dict[_]) = BitBuffer(code, dict.currentCode.bitLength)
 
   /**
     * Processes the given block (given as head and tail) and returns a tuple of a potentially changed
@@ -48,7 +48,7 @@ object LZW extends Debugging {
       (CompressionState(state.dict, Bytes.empty), None)
 
     case Some(code) =>
-      state.dict.findKey(code) match {
+      state.dict.find(code) match {
         case None =>
           // Handle cases where the code is not yet inferred by the decoder;
           // if the previous value is xω then we can infer the next code to be xωx
@@ -67,7 +67,7 @@ object LZW extends Debugging {
 
   type CodecF[I, O] = (CompressionState, Option[I]) => (CompressionState, Option[O])
 
-  private def codec[F[_], I, O](f: => CodecF[I, O])(implicit alphabet: Alphabet[Byte]): Pipe[F, I, O] = {
+  private def codec[F[_], I, O](dict: Dict[Bytes])(f: => CodecF[I, O]): Pipe[F, I, O] = {
     def go(stream: Stream[F, I], state: CompressionState): Pull[F, O, Unit] = {
       stream.pull.uncons1.flatMap {
         case Some((head, tail)) =>
@@ -86,14 +86,19 @@ object LZW extends Debugging {
           }
       }
     }
-    in => {
-      val dict = Dict.init(alphabet.pure[List])
-      go(in, CompressionState(dict, Bytes.empty)).stream
-    }
+    stream => go(stream, CompressionState(dict, Bytes.empty)).stream
   }
 
   def flatten[F[_], O](s: Stream[F, Seq[O]]) = s.flatMap(bs => Stream.emits(bs))
 
-  def compress[F[_]](implicit alphabet: Alphabet[Byte]) = codec[F, Byte, BitBuffer](emit)
-  def decompress[F[_]](implicit alphabet: Alphabet[Byte]) = codec[F, Code, Bytes](infer).andThen(flatten)
+  def makeCompressionDict(implicit alphabet: Alphabet[Byte]): Dict[Bytes] =
+    CompressionDict.fromAlphabet(alphabet.pure[List])
+
+  def makeDecompressionDict(implicit alphabet: Alphabet[Byte]): Dict[Bytes] =
+    DecompressionDict.fromAlphabet(alphabet.pure[List])
+
+  def compress[F[_]](implicit alphabet: Alphabet[Byte]) =
+    codec[F, Byte, BitBuffer](makeCompressionDict)(emit)
+  def decompress[F[_]](implicit alphabet: Alphabet[Byte]) =
+    codec[F, Code, Bytes](makeDecompressionDict)(infer).andThen(flatten)
 }
