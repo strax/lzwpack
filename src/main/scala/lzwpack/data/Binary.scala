@@ -4,7 +4,7 @@ import java.lang.{Long => JavaLong}
 
 object Binary {
   /**
-    * Returns n rounded up to nearest 2^k, k ∈ {0,1,2...}.
+    * Returns n rounded up to nearest 2^k - 1, k ∈ {0,1,2...}.
     */
   def bitmask(n: Long): Long = {
     var v = n

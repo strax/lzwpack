@@ -7,7 +7,7 @@ class BinarySpec extends UnitSpec {
   import Binary._
 
   describe("bitmask") {
-    it("returns the nearest higher power of two for the given number") {
+    it("returns the next highest number with all bits set for the given number") {
       assert(bitmask(0) == 0)
       assert(bitmask(1) == 1)
       assert(bitmask(2) == 3)
