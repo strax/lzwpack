@@ -1,0 +1,161 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: Dict</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">lzwpack</a> ]
+</div>
+
+<h1>Coverage Summary for Class: Dict (lzwpack)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Dict</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (6/ 9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    72.7%
+  </span>
+  <span class="absValue">
+    (8/ 11)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Dict$</td>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (4/ 5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (4/ 5)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    71.4%
+  </span>
+  <span class="absValue">
+    (10/ 14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (12/ 16)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package lzwpack
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;/**
+<i>4</i>&nbsp;  * A dictionary contains unique codes for given chunks in the input
+<i>5</i>&nbsp;  *
+<i>6</i>&nbsp;  * @todo Change Map to custom trie
+<i>7</i>&nbsp;  */
+<b class="pc"><i>8</i>&nbsp;case class Dict[A](entries: Map[A, Code], headIndex: Int) {</b>
+<i>9</i>&nbsp;  /**
+<i>10</i>&nbsp;    * Returns a boolean determining if this dictionary contains a given chunk
+<i>11</i>&nbsp;    */
+<b class="fc"><i>12</i>&nbsp;  def contains(a: A): Boolean = entries.contains(a)</b>
+<i>13</i>&nbsp;
+<i>14</i>&nbsp;  /**
+<i>15</i>&nbsp;    * Adds a new chunk to the dictionary
+<i>16</i>&nbsp;    * @return a new dictionary with the inserted element
+<i>17</i>&nbsp;    */
+<i>18</i>&nbsp;  def add(a: A): Dict[A] = {
+<b class="fc"><i>19</i>&nbsp;    val newIndex = headIndex + 1</b>
+<b class="fc"><i>20</i>&nbsp;    Dict(entries + (a -&gt; newIndex), newIndex)</b>
+<i>21</i>&nbsp;  }
+<i>22</i>&nbsp;
+<b class="nc"><i>23</i>&nbsp;  def nextIndex: Int = headIndex + 1</b>
+<i>24</i>&nbsp;
+<b class="nc"><i>25</i>&nbsp;  def codeSize: Int = Math.max(headIndex.bitLength, MaxCodeSize)</b>
+<i>26</i>&nbsp;
+<i>27</i>&nbsp;  /**
+<i>28</i>&nbsp;    * Returns the code associated with the given chunk.
+<i>29</i>&nbsp;    * @throws java.util.NoSuchElementException if this dictionary does not contain the given chunk
+<i>30</i>&nbsp;    */
+<b class="fc"><i>31</i>&nbsp;  def get(a: A): Code = entries(a)</b>
+<i>32</i>&nbsp;
+<b class="fc"><i>33</i>&nbsp;  def findKey(code: Code): Option[A] = entries.find {</b>
+<b class="fc"><i>34</i>&nbsp;    case (_, other) =&gt; code == other</b>
+<b class="fc"><i>35</i>&nbsp;  }.map(_._1)</b>
+<i>36</i>&nbsp;
+<b class="nc"><i>37</i>&nbsp;  private[Dict] def inc: Dict[A] = Dict(this.entries, this.headIndex + 1)</b>
+<i>38</i>&nbsp;}
+<i>39</i>&nbsp;
+<i>40</i>&nbsp;/**
+<i>41</i>&nbsp;  * Companion object for {@see Dict}
+<i>42</i>&nbsp;  */
+<b class="fc"><i>43</i>&nbsp;object Dict {</b>
+<b class="fc"><i>44</i>&nbsp;  def empty[A] = Dict(Map.empty[A, Code], 0)</b>
+<i>45</i>&nbsp;
+<i>46</i>&nbsp;  /**
+<i>47</i>&nbsp;    * Initializes a new dictionary with the given alphabet.
+<i>48</i>&nbsp;    * In LZW, the dictionary always contains codes for the whole alphabet before compression / decompression.
+<i>49</i>&nbsp;    */
+<b class="fc"><i>50</i>&nbsp;  def init[A](alphabet: Alphabet[A]): Dict[A] = alphabet.foldLeft(empty[A])((z, a) =&gt; z.add(a))</b>
+<i>51</i>&nbsp;}
+<b class="fc"><i>52</i>&nbsp;</b>
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2018-02-08 12:27</div>
+</div>
+</body>
+</html>

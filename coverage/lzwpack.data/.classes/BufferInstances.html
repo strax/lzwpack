@@ -1,0 +1,204 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: BufferInstances</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">lzwpack.data</a> ]
+</div>
+
+<h1>Coverage Summary for Class: BufferInstances (lzwpack.data)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BufferInstances</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/ 2)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">BufferInstances$BufferMonoid$</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/ 3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/ 3)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/ 4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/ 5)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package lzwpack.data
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import lzwpack._
+<i>4</i>&nbsp;import cats._
+<i>5</i>&nbsp;import cats.implicits._
+<i>6</i>&nbsp;import java.lang.{Long =&gt; JavaLong}
+<i>7</i>&nbsp;
+<i>8</i>&nbsp;import scala.util.Try
+<i>9</i>&nbsp;
+<i>10</i>&nbsp;case class BitBuffer(private[data] val data: Long, size: Int) {
+<i>11</i>&nbsp;  assert(size &gt;= 0)
+<i>12</i>&nbsp;
+<i>13</i>&nbsp;  /**
+<i>14</i>&nbsp;    * Reads n bits from input and returns a tuple of (read bits, remaining bits).
+<i>15</i>&nbsp;    */
+<i>16</i>&nbsp;  def read(bits: Int, allowFewer: Boolean = false): (BitBuffer, Int) = {
+<i>17</i>&nbsp;    if (!allowFewer &amp;&amp; bits &gt; size) throw new IndexOutOfBoundsException(s&quot;Tried to read $bits bits from a buffer with $size bits&quot;)
+<i>18</i>&nbsp;    (drop(bits), take(bits).toInt)
+<i>19</i>&nbsp;  }
+<i>20</i>&nbsp;
+<i>21</i>&nbsp;  def readOption(bits: Int): Option[(BitBuffer, Int)] = Try(read(bits)).toOption
+<i>22</i>&nbsp;
+<i>23</i>&nbsp;  def readByte: (BitBuffer, Byte) = read(8).map(_.toByte)
+<i>24</i>&nbsp;
+<i>25</i>&nbsp;  def drop(n: Int): BitBuffer = {
+<i>26</i>&nbsp;    val tail = data &gt;&gt;&gt; n
+<i>27</i>&nbsp;    BitBuffer(tail, Math.max(size - n, 0))
+<i>28</i>&nbsp;  }
+<i>29</i>&nbsp;
+<i>30</i>&nbsp;  def take(n: Int): BitBuffer = {
+<i>31</i>&nbsp;    val mask = (1 &lt;&lt; n) - 1
+<i>32</i>&nbsp;    val head = data &amp; mask
+<i>33</i>&nbsp;    BitBuffer(head, Math.min(size, n))
+<i>34</i>&nbsp;  }
+<i>35</i>&nbsp;
+<i>36</i>&nbsp;  def toInt: Int = data.toInt
+<i>37</i>&nbsp;  def toByte: Byte = data.toByte
+<i>38</i>&nbsp;
+<i>39</i>&nbsp;  /**
+<i>40</i>&nbsp;    * Returns a new buffer that contains this buffer preceded by the other buffer.
+<i>41</i>&nbsp;    */
+<i>42</i>&nbsp;  def append(other: BitBuffer): BitBuffer = {
+<i>43</i>&nbsp;    assert(other.size + size &lt; JavaLong.SIZE)
+<i>44</i>&nbsp;    val bb = other.data
+<i>45</i>&nbsp;    BitBuffer((bb &lt;&lt; size) ^ data, other.size + size)
+<i>46</i>&nbsp;  }
+<i>47</i>&nbsp;
+<i>48</i>&nbsp;  def ++(other: BitBuffer): BitBuffer = this append other
+<i>49</i>&nbsp;
+<i>50</i>&nbsp;  /**
+<i>51</i>&nbsp;    * Extracts as many values from this buffer as possible. Trailing zero-filled chunks are discarded.
+<i>52</i>&nbsp;    * @param chunkSize the size of each read value in bytes
+<i>53</i>&nbsp;    * @return an array of values
+<i>54</i>&nbsp;    */
+<i>55</i>&nbsp;  def drain(chunkSize: Int): (BitBuffer, Array[Int]) = {
+<i>56</i>&nbsp;    assert(chunkSize &gt; 0)
+<i>57</i>&nbsp;    val chunkCount = size / chunkSize
+<i>58</i>&nbsp;    val values = new Array[Int](chunkCount)
+<i>59</i>&nbsp;
+<i>60</i>&nbsp;    @annotation.tailrec
+<i>61</i>&nbsp;    def go(i: Int, buffer: BitBuffer): Unit = {
+<i>62</i>&nbsp;      if (i &lt; chunkCount) {
+<i>63</i>&nbsp;        buffer.read(chunkSize) match {
+<i>64</i>&nbsp;          case (rest, value) =&gt;
+<i>65</i>&nbsp;            values(i) = value
+<i>66</i>&nbsp;            if (rest.data &gt; 0) go(i + 1, rest)
+<i>67</i>&nbsp;          case _ =&gt;
+<i>68</i>&nbsp;        }
+<i>69</i>&nbsp;      }
+<i>70</i>&nbsp;    }
+<i>71</i>&nbsp;
+<i>72</i>&nbsp;    go(0, this)
+<i>73</i>&nbsp;    (drop(chunkCount * chunkSize), values)
+<i>74</i>&nbsp;  }
+<i>75</i>&nbsp;
+<i>76</i>&nbsp;  override def toString(): String = s&quot;BitBuffer(${data.bin(size)}, $size bits)&quot;
+<i>77</i>&nbsp;}
+<i>78</i>&nbsp;
+<b class="fc"><i>79</i>&nbsp;trait BufferInstances {</b>
+<b class="fc"><i>80</i>&nbsp;  implicit object BufferMonoid extends Monoid[BitBuffer] {</b>
+<b class="fc"><i>81</i>&nbsp;    override def empty: BitBuffer = BitBuffer.empty</b>
+<b class="fc"><i>82</i>&nbsp;    override def combine(a: BitBuffer, b: BitBuffer): BitBuffer = a append b</b>
+<i>83</i>&nbsp;  }
+<i>84</i>&nbsp;
+<b class="fc"><i>85</i>&nbsp;  implicit val bitBufferShow: Show[BitBuffer] = Show.fromToString[BitBuffer]</b>
+<i>86</i>&nbsp;}
+<i>87</i>&nbsp;
+<i>88</i>&nbsp;object BitBuffer {
+<i>89</i>&nbsp;  @inline def apply(b: Byte): BitBuffer = BitBuffer(b.unsigned, 8)
+<i>90</i>&nbsp;  @inline def apply(data: Int): BitBuffer = BitBuffer(data, data.bitLength)
+<i>91</i>&nbsp;
+<i>92</i>&nbsp;  def tupled(t: (Int, Int)): BitBuffer = BitBuffer(t._1, t._2)
+<i>93</i>&nbsp;
+<i>94</i>&nbsp;  def empty: BitBuffer = BitBuffer(0, 0)
+<i>95</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2018-02-08 12:27</div>
+</div>
+</body>
+</html>

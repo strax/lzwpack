@@ -1,0 +1,218 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: Implicits</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">lzwpack</a> ]
+</div>
+
+<h1>Coverage Summary for Class: Implicits (lzwpack)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Implicits</td>
+<td class="coverageStat">
+  <span class="percent">
+    85.7%
+  </span>
+  <span class="absValue">
+    (6/ 7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    85.7%
+  </span>
+  <span class="absValue">
+    (6/ 7)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Implicits$ByteListOps</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (3/ 4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (3/ 9)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Implicits$ByteOps</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/ 3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/ 3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Implicits$LongOps</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (3/ 6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (3/ 6)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Implicits$StringOps</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/ 3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/ 3)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    78.3%
+  </span>
+  <span class="absValue">
+    (18/ 23)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    64.3%
+  </span>
+  <span class="absValue">
+    (18/ 28)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package lzwpack
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import java.lang.{Byte =&gt; JavaByte, Long =&gt; JavaLong}
+<i>4</i>&nbsp;import java.nio.charset.{Charset, CodingErrorAction}
+<i>5</i>&nbsp;
+<i>6</i>&nbsp;import cats._
+<i>7</i>&nbsp;import cats.implicits._
+<i>8</i>&nbsp;
+<i>9</i>&nbsp;import scala.io.Codec
+<i>10</i>&nbsp;
+<i>11</i>&nbsp;/**
+<i>12</i>&nbsp;  * Contains extension methods to existing types, grouped into an object
+<i>13</i>&nbsp;  * so all the implicits can be imported with &lt;code&gt;import Implicits._&lt;/code&gt;.
+<i>14</i>&nbsp;  */
+<b class="fc"><i>15</i>&nbsp;trait Implicits {</b>
+<b class="nc"><i>16</i>&nbsp;  implicit lazy val ASCII: Charset = Charset.forName(&quot;US-ASCII&quot;)</b>
+<i>17</i>&nbsp;
+<b class="fc"><i>18</i>&nbsp;  implicit class ByteOps(b: Byte) {</b>
+<i>19</i>&nbsp;    /**
+<i>20</i>&nbsp;      * Converts a signed JVM byte into its unsigned representation.
+<i>21</i>&nbsp;      */
+<b class="fc"><i>22</i>&nbsp;    def unsigned: Int = JavaByte.toUnsignedInt(b)</b>
+<i>23</i>&nbsp;  }
+<i>24</i>&nbsp;
+<b class="fc"><i>25</i>&nbsp;  implicit class LongOps(n: Long) {</b>
+<b class="fc"><i>26</i>&nbsp;    def bitLength: Int = if(n == 0L) 0 else Math.floor(Math.log(n) / Math.log(2)).toInt + 1</b>
+<i>27</i>&nbsp;
+<b class="nc"><i>28</i>&nbsp;    def bin: String = bin(JavaLong.SIZE)</b>
+<b class="nc"><i>29</i>&nbsp;    def bin(size: Int): String = n.toBinaryString.reverse.padTo(size, &quot;0&quot;).reverse.mkString</b>
+<i>30</i>&nbsp;
+<b class="nc"><i>31</i>&nbsp;    def hex: String = n formatted &quot;0x%02X&quot;</b>
+<i>32</i>&nbsp;  }
+<i>33</i>&nbsp;
+<b class="fc"><i>34</i>&nbsp;  implicit class ByteListOps(bs: List[Byte]) {</b>
+<b class="fc"><i>35</i>&nbsp;    def unsigned: List[Int] = bs map (_.unsigned)</b>
+<i>36</i>&nbsp;    def asString(implicit charset: Charset): String = {
+<b class="nc"><i>37</i>&nbsp;      val decoder = charset</b>
+<i>38</i>&nbsp;        .newDecoder
+<b class="nc"><i>39</i>&nbsp;        .replaceWith(&quot;.&quot;)</b>
+<b class="nc"><i>40</i>&nbsp;        .onUnmappableCharacter(CodingErrorAction.REPLACE)</b>
+<b class="nc"><i>41</i>&nbsp;        .onMalformedInput(CodingErrorAction.REPLACE)</b>
+<b class="nc"><i>42</i>&nbsp;      val buffer = java.nio.ByteBuffer.wrap(bs.toArray)</b>
+<b class="nc"><i>43</i>&nbsp;      decoder.decode(buffer).toString</b>
+<i>44</i>&nbsp;    }
+<i>45</i>&nbsp;  }
+<i>46</i>&nbsp;
+<b class="fc"><i>47</i>&nbsp;  implicit val byteListShow: Show[List[Byte]] = bs =&gt; bs.map(_ formatted &quot;%02X&quot;).mkString(&quot; &quot;)</b>
+<i>48</i>&nbsp;
+<b class="fc"><i>49</i>&nbsp;  implicit class StringOps(sc: StringContext) {</b>
+<b class="fc"><i>50</i>&nbsp;    def b(_args: Any*): Int = Integer.parseUnsignedInt(sc.parts.mkString, 2)</b>
+<i>51</i>&nbsp;  }
+<b class="fc"><i>52</i>&nbsp;}</b>
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2018-02-08 12:27</div>
+</div>
+</body>
+</html>

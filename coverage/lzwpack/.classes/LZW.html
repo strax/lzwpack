@@ -1,0 +1,246 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: LZW</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">lzwpack</a> ]
+</div>
+
+<h1>Coverage Summary for Class: LZW (lzwpack)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+  <tr>
+    <td class="name">LZW$</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (12/ 12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (43/ 43)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">LZW$CompressionException</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">LZW$CompressionState</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">LZW$CompressionState$</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    86.7%
+  </span>
+  <span class="absValue">
+    (13/ 15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    95.7%
+  </span>
+  <span class="absValue">
+    (44/ 46)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package lzwpack
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import java.nio.charset.Charset
+<i>4</i>&nbsp;
+<i>5</i>&nbsp;import fs2._
+<i>6</i>&nbsp;import lzwpack.data.BitBuffer
+<i>7</i>&nbsp;
+<i>8</i>&nbsp;
+<b class="fc"><i>9</i>&nbsp;object LZW extends Debugging {</b>
+<b class="nc"><i>10</i>&nbsp;  class CompressionException(cause: String) extends RuntimeException(cause)</b>
+<i>11</i>&nbsp;
+<i>12</i>&nbsp;  import cats._
+<i>13</i>&nbsp;  import cats.implicits._
+<i>14</i>&nbsp;
+<i>15</i>&nbsp;  type Output = Code
+<i>16</i>&nbsp;
+<b class="pc"><i>17</i>&nbsp;  case class CompressionState(dict: Dict[Bytes], buffered: Bytes)</b>
+<i>18</i>&nbsp;
+<b class="fc"><i>19</i>&nbsp;  private def makeBitBuffer(code: Code, dict: Dict[_]) = BitBuffer(code, dict.headIndex.bitLength)</b>
+<i>20</i>&nbsp;
+<i>21</i>&nbsp;  /**
+<i>22</i>&nbsp;    * Processes the given block (given as head and tail) and returns a tuple of a potentially changed
+<i>23</i>&nbsp;    * dictionary and an Option indicating whether to emit a code to the output.
+<i>24</i>&nbsp;    *
+<i>25</i>&nbsp;    * @todo Refactor: can remove Option from output type?
+<i>26</i>&nbsp;    */
+<i>27</i>&nbsp;  private def emit(state: CompressionState, head: Option[Byte]): (CompressionState, Option[BitBuffer]) = {
+<b class="fc"><i>28</i>&nbsp;    val dict = state.dict</b>
+<i>29</i>&nbsp;
+<b class="fc"><i>30</i>&nbsp;    head match {</b>
+<b class="fc"><i>31</i>&nbsp;      case None =&gt;</b>
+<b class="fc"><i>32</i>&nbsp;        val code = dict.get(state.buffered)</b>
+<b class="fc"><i>33</i>&nbsp;        val bb = makeBitBuffer(code, dict)</b>
+<b class="fc"><i>34</i>&nbsp;        (CompressionState(dict, Bytes.empty), Some(bb))</b>
+<i>35</i>&nbsp;
+<b class="fc"><i>36</i>&nbsp;      case Some(byte) if dict.contains(state.buffered :+ byte) =&gt;</b>
+<b class="fc"><i>37</i>&nbsp;        (CompressionState(dict, state.buffered :+ byte), None)</b>
+<i>38</i>&nbsp;
+<b class="fc"><i>39</i>&nbsp;      case Some(byte) =&gt;</b>
+<b class="fc"><i>40</i>&nbsp;        val nextDict = dict.add(state.buffered :+ byte)</b>
+<b class="fc"><i>41</i>&nbsp;        val code = nextDict.get(state.buffered)</b>
+<b class="fc"><i>42</i>&nbsp;        (CompressionState(nextDict, Bytes(byte)), Some(makeBitBuffer(code, dict)))</b>
+<i>43</i>&nbsp;    }
+<i>44</i>&nbsp;  }
+<i>45</i>&nbsp;
+<b class="fc"><i>46</i>&nbsp;  private def infer(state: CompressionState, code: Option[Code]): (CompressionState, Option[Bytes]) = code match {</b>
+<b class="fc"><i>47</i>&nbsp;    case None =&gt;</b>
+<b class="fc"><i>48</i>&nbsp;      (CompressionState(state.dict, Bytes.empty), None)</b>
+<i>49</i>&nbsp;
+<b class="fc"><i>50</i>&nbsp;    case Some(code) =&gt;</b>
+<b class="fc"><i>51</i>&nbsp;      state.dict.findKey(code) match {</b>
+<b class="fc"><i>52</i>&nbsp;        case None =&gt;</b>
+<i>53</i>&nbsp;          // Handle cases where the code is not yet inferred by the decoder;
+<i>54</i>&nbsp;          // if the previous value is xω then we can infer the next code to be xωx
+<b class="fc"><i>55</i>&nbsp;          val inferred = state.buffered ++ state.buffered.take(1)</b>
+<b class="fc"><i>56</i>&nbsp;          (CompressionState(state.dict.add(inferred), inferred), Some(inferred))</b>
+<i>57</i>&nbsp;
+<b class="fc"><i>58</i>&nbsp;        case Some(block) =&gt;</b>
+<b class="fc"><i>59</i>&nbsp;          if (!state.buffered.isEmpty) {</b>
+<i>60</i>&nbsp;            // New dictionary entry is conjecture + first byte of the current key
+<b class="fc"><i>61</i>&nbsp;            (CompressionState(state.dict.add(state.buffered ++ block.take(1)), block), Some(block))</b>
+<i>62</i>&nbsp;          } else {
+<b class="fc"><i>63</i>&nbsp;            (CompressionState(state.dict, block), Some(block))</b>
+<i>64</i>&nbsp;          }
+<i>65</i>&nbsp;      }
+<i>66</i>&nbsp;  }
+<i>67</i>&nbsp;
+<i>68</i>&nbsp;  type CodecF[I, O] = (CompressionState, Option[I]) =&gt; (CompressionState, Option[O])
+<i>69</i>&nbsp;
+<i>70</i>&nbsp;  private def codec[F[_], I, O](f: =&gt; CodecF[I, O])(implicit alphabet: Alphabet[Byte]): Pipe[F, I, O] = {
+<i>71</i>&nbsp;    def go(stream: Stream[F, I], state: CompressionState): Pull[F, O, Unit] = {
+<b class="fc"><i>72</i>&nbsp;      stream.pull.uncons1.flatMap {</b>
+<b class="fc"><i>73</i>&nbsp;        case Some((head, tail)) =&gt;</b>
+<b class="fc"><i>74</i>&nbsp;          f(state, Some(head)) match {</b>
+<b class="fc"><i>75</i>&nbsp;            case (s, Some(output)) =&gt;</b>
+<b class="fc"><i>76</i>&nbsp;              Pull.output(Segment(output)) &gt;&gt; go(tail, s)</b>
+<i>77</i>&nbsp;
+<b class="fc"><i>78</i>&nbsp;            case (s, None) =&gt;</b>
+<b class="fc"><i>79</i>&nbsp;              go(tail, s)</b>
+<i>80</i>&nbsp;          }
+<i>81</i>&nbsp;
+<b class="fc"><i>82</i>&nbsp;        case None =&gt;</b>
+<b class="fc"><i>83</i>&nbsp;          f(state, None) match {</b>
+<b class="fc"><i>84</i>&nbsp;            case (_, output) =&gt;</b>
+<b class="fc"><i>85</i>&nbsp;              output.fold(Pull.done.covaryOutput[O])(Pull.output1(_))</b>
+<i>86</i>&nbsp;          }
+<i>87</i>&nbsp;      }
+<i>88</i>&nbsp;    }
+<b class="fc"><i>89</i>&nbsp;    in =&gt; {</b>
+<b class="fc"><i>90</i>&nbsp;      val dict = Dict.init(alphabet.pure[List])</b>
+<b class="fc"><i>91</i>&nbsp;      go(in, CompressionState(dict, Bytes.empty)).stream</b>
+<i>92</i>&nbsp;    }
+<i>93</i>&nbsp;  }
+<i>94</i>&nbsp;
+<b class="fc"><i>95</i>&nbsp;  def flatten[F[_], O](s: Stream[F, Seq[O]]) = s.flatMap(bs =&gt; Stream.emits(bs))</b>
+<i>96</i>&nbsp;
+<b class="fc"><i>97</i>&nbsp;  def compress[F[_]](implicit alphabet: Alphabet[Byte]) = codec[F, Byte, BitBuffer](emit)</b>
+<b class="fc"><i>98</i>&nbsp;  def decompress[F[_]](implicit alphabet: Alphabet[Byte]) = codec[F, Code, Bytes](infer).andThen(flatten)</b>
+<i>99</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2018-02-08 12:27</div>
+</div>
+</body>
+</html>
