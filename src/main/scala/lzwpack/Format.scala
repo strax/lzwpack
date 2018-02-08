@@ -23,7 +23,7 @@ object Format extends Debugging {
   }
 
   case class UnpackState(buffer: BitBuffer, counter: Int) {
-    def codeSize: Int = Math.min((counter).bitLength, MaxCodeSize)
+    def codeSize: Int = Math.min((counter).bitsize, MaxCodeSize)
     def set(bb: BitBuffer) = UnpackState(bb, counter)
   }
 

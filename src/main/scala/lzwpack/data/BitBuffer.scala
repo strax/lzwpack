@@ -87,7 +87,7 @@ trait BufferInstances {
 
 object BitBuffer {
   @inline def apply(b: Byte): BitBuffer = BitBuffer(b.unsigned, 8)
-  @inline def apply(data: Int): BitBuffer = BitBuffer(data, data.bitLength)
+  @inline def apply(data: Int): BitBuffer = BitBuffer(data, data.bitsize)
 
   def tupled(t: (Int, Int)): BitBuffer = BitBuffer(t._1, t._2)
 

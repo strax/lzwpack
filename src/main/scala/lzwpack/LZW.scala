@@ -18,7 +18,7 @@ object LZW extends Debugging {
 
   case class CompressionState(dict: Dict[Bytes], buffered: Bytes)
 
-  private def makeBitBuffer(code: Code, dict: Dict[_]) = BitBuffer(code, dict.currentCode.bitLength)
+  private def makeBitBuffer(code: Code, dict: Dict[_]) = BitBuffer(code, dict.currentCode.bitsize)
 
   /**
     * Processes the given block (given as head and tail) and returns a tuple of a potentially changed
