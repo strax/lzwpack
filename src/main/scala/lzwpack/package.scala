@@ -1,9 +1,10 @@
 import cats.Applicative
 import fs2.Pipe
+import lzwpack.implicits.AllImplicits
 
 import scala.collection.immutable.List
 
-package object lzwpack extends Implicits with DictInstances {
+package object lzwpack extends AllImplicits with DictInstances {
   val MaxCodeSize = 16 // bits
 
   /**
