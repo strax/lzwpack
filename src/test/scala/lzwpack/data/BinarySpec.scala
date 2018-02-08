@@ -13,6 +13,7 @@ class BinarySpec extends UnitSpec {
       assert(bitmask(2) == 3)
       assert(bitmask(3) == 3)
       assert(bitmask(4) == 7)
+      assert(bitmask(Long.MaxValue) == Long.MaxValue)
     }
   }
 
@@ -26,6 +27,8 @@ class BinarySpec extends UnitSpec {
       assert(bitsize(4) == 3)
       assert(bitsize(7) == 3)
       assert(bitsize(8) == 4)
+      // -1 == 64 bits set in a Long
+      assert(bitsize(-1L) == 64)
     }
   }
 }
