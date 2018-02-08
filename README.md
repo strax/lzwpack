@@ -4,6 +4,8 @@ Course work for HelsinkiU CS project.
 
 ## Documentation (Finnish)
 
+[Test coverage](https://strax.github.io/lzwpack/coverage)
+
 [Specification](doc/maarittelydokumentti.pdf)
 
 [Week 1 recap](doc/viikkoraportti1.md)
