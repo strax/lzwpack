@@ -13,3 +13,5 @@ Course work for HelsinkiU CS project.
 [Week 2 recap](doc/viikkoraportti2.md)
 
 [Week 3 recap](doc/viikkoraportti3.md)
+
+[Week 4 recap](doc/viikkoraportti4.md)
