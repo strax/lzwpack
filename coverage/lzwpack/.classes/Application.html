@@ -42,7 +42,7 @@
     0%
   </span>
   <span class="absValue">
-    (0/ 3)
+    (0/ 11)
   </span>
 </td>
 <td class="coverageStat">
@@ -50,7 +50,121 @@
     0%
   </span>
   <span class="absValue">
-    (0/ 11)
+    (0/ 20)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Application$$anon$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 10)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Application$OperationMode$</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Application$OperationMode$Compress$</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Application$OperationMode$Decompress$</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Application$Options</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Application$Options$</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
   </span>
 </td>
   </tr>
@@ -61,7 +175,7 @@
     0%
   </span>
   <span class="absValue">
-    (0/ 3)
+    (0/ 20)
   </span>
 </td>
 <td class="coverageStat">
@@ -69,7 +183,7 @@
     0%
   </span>
   <span class="absValue">
-    (0/ 11)
+    (0/ 35)
   </span>
 </td>
 </tr>
@@ -81,40 +195,83 @@
 
 <div class="sourceCode"><i>1</i>&nbsp;package lzwpack
 <i>2</i>&nbsp;
-<i>3</i>&nbsp;import java.nio.file.Paths
+<i>3</i>&nbsp;import java.nio.file.{Path, Paths}
 <i>4</i>&nbsp;
 <i>5</i>&nbsp;import cats.effect.{IO, Sync}
-<i>6</i>&nbsp;
-<i>7</i>&nbsp;object Application {
-<i>8</i>&nbsp;  import LZW._
-<i>9</i>&nbsp;  import Format._
-<i>10</i>&nbsp;
-<i>11</i>&nbsp;  def main(args: Array[String]): Unit = {
-<i>12</i>&nbsp;    import Alphabet.Compress
-<i>13</i>&nbsp;
-<b class="nc"><i>14</i>&nbsp;    implicit val F = implicitly[Sync[IO]]</b>
-<i>15</i>&nbsp;
-<b class="nc"><i>16</i>&nbsp;    fs2.io.file.readAll(Paths.get(&quot;fixtures/alice29.txt&quot;), 4028)</b>
-<b class="nc"><i>17</i>&nbsp;      .through(compressAdaptive)</b>
-<b class="nc"><i>18</i>&nbsp;      .to(fs2.io.file.writeAll(Paths.get(&quot;tmp/alice29.txt.Z&quot;)))</b>
-<i>19</i>&nbsp;      .compile
-<b class="nc"><i>20</i>&nbsp;      .drain.unsafeRunSync()</b>
-<i>21</i>&nbsp;
-<b class="nc"><i>22</i>&nbsp;    fs2.io.file.readAll(Paths.get(&quot;tmp/alice29.txt.Z&quot;), 4028)</b>
-<b class="nc"><i>23</i>&nbsp;      .through(CompressHeader.decode)</b>
-<b class="nc"><i>24</i>&nbsp;      .through(decompressAdaptive)</b>
-<b class="nc"><i>25</i>&nbsp;      .to(fs2.io.file.writeAll(Paths.get(&quot;tmp/alice29.txt&quot;)))</b>
-<i>26</i>&nbsp;      .compile
-<b class="nc"><i>27</i>&nbsp;      .drain</b>
-<i>28</i>&nbsp;      .unsafeRunSync()
-<i>29</i>&nbsp;  }
-<b class="nc"><i>30</i>&nbsp;}</b>
+<i>6</i>&nbsp;import fs2.Stream
+<i>7</i>&nbsp;
+<i>8</i>&nbsp;object Application {
+<i>9</i>&nbsp;  sealed trait OperationMode
+<i>10</i>&nbsp;  object OperationMode {
+<b class="nc"><i>11</i>&nbsp;    case object Compress extends OperationMode</b>
+<b class="nc"><i>12</i>&nbsp;    case object Decompress extends OperationMode</b>
+<i>13</i>&nbsp;  }
+<i>14</i>&nbsp;
+<b class="nc"><i>15</i>&nbsp;  case class Options(path: Path = Paths.get(&quot;.&quot;), mode: OperationMode = OperationMode.Compress, maxCodeSize: Int = MaxCodeSize)</b>
+<i>16</i>&nbsp;
+<b class="nc"><i>17</i>&nbsp;  def options = new scopt.OptionParser[Options](&quot;lzwpack&quot;) {</b>
+<b class="nc"><i>18</i>&nbsp;    head(&quot;lzwpack&quot;, &quot;LZW compression utility&quot;)</b>
+<i>19</i>&nbsp;
+<b class="nc"><i>20</i>&nbsp;    opt[Unit](&#39;d&#39;, &quot;decompress&quot;) action { (_, opts) =&gt;</b>
+<b class="nc"><i>21</i>&nbsp;      opts.copy(mode = OperationMode.Decompress)</b>
+<b class="nc"><i>22</i>&nbsp;    } text &quot;decompress input file instead of compression&quot;</b>
+<i>23</i>&nbsp;
+<b class="nc"><i>24</i>&nbsp;    opt[Int](&#39;b&#39;, &quot;bits&quot;) action { (n, opts) =&gt; opts.copy(maxCodeSize = n) } validate { n =&gt;</b>
+<b class="nc"><i>25</i>&nbsp;      if (n &gt;= 9 &amp;&amp; n &lt;= 16) success</b>
+<b class="nc"><i>26</i>&nbsp;      else failure(&quot;Code size must be between 9 and 16&quot;)</b>
+<b class="nc"><i>27</i>&nbsp;    } text &quot;the maximum number of bits to use for each code&quot;</b>
+<i>28</i>&nbsp;
+<b class="nc"><i>29</i>&nbsp;    arg[String](&quot;path&quot;) action { (path, opts) =&gt; opts.copy(path = Paths.get(path)) }</b>
+<i>30</i>&nbsp;
+<b class="nc"><i>31</i>&nbsp;    help(&quot;help&quot;).text(&quot;prints this usage text&quot;)</b>
+<i>32</i>&nbsp;  }
+<i>33</i>&nbsp;
+<i>34</i>&nbsp;  // Use compress(1) compatible alphabet by default
+<i>35</i>&nbsp;  import Alphabet.Compress
+<i>36</i>&nbsp;
+<b class="nc"><i>37</i>&nbsp;  def inputStream(path: Path): Stream[IO, Byte] = fs2.io.file.readAll[IO](path, 4028)</b>
+<i>38</i>&nbsp;
+<i>39</i>&nbsp;  def runCompress(path: Path, maxCodeSize: Int): IO[Unit] = {
+<b class="nc"><i>40</i>&nbsp;    inputStream(path)</b>
+<b class="nc"><i>41</i>&nbsp;      .through(compressAdaptive)</b>
+<b class="nc"><i>42</i>&nbsp;      .through(CompressHeader.encode)</b>
+<b class="nc"><i>43</i>&nbsp;      .to(fs2.io.stdout)</b>
+<i>44</i>&nbsp;      .compile
+<b class="nc"><i>45</i>&nbsp;      .drain</b>
+<i>46</i>&nbsp;  }
+<i>47</i>&nbsp;
+<i>48</i>&nbsp;  def runDecompress(path: Path, maxCodeSize: Int): IO[Unit] = {
+<b class="nc"><i>49</i>&nbsp;    inputStream(path)</b>
+<b class="nc"><i>50</i>&nbsp;      .through(CompressHeader.decode)</b>
+<b class="nc"><i>51</i>&nbsp;      .through(decompressAdaptive)</b>
+<b class="nc"><i>52</i>&nbsp;      .to(fs2.io.stdout)</b>
+<i>53</i>&nbsp;      .compile
+<b class="nc"><i>54</i>&nbsp;      .drain</b>
+<i>55</i>&nbsp;  }
+<i>56</i>&nbsp;
+<b class="nc"><i>57</i>&nbsp;  def parseOptions(args: Seq[String]): IO[Option[Options]] = IO {</b>
+<b class="nc"><i>58</i>&nbsp;    options.parse(args, Options())</b>
+<i>59</i>&nbsp;  }
+<i>60</i>&nbsp;
+<i>61</i>&nbsp;  /**
+<i>62</i>&nbsp;    * Parses program options and evaluates the corresponding action.
+<i>63</i>&nbsp;    * This function does not actually perform side effects; it just returns a IO instance that can then
+<i>64</i>&nbsp;    * be evaluated &quot;at the end of the universe&quot; – the program&#39;s [[main]] method.
+<i>65</i>&nbsp;    */
+<b class="nc"><i>66</i>&nbsp;  def program(args: Seq[String]): IO[Unit] = parseOptions(args) flatMap {</b>
+<b class="nc"><i>67</i>&nbsp;    case Some(Options(path, OperationMode.Compress, maxCodeSize)) =&gt; runCompress(path, maxCodeSize)</b>
+<b class="nc"><i>68</i>&nbsp;    case Some(Options(path, OperationMode.Decompress, maxCodeSize)) =&gt; runDecompress(path, maxCodeSize)</b>
+<b class="nc"><i>69</i>&nbsp;    case None =&gt; IO.unit</b>
+<i>70</i>&nbsp;  }
+<i>71</i>&nbsp;
+<b class="nc"><i>72</i>&nbsp;  def main(args: Array[String]): Unit = program(args).unsafeRunSync()</b>
+<b class="nc"><i>73</i>&nbsp;}</b>
 </div>
 </div>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2018-02-08 12:27</div>
+    <div style="float:right;">generated on 2018-02-10 13:10</div>
 </div>
 </body>
 </html>

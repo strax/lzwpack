@@ -142,7 +142,7 @@
 <i>23</i>&nbsp;  }
 <i>24</i>&nbsp;
 <b class="pc"><i>25</i>&nbsp;  case class UnpackState(buffer: BitBuffer, counter: Int) {</b>
-<b class="fc"><i>26</i>&nbsp;    def codeSize: Int = Math.min((counter).bitLength, MaxCodeSize)</b>
+<b class="fc"><i>26</i>&nbsp;    def codeSize: Int = Math.min((counter).bitsize, MaxCodeSize)</b>
 <b class="fc"><i>27</i>&nbsp;    def set(bb: BitBuffer) = UnpackState(bb, counter)</b>
 <i>28</i>&nbsp;  }
 <i>29</i>&nbsp;
@@ -178,7 +178,7 @@
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2018-02-08 12:27</div>
+    <div style="float:right;">generated on 2018-02-10 13:10</div>
 </div>
 </body>
 </html>
