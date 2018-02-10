@@ -1,0 +1,114 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: Binary</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">lzwpack.data</a> ]
+</div>
+
+<h1>Coverage Summary for Class: Binary (lzwpack.data)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+  <tr>
+    <td class="name">Binary$</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/ 3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (11/ 11)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/ 3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (11/ 11)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package lzwpack.data
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import java.lang.{Long =&gt; JavaLong}
+<i>4</i>&nbsp;
+<b class="fc"><i>5</i>&nbsp;object Binary {</b>
+<i>6</i>&nbsp;  /**
+<i>7</i>&nbsp;    * Returns n rounded up to nearest 2^k - 1, k ∈ {0,1,2...}.
+<i>8</i>&nbsp;    */
+<i>9</i>&nbsp;  def bitmask(n: Long): Long = {
+<b class="fc"><i>10</i>&nbsp;    var v = n</b>
+<b class="fc"><i>11</i>&nbsp;    v |= v &gt;&gt; 1</b>
+<b class="fc"><i>12</i>&nbsp;    v |= v &gt;&gt; 2</b>
+<b class="fc"><i>13</i>&nbsp;    v |= v &gt;&gt; 4</b>
+<b class="fc"><i>14</i>&nbsp;    v |= v &gt;&gt; 8</b>
+<b class="fc"><i>15</i>&nbsp;    v |= v &gt;&gt; 16</b>
+<b class="fc"><i>16</i>&nbsp;    v |= v &gt;&gt; 32</b>
+<b class="fc"><i>17</i>&nbsp;    v</b>
+<i>18</i>&nbsp;  }
+<i>19</i>&nbsp;
+<i>20</i>&nbsp;  /**
+<i>21</i>&nbsp;    * Returns the amount of bits it takes to represent `n` in binary.
+<i>22</i>&nbsp;    */
+<b class="fc"><i>23</i>&nbsp;  def bitsize(n: Long): Int = if(n == 0) 1 else JavaLong.bitCount(bitmask(n))</b>
+<b class="fc"><i>24</i>&nbsp;}</b>
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2018-02-10 13:10</div>
+</div>
+</body>
+</html>
