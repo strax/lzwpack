@@ -25,6 +25,8 @@ libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.13.4" % "test"
 // libraryDependencies += "com.github.alexarchambault" %% "scalacheck-shapeless_1.13" % "1.1.6" % "test"
 libraryDependencies += "org.typelevel" %% "cats-laws" % "1.0.1" % "test"
 libraryDependencies += "org.typelevel" %% "cats-testkit" % "1.0.0-RC1" % "test"
+libraryDependencies += "org.openjdk.jmh" % "jmh-core" % "1.20" % "test"
+libraryDependencies += "org.openjdk.jmh" % "jmh-generator-annprocess" % "1.20" % "test"
 
 
 libraryDependencies += "com.lihaoyi" % "ammonite" % "1.0.3" % "test" cross CrossVersion.full

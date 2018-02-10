@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+SCALA_VERSION="2.12"
+LZWPACK_VERSION="0.1"
+
+java -client -jar target/scala-$SCALA_VERSION/lzwpack-assembly-$LZWPACK_VERSION.jar $@
