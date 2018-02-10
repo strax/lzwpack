@@ -15,6 +15,10 @@ available options.
 
 [Specification](doc/maarittelydokumentti.pdf)
 
+[Testing document](doc/testausdokumentti.md)
+
+[Implementation document](doc/toteutusdokumentti.md)
+
 [Week 1 recap](doc/viikkoraportti1.md)
 
 [Week 2 recap](doc/viikkoraportti2.md)
