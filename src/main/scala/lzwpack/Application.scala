@@ -34,9 +34,9 @@ object Application {
   // Use compress(1) compatible alphabet by default
   import Alphabet.Compress
 
-  def inputStream[F[_]: Sync](path: Path): Stream[F, Byte] = fs2.io.file.readAll(path, 4028)
+  def inputStream(path: Path): Stream[IO, Byte] = fs2.io.file.readAll[IO](path, 4028)
 
-  def runCompress[F[_]: Sync](path: Path, maxCodeSize: Int): F[Unit] = {
+  def runCompress(path: Path, maxCodeSize: Int): IO[Unit] = {
     inputStream(path)
       .through(compressAdaptive)
       .through(CompressHeader.encode)
@@ -45,7 +45,7 @@ object Application {
       .drain
   }
 
-  def runDecompress[F[_]: Sync](path: Path, maxCodeSize: Int): F[Unit] = {
+  def runDecompress(path: Path, maxCodeSize: Int): IO[Unit] = {
     inputStream(path)
       .through(CompressHeader.decode)
       .through(decompressAdaptive)
@@ -54,16 +54,20 @@ object Application {
       .drain
   }
 
-  /**
-    * Parses program options and evaluates the corresponding action.
-    * This function does not actually perform side effects; it just returns a [[F]] instance that can then
-    * be evaluated "at the end of the universe" – the program's [[main]] method.
-    */
-  def program[F[_]: Sync](args: Array[String]): F[Unit] = options.parse(args, Options()) match {
-    case Some(Options(path, OperationMode.Compress, maxCodeSize)) => runCompress(path, maxCodeSize)
-    case Some(Options(path, OperationMode.Decompress, maxCodeSize)) => runDecompress(path, maxCodeSize)
-    case None => Sync[F].unit
+  def parseOptions(args: Seq[String]): IO[Option[Options]] = IO {
+    options.parse(args, Options())
   }
 
-  def main(args: Array[String]): Unit = program[IO](args).unsafeRunSync()
+  /**
+    * Parses program options and evaluates the corresponding action.
+    * This function does not actually perform side effects; it just returns a IO instance that can then
+    * be evaluated "at the end of the universe" – the program's [[main]] method.
+    */
+  def program(args: Seq[String]): IO[Unit] = parseOptions(args) flatMap {
+    case Some(Options(path, OperationMode.Compress, maxCodeSize)) => runCompress(path, maxCodeSize)
+    case Some(Options(path, OperationMode.Decompress, maxCodeSize)) => runDecompress(path, maxCodeSize)
+    case None => IO.unit
+  }
+
+  def main(args: Array[String]): Unit = program(args).unsafeRunSync()
 }
