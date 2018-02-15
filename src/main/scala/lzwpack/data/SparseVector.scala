@@ -10,6 +10,8 @@ import SparseVector._
   * It supports O(log32(n)) insertion, updating and random access.
   */
 sealed trait SparseVector[+A] {
+  def apply(i: Int): A = get(i).getOrElse(throw new NoSuchElementException)
+
   def contains(i: Int): Boolean = get(i).nonEmpty
 
   def get(i: Int): Option[A]
@@ -18,6 +20,17 @@ sealed trait SparseVector[+A] {
 
   def +[AA >: A](kv: (Int, AA)): SparseVector[AA] = kv match {
     case (k, v) => updated(k, v)
+  }
+
+  /**
+    * Returns a new [[SparseVector]] with the element at the given index applied to f.
+    * If no element exists at the given index, this is a no-op.
+    */
+  def transform[AA >: A](i: Int)(f: A => AA): SparseVector[AA] = {
+    if (this contains i)
+      this.updated(i, f(apply(i)))
+    else
+      this
   }
 
   def foldLeft[B](init: B)(f: (B, (Int, A)) => B): B

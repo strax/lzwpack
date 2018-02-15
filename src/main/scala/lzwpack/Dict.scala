@@ -1,6 +1,6 @@
 package lzwpack
 
-import lzwpack.data.SparseVector
+import lzwpack.data.{HashMapVector, SparseVector}
 
 /**
   * A dict is a set of keys that have an associated monotonic unique code.
@@ -55,7 +55,7 @@ trait MakeDict[T[_]] {
   * A [[Dict]] optimized for compression.
   * Provides amortized O(1) add and lookup by key, but O(n) lookup by code.
   */
-case class CompressionDict[K](map: Map[K, Code], currentCode: Int) extends Dict[K] {
+case class CompressionDict[K](map: HashMapVector[K, Code], currentCode: Int) extends Dict[K] {
   override def contains(key: K): Boolean = map contains key
 
   override def add(key: K): Dict[K] = CompressionDict(map + (key -> nextCode), nextCode)
@@ -68,7 +68,7 @@ case class CompressionDict[K](map: Map[K, Code], currentCode: Int) extends Dict[
 }
 
 object CompressionDict extends MakeDict[CompressionDict] {
-  def empty[K]: Dict[K] = CompressionDict(Map.empty[K, Code], 0)
+  def empty[K]: Dict[K] = CompressionDict(HashMapVector.empty[K, Code], 0)
 }
 
 /**
