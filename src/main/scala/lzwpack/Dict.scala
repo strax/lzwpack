@@ -1,5 +1,7 @@
 package lzwpack
 
+import lzwpack.data.SparseVector
+
 /**
   * A dict is a set of keys that have an associated monotonic unique code.
   *
@@ -74,7 +76,7 @@ object CompressionDict extends MakeDict[CompressionDict] {
   * This is essentially the dual of [[CompressionDict]], so key lookup is O(n) while
   * code lookup and add are O(1) amortized.
   */
-case class DecompressionDict[K](map: Map[Code, K], currentCode: Int) extends Dict[K] {
+case class DecompressionDict[K](map: SparseVector[K], currentCode: Int) extends Dict[K] {
   override def contains(key: K): Boolean = getOption(key).nonEmpty
 
   override def add(key: K): Dict[K] = DecompressionDict(map + (nextCode -> key), nextCode)
@@ -89,7 +91,7 @@ case class DecompressionDict[K](map: Map[Code, K], currentCode: Int) extends Dic
 }
 
 object DecompressionDict extends MakeDict[DecompressionDict] {
-  override def empty[K]: Dict[K] = DecompressionDict(Map.empty[Code, K], 0)
+  override def empty[K]: Dict[K] = DecompressionDict(SparseVector.empty[K], 0)
 }
 
 // Provide implicit MakeDict instances to support generic Dict creation

@@ -20,16 +20,14 @@ sealed trait SparseVector[+A] {
     case (k, v) => updated(k, v)
   }
 
-  def foldLeft[B](init: B)(f: (B, SparseVector[A]) => B): B
+  def foldLeft[B](init: B)(f: (B, (Int, A)) => B): B
 
-  def size: Int = foldLeft(0) { (acc, node) =>
-    node match {
-      case Leaf(_, _) => acc + 1
-      case _ => acc
-    }
+  def size: Int = foldLeft(0)((n, _) => n + 1)
+
+  def find(f: (Int, A) => Boolean): Option[(Int, A)] = foldLeft(Option.empty[(Int, A)]) {
+    case (None, (k, v)) if f(k, v) => Some((k, v))
+    case (acc, _) => acc
   }
-
-  def find(f: (Int, A) => Boolean): Option[(Int, A)] = ???
 
   def isEmpty: Boolean
 }
@@ -51,10 +49,13 @@ private[data] case class Branch[+A](private val subforest: Array[SparseVector[A 
   }
 
 
-  override def foldLeft[B](init: B)(f: (B, SparseVector[A]) => B): B = {
-    var acc = f(init, this)
-    for (subtree <- subforest if !subtree.isEmpty) {
-      acc = subtree.foldLeft(acc)(f)
+  override def foldLeft[B](init: B)(f: (B, (Int, A)) => B): B = {
+    var acc = init
+    for ((subtree, prefix) <- subforest.zipWithIndex if !subtree.isEmpty) {
+      acc = subtree.foldLeft(acc) { case (acc, (suffix, v)) =>
+        val key = (suffix << ChunkSize) ^ prefix
+        f(acc, (key, v))
+      }
     }
     acc
   }
@@ -75,7 +76,7 @@ private[data] case class Leaf[+A](key: Int, value: A) extends SparseVector[A] {
   }
 
 
-  override def foldLeft[B](init: B)(f: (B, SparseVector[A]) => B): B = f(init, this)
+  override def foldLeft[B](init: B)(f: (B, (Int, A)) => B): B = f(init, (key, value))
 
   override def isEmpty: Boolean = false
 }
@@ -86,12 +87,12 @@ private[data] case object Empty extends SparseVector[Nothing] {
 
   override def isEmpty: Boolean = true
 
-  override def foldLeft[B](init: B)(f: (B, SparseVector[Nothing]) => B) = f(init, this)
+  override def foldLeft[B](init: B)(f: (B, (Int, Nothing)) => B): B = init
 }
 
 object SparseVector {
   val Radix = 32
-  private[data] val ChunkSize = Radix.bitsize
+  private[data] val ChunkSize = Radix.bitsize - 1
   private[data] val Bitmask = Radix - 1 // Radix must be a power of 2, so (Radix - 1) masks values 0..Radix
 
   def apply[A](as: A*): SparseVector[A] = as.zipWithIndex.foldLeft(EmptyBranch: SparseVector[A]) {
