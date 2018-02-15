@@ -23,6 +23,16 @@ class SparseVectorSpec extends UnitSpec {
     }
   }
 
+  describe("size") {
+    it("returns 0 for an empty SparseVector") {
+      assert(SparseVector().size == 0)
+    }
+
+    it("returns the number of values stored in the SparseVector") {
+      assert(SparseVector(1,2,3).size == 3)
+    }
+  }
+
   describe("updated") {
     it("does not mutate this vector") {
       val vec = SparseVector(1, 2, 3)

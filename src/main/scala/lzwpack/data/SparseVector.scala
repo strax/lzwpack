@@ -3,7 +3,6 @@ package lzwpack.data
 import lzwpack._
 
 import scala.annotation.unchecked.uncheckedVariance
-
 import SparseVector._
 
 /**
@@ -16,23 +15,51 @@ sealed trait SparseVector[+A] {
   def get(i: Int): Option[A]
 
   def updated[AA >: A](i: Int, a: AA): SparseVector[AA]
+
+  def +[AA >: A](kv: (Int, AA)): SparseVector[AA] = kv match {
+    case (k, v) => updated(k, v)
+  }
+
+  def foldLeft[B](init: B)(f: (B, SparseVector[A]) => B): B
+
+  def size: Int = foldLeft(0) { (acc, node) =>
+    node match {
+      case Leaf(_, _) => acc + 1
+      case _ => acc
+    }
+  }
+
+  def find(f: (Int, A) => Boolean): Option[(Int, A)] = ???
+
+  def isEmpty: Boolean
 }
 
 // Type parameter variance on Array is suppressed due to it being invariant; we can maintain the invariant ourselves
 // by never mutating the array
-private[data] case class Branch[+A](private val underlying: Array[SparseVector[A @uncheckedVariance]]) extends SparseVector[A] {
+private[data] case class Branch[+A](private val subforest: Array[SparseVector[A @uncheckedVariance]]) extends SparseVector[A] {
   def get(i: Int): Option[A] = {
-    underlying(i & Bitmask).get(i >>> ChunkSize)
+    subforest(i & Bitmask).get(i >>> ChunkSize)
   }
 
   def updated[AA >: A](i: Int, a: AA): SparseVector[AA] = {
     // Make a new copy of the array to preserve persistence
     val copy = new Array[SparseVector[AA]](Radix)
-    underlying.copyToArray(copy)
+    subforest.copyToArray(copy)
     copy.update(i & Bitmask, copy(i & Bitmask).updated(i >>> ChunkSize, a))
 
     Branch[AA](copy)
   }
+
+
+  override def foldLeft[B](init: B)(f: (B, SparseVector[A]) => B): B = {
+    var acc = f(init, this)
+    for (subtree <- subforest if !subtree.isEmpty) {
+      acc = subtree.foldLeft(acc)(f)
+    }
+    acc
+  }
+
+  override def isEmpty: Boolean = false
 }
 
 private[data] case class Leaf[+A](key: Int, value: A) extends SparseVector[A] {
@@ -46,11 +73,20 @@ private[data] case class Leaf[+A](key: Int, value: A) extends SparseVector[A] {
       EmptyBranch.updated(key, value).updated(i, a)
     }
   }
+
+
+  override def foldLeft[B](init: B)(f: (B, SparseVector[A]) => B): B = f(init, this)
+
+  override def isEmpty: Boolean = false
 }
 
 private[data] case object Empty extends SparseVector[Nothing] {
   def get(i: Int): Option[Nothing] = None
   def updated[A](i: Int, a: A): SparseVector[A] = Leaf(i, a)
+
+  override def isEmpty: Boolean = true
+
+  override def foldLeft[B](init: B)(f: (B, SparseVector[Nothing]) => B) = f(init, this)
 }
 
 object SparseVector {
