@@ -1,6 +1,14 @@
 package lzwpack.data
 
-class HashMapVector[K, +V] private[data](private val vector: SparseVector[(K, V)]) { self =>
+/**
+  * A [[HashMapVector]] is a hash map implementation on top of a bit-indexed trie.
+  * As such, it provides the same functionality and performance characteristics as
+  * [[SparseVector]], but instead of an integer key we can use any JVM object with
+  * `hashCode` implemented as the key.
+  *
+  * @todo Handle overflow scenario when two distinct objects with the same hashCode() are added to the map
+  */
+class HashMapVector[K, +V] private[data](private val vector: SparseVector[(K, V)]) {
   private def hash(key: K): Int = key.hashCode
 
   def apply(key: K): V = get(key).getOrElse(throw new NoSuchElementException)
