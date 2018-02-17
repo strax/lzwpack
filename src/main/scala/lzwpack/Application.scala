@@ -3,7 +3,7 @@ package lzwpack
 import java.nio.file.{Path, Paths}
 
 import cats.effect.{IO, Sync}
-import fs2.Stream
+import fs2.{Sink, Stream}
 
 object Application {
   sealed trait OperationMode
@@ -36,20 +36,20 @@ object Application {
 
   def inputStream(path: Path): Stream[IO, Byte] = fs2.io.file.readAll[IO](path, 4028)
 
-  def runCompress(path: Path, maxCodeSize: Int): IO[Unit] = {
+  def runCompress(path: Path, maxCodeSize: Int, sink: Sink[IO, Byte] = fs2.io.stdout): IO[Unit] = {
     inputStream(path)
       .through(compressAdaptive)
       .through(CompressHeader.encode)
-      .to(fs2.io.stdout)
+      .to(sink)
       .compile
       .drain
   }
 
-  def runDecompress(path: Path, maxCodeSize: Int): IO[Unit] = {
+  def runDecompress(path: Path, maxCodeSize: Int, sink: Sink[IO, Byte] = fs2.io.stdout): IO[Unit] = {
     inputStream(path)
       .through(CompressHeader.decode)
       .through(decompressAdaptive)
-      .to(fs2.io.stdout)
+      .to(sink)
       .compile
       .drain
   }
