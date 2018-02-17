@@ -5,7 +5,7 @@ import java.util.concurrent.TimeUnit
 
 import cats.effect.IO
 import fs2.Sink
-import lzwpack.Application
+import lzwpack._
 import org.openjdk.jmh.annotations._
 
 // jmh:run -i 10 -wi 10 -f1 -t1 lzwpack.bench.*
@@ -14,6 +14,8 @@ import org.openjdk.jmh.annotations._
 @State(Scope.Thread)
 class CompressionBenchmarks {
   val sink: Sink[IO, Byte] = fs2.io.file.writeAll(Paths.get("/dev/null"))
+
+  import Alphabet.Compress
 
   def benchmarkCompress(fixture: Path): IO[Unit] = {
     Application.runCompress(fixture, 16, sink)
@@ -28,8 +30,20 @@ class CompressionBenchmarks {
     benchmarkCompress(Paths.get("fixtures/alice29.txt")).unsafeRunSync()
   }
 
+  @Benchmark def compressAlice29WithoutPack(): Unit = {
+    fs2.io.file.readAll[IO](Paths.get("fixtures/alice29.txt"), 4028)
+        .through(LZW.compress)
+        .compile.drain.unsafeRunSync()
+  }
+
   @Benchmark def decompressAlice29(): Unit = {
     benchmarkDecompress(Paths.get("fixtures/compress/alice29.txt.Z")).unsafeRunSync()
+  }
+
+  @Benchmark def unpackAlice29(): Unit = {
+    fs2.io.file.readAll[IO](Paths.get("fixtures/alice29.noheader.txt.Z"), 4028)
+        .through(Format.unpack)
+      .compile.drain.unsafeRunSync()
   }
 
   // Ptt5 = 501K
