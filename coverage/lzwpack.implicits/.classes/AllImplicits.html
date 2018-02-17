@@ -76,15 +76,18 @@
 <i>2</i>&nbsp;
 <i>3</i>&nbsp;import java.nio.charset.Charset
 <i>4</i>&nbsp;
-<b class="fc"><i>5</i>&nbsp;trait AllImplicits extends ByteImplicits with ByteListImplicits with LongImplicits with StringImplicits {</b>
-<b class="nc"><i>6</i>&nbsp;  implicit lazy val ASCII: Charset = Charset.forName(&quot;US-ASCII&quot;)</b>
-<i>7</i>&nbsp;}
+<i>5</i>&nbsp;/**
+<i>6</i>&nbsp;  * Mixins all implicits into a single trait.
+<i>7</i>&nbsp;  */
+<b class="fc"><i>8</i>&nbsp;trait AllImplicits extends ByteImplicits with ByteListImplicits with LongImplicits with StringImplicits {</b>
+<b class="nc"><i>9</i>&nbsp;  implicit lazy val ASCII: Charset = Charset.forName(&quot;US-ASCII&quot;)</b>
+<i>10</i>&nbsp;}
 </div>
 </div>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2018-02-10 13:10</div>
+    <div style="float:right;">generated on 2018-02-17 20:57</div>
 </div>
 </body>
 </html>

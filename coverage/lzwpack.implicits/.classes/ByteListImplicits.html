@@ -104,28 +104,38 @@
 <i>4</i>&nbsp;
 <i>5</i>&nbsp;import cats.Show
 <i>6</i>&nbsp;
-<b class="fc"><i>7</i>&nbsp;trait ByteListImplicits {</b>
-<b class="fc"><i>8</i>&nbsp;  implicit class ByteListOps(bs: List[Byte]) {</b>
-<b class="fc"><i>9</i>&nbsp;    def unsigned: List[Int] = bs map (_.unsigned)</b>
-<i>10</i>&nbsp;    def asString(implicit charset: Charset): String = {
-<b class="nc"><i>11</i>&nbsp;      val decoder = charset</b>
-<i>12</i>&nbsp;        .newDecoder
-<b class="nc"><i>13</i>&nbsp;        .replaceWith(&quot;.&quot;)</b>
-<b class="nc"><i>14</i>&nbsp;        .onUnmappableCharacter(CodingErrorAction.REPLACE)</b>
-<b class="nc"><i>15</i>&nbsp;        .onMalformedInput(CodingErrorAction.REPLACE)</b>
-<b class="nc"><i>16</i>&nbsp;      val buffer = java.nio.ByteBuffer.wrap(bs.toArray)</b>
-<b class="nc"><i>17</i>&nbsp;      decoder.decode(buffer).toString</b>
-<i>18</i>&nbsp;    }
-<i>19</i>&nbsp;  }
-<i>20</i>&nbsp;
-<b class="fc"><i>21</i>&nbsp;  implicit val byteListShow: Show[List[Byte]] = bs =&gt; bs.map(_ formatted &quot;%02X&quot;).mkString(&quot; &quot;)</b>
-<i>22</i>&nbsp;}
+<i>7</i>&nbsp;/**
+<i>8</i>&nbsp;  * Provides extension methods for the [[scala.List[Byte]]] type.
+<i>9</i>&nbsp;  */
+<b class="fc"><i>10</i>&nbsp;trait ByteListImplicits {</b>
+<b class="fc"><i>11</i>&nbsp;  implicit class ByteListOps(bs: List[Byte]) {</b>
+<i>12</i>&nbsp;    /**
+<i>13</i>&nbsp;      * Converts each byte in this byte list into an unsigned int.
+<i>14</i>&nbsp;      */
+<b class="fc"><i>15</i>&nbsp;    def unsigned: List[Int] = bs map (_.unsigned)</b>
+<i>16</i>&nbsp;
+<i>17</i>&nbsp;    /**
+<i>18</i>&nbsp;      * Converts this byte list to a string using the implicit charset in scope.
+<i>19</i>&nbsp;      */
+<i>20</i>&nbsp;    def asString(implicit charset: Charset): String = {
+<b class="nc"><i>21</i>&nbsp;      val decoder = charset</b>
+<i>22</i>&nbsp;        .newDecoder
+<b class="nc"><i>23</i>&nbsp;        .replaceWith(&quot;.&quot;)</b>
+<b class="nc"><i>24</i>&nbsp;        .onUnmappableCharacter(CodingErrorAction.REPLACE)</b>
+<b class="nc"><i>25</i>&nbsp;        .onMalformedInput(CodingErrorAction.REPLACE)</b>
+<b class="nc"><i>26</i>&nbsp;      val buffer = java.nio.ByteBuffer.wrap(bs.toArray)</b>
+<b class="nc"><i>27</i>&nbsp;      decoder.decode(buffer).toString</b>
+<i>28</i>&nbsp;    }
+<i>29</i>&nbsp;  }
+<i>30</i>&nbsp;
+<b class="fc"><i>31</i>&nbsp;  implicit val byteListShow: Show[List[Byte]] = bs =&gt; bs.map(_ formatted &quot;%02X&quot;).mkString(&quot; &quot;)</b>
+<i>32</i>&nbsp;}
 </div>
 </div>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2018-02-10 13:10</div>
+    <div style="float:right;">generated on 2018-02-17 20:57</div>
 </div>
 </body>
 </html>

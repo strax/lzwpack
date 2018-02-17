@@ -102,20 +102,23 @@
 <i>2</i>&nbsp;
 <i>3</i>&nbsp;import java.lang.{Byte =&gt; JavaByte}
 <i>4</i>&nbsp;
-<b class="fc"><i>5</i>&nbsp;trait ByteImplicits {</b>
-<b class="fc"><i>6</i>&nbsp;  implicit class ByteOps(b: Byte) {</b>
-<i>7</i>&nbsp;    /**
-<i>8</i>&nbsp;      * Converts a signed JVM byte into its unsigned representation.
-<i>9</i>&nbsp;      */
-<b class="fc"><i>10</i>&nbsp;    def unsigned: Int = JavaByte.toUnsignedInt(b)</b>
-<i>11</i>&nbsp;  }
-<b class="fc"><i>12</i>&nbsp;}</b>
+<i>5</i>&nbsp;/**
+<i>6</i>&nbsp;  * Provides extension functions for the standard [[scala.Byte]] type.
+<i>7</i>&nbsp;  */
+<b class="fc"><i>8</i>&nbsp;trait ByteImplicits {</b>
+<b class="fc"><i>9</i>&nbsp;  implicit class ByteOps(b: Byte) {</b>
+<i>10</i>&nbsp;    /**
+<i>11</i>&nbsp;      * Converts a signed JVM byte into its unsigned representation.
+<i>12</i>&nbsp;      */
+<b class="fc"><i>13</i>&nbsp;    def unsigned: Int = JavaByte.toUnsignedInt(b)</b>
+<i>14</i>&nbsp;  }
+<b class="fc"><i>15</i>&nbsp;}</b>
 </div>
 </div>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2018-02-10 13:10</div>
+    <div style="float:right;">generated on 2018-02-17 20:57</div>
 </div>
 </body>
 </html>

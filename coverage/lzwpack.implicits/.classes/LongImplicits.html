@@ -106,20 +106,29 @@
 <i>6</i>&nbsp;
 <b class="fc"><i>7</i>&nbsp;trait LongImplicits {</b>
 <b class="fc"><i>8</i>&nbsp;  implicit class LongOps(n: Long) {</b>
-<b class="fc"><i>9</i>&nbsp;    def bitsize: Int = Binary.bitsize(n)</b>
-<i>10</i>&nbsp;
-<b class="nc"><i>11</i>&nbsp;    def bin: String = bin(JavaLong.SIZE)</b>
-<b class="nc"><i>12</i>&nbsp;    def bin(size: Int): String = n.toBinaryString.reverse.padTo(size, &quot;0&quot;).reverse.mkString</b>
+<i>9</i>&nbsp;    /**
+<i>10</i>&nbsp;      * Returns the amount of significant bits in this Long.
+<i>11</i>&nbsp;      */
+<b class="fc"><i>12</i>&nbsp;    def bitsize: Int = Binary.bitsize(n)</b>
 <i>13</i>&nbsp;
-<b class="nc"><i>14</i>&nbsp;    def hex: String = n formatted &quot;0x%02X&quot;</b>
-<i>15</i>&nbsp;  }
-<b class="fc"><i>16</i>&nbsp;}</b>
+<i>14</i>&nbsp;    /**
+<i>15</i>&nbsp;      * Converts this Long into its binary representation.
+<i>16</i>&nbsp;      */
+<b class="nc"><i>17</i>&nbsp;    def bin: String = bin(JavaLong.SIZE)</b>
+<b class="nc"><i>18</i>&nbsp;    def bin(size: Int): String = n.toBinaryString.reverse.padTo(size, &quot;0&quot;).reverse.mkString</b>
+<i>19</i>&nbsp;
+<i>20</i>&nbsp;    /**
+<i>21</i>&nbsp;      * Converts this Long into its hexadecimal representation.
+<i>22</i>&nbsp;      */
+<b class="nc"><i>23</i>&nbsp;    def hex: String = n formatted &quot;0x%02X&quot;</b>
+<i>24</i>&nbsp;  }
+<b class="fc"><i>25</i>&nbsp;}</b>
 </div>
 </div>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2018-02-10 13:10</div>
+    <div style="float:right;">generated on 2018-02-17 20:57</div>
 </div>
 </body>
 </html>

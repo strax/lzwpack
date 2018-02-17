@@ -102,15 +102,19 @@
 <i>2</i>&nbsp;
 <b class="fc"><i>3</i>&nbsp;trait StringImplicits {</b>
 <b class="fc"><i>4</i>&nbsp;  implicit class StringOps(sc: StringContext) {</b>
-<b class="fc"><i>5</i>&nbsp;    def b(_args: Any*): Int = Integer.parseUnsignedInt(sc.parts.mkString.replaceAll(&quot;&quot;&quot;\s+&quot;&quot;&quot;, &quot;&quot;), 2)</b>
-<i>6</i>&nbsp;  }
-<b class="fc"><i>7</i>&nbsp;}</b>
+<i>5</i>&nbsp;    /**
+<i>6</i>&nbsp;      * Convenience method for the binary literal syntax:
+<i>7</i>&nbsp;      * `b&quot;0110&quot; == 4`.
+<i>8</i>&nbsp;      */
+<b class="fc"><i>9</i>&nbsp;    def b(_args: Any*): Int = Integer.parseUnsignedInt(sc.parts.mkString.replaceAll(&quot;&quot;&quot;\s+&quot;&quot;&quot;, &quot;&quot;), 2)</b>
+<i>10</i>&nbsp;  }
+<b class="fc"><i>11</i>&nbsp;}</b>
 </div>
 </div>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2018-02-10 13:10</div>
+    <div style="float:right;">generated on 2018-02-17 20:57</div>
 </div>
 </body>
 </html>
