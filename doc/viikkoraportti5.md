@@ -1,0 +1,7 @@
+# Viikkoraportti 5
+
+Tällä viikolla tein ensimmäisen iteraation hajautustaulurakenteesta. Se on muuten toimiva, mutta ei tue vielä ylivuotolistoja eli teoreettisesti kaksi avainta samalla `hashCode()`-arvolla kuvautuu virheellisesti samaan arvoon. Lisäksi `SparseVector`-luokan ja `HashMapVector`-luokan toiminnallisuudet ovat hyvin samanlaisia, ja ensi viikolla ajattelinkin selvittää voisiko näitä refaktoroida esimerkiksi type classiin.
+
+Lisäsin projektille myös muutaman makrotason suorituskykytestin ja laskin niiden perusteella approksimoidun suoritustehon. Suoritustehoa (MB/s) käytetään yleisesti pakkausalgoritmien vertailuun, joten tämän suureen laskeminen tarjoaa mielenkiintoista tietoa siitä, kuinka nopea tämänkaltaisesta funktionaalisesta toteutuksesta voi tulla verrattuna imperatiivisiin toteutuksiin. Suorituskykytestit paljastivat myös, että tällä hetkellä algoritmin suoritusteho on sama ainakin testatulla kahdella eri kokoisella syötteellä. Tämä saattaa implikoida, että algoritmin suoritusaika on lineaarinen syötteen kokoon nähden, mutta ennen johtopäätöksiä kannattanee testejä vielä erilaisilla syötteillä. Algoritmin toteutus on sen verran monimutkainen, että aikavaativuutta tuskin pystyy todistamaan formaalisti.
+
+Ensi viikolla ajattelin selvittää, saisiko `BitBuffer`-luokan 64-bittisen puskurin muuttamalla linkitetyksi listaksi nopeutettua algoritmin nopeutta – ideana se, että puskuriin voidaan tallentaa kerralla huomattavasti enemmän dataa ja sitten tulostaa isompia tavulohkoja kerralla - sekä viimeistellä ja refaktoroida em. vektoriluokat.
