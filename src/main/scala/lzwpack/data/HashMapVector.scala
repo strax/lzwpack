@@ -5,30 +5,39 @@ package lzwpack.data
   * As such, it provides the same functionality and performance characteristics as
   * [[SparseVector]], but instead of an integer key we can use any JVM object with
   * `hashCode` implemented as the key.
-  *
-  * @todo Handle overflow scenario when two distinct objects with the same hashCode() are added to the map
   */
-class HashMapVector[K, +V] private[data](private val vector: SparseVector[(K, V)]) {
+class HashMapVector[K, V] private[data](private val vector: SparseVector[HashMapVector[K, V]#Bucket]) {
+  // Use overflow lists ("buckets") to handle hashCode collisions
+  type Bucket = List[(K, V)]
+
   private def hash(key: K): Int = key.hashCode
+
+  private def bucketForKey(key: K): Bucket = vector.get(hash(key)).getOrElse(List.empty)
+
+  // Sets (k -> v) in the given bucket
+  private def addOrReplaceInBucket(bucket: Bucket)(kv: (K, V)): Bucket = kv match {
+    case (key, _) => kv :: bucket.filter(_._1 != key)
+  }
 
   def apply(key: K): V = get(key).getOrElse(throw new NoSuchElementException)
 
   def contains(key: K): Boolean = get(key).nonEmpty
 
-  def get(key: K): Option[V] = vector.get(hash(key)).map(_._2)
+  def get(key: K): Option[V] = for {
+    (_, value) <- bucketForKey(key).find(_._1 == key)
+  } yield value
 
-  def updated[VV >: V](kv: (K, VV)): HashMapVector[K, VV] = kv match {
-    case (k, v) => new HashMapVector(vector.updated[(K, VV)](hash(k), (k, v)))
-  }
+  def updated(kv: (K, V)): HashMapVector[K, V] =
+    new HashMapVector(vector.updated(hash(kv._1), addOrReplaceInBucket(bucketForKey(kv._1))(kv)))
 
-  def +[VV >: V](kv: (K, VV)): HashMapVector[K, VV] = updated(kv)
+  def +(kv: (K, V)): HashMapVector[K, V] = updated(kv)
 
   def size: Int = vector.size
 
   def isEmpty: Boolean = vector.isEmpty
 
   def foldLeft[B](init: B)(f: (B, (K, V)) => B): B =
-    vector.foldLeft(init) { case (acc, (_, kv)) => f(acc, kv) }
+    vector.foldLeft(init) { case (acc, (_, kvs)) => kvs.foldLeft(acc)(f) }
 
   def find(f: (K, V) => Boolean): Option[(K, V)] = foldLeft(Option.empty[(K, V)]) {
     case (None, (k, v)) if f(k, v) => Some((k, v))

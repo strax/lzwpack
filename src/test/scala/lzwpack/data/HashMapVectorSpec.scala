@@ -23,7 +23,15 @@ class HashMapVectorSpec extends UnitSpec {
     }
 
     it("puts two elements with the same hashCode() but for which a != b to an overflow list") {
-      pending
+      val a = new {
+        override def hashCode(): Int = 2
+      }
+      val b = new {
+        override def hashCode(): Int = 2
+      }
+      val map = HashMapVector(a -> "a", b -> "b")
+      assert(map.get(a) === Some("a"))
+      assert(map.get(b) === Some("b"))
     }
   }
 }

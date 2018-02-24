@@ -22,17 +22,6 @@ sealed trait SparseVector[+A] {
     case (k, v) => updated(k, v)
   }
 
-  /**
-    * Returns a new [[SparseVector]] with the element at the given index applied to f.
-    * If no element exists at the given index, this is a no-op.
-    */
-  def transform[AA >: A](i: Int)(f: A => AA): SparseVector[AA] = {
-    if (this contains i)
-      this.updated(i, f(apply(i)))
-    else
-      this
-  }
-
   def foldLeft[B](init: B)(f: (B, (Int, A)) => B): B
 
   def size: Int = foldLeft(0)((n, _) => n + 1)
