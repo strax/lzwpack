@@ -24,6 +24,7 @@ sealed trait SparseVector[+A] {
 
   def foldLeft[B](init: B)(f: (B, (Int, A)) => B): B
 
+  // Note: O(n) complexity
   def size: Int = foldLeft(0)((n, _) => n + 1)
 
   def find(f: (Int, A) => Boolean): Option[(Int, A)] = foldLeft(Option.empty[(Int, A)]) {

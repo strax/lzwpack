@@ -8,15 +8,15 @@ package lzwpack.data
   */
 class HashMapVector[K, V] private[data](private val vector: SparseVector[HashMapVector[K, V]#Bucket]) {
   // Use overflow lists ("buckets") to handle hashCode collisions
-  type Bucket = List[(K, V)]
+  type Bucket = ListVector[(K, V)]
 
   private def hash(key: K): Int = key.hashCode
 
-  private def bucketForKey(key: K): Bucket = vector.get(hash(key)).getOrElse(List.empty)
+  private def bucketForKey(key: K): Bucket = vector.get(hash(key)).getOrElse(ListVector.empty)
 
   // Sets (k -> v) in the given bucket
   private def addOrReplaceInBucket(bucket: Bucket)(kv: (K, V)): Bucket = kv match {
-    case (key, _) => kv :: bucket.filter(_._1 != key)
+    case (key, _) => bucket.filter(_._1 != key) + kv
   }
 
   def apply(key: K): V = get(key).getOrElse(throw new NoSuchElementException)
