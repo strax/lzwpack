@@ -28,3 +28,5 @@ available options.
 [Week 4 recap](doc/viikkoraportti4.md)
 
 [Week 5 recap](doc/viikkoraportti5.md)
+
+[Week 6 recap](doc/viikkoraportti6.md)
