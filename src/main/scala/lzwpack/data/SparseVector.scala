@@ -22,12 +22,12 @@ sealed trait SparseVector[+A] {
     case (k, v) => updated(k, v)
   }
 
-  def foldLeft[B](init: B)(f: (B, (Int, A)) => B): B
+  def fold[B](init: B)(f: (B, (Int, A)) => B): B
 
   // Note: O(n) complexity
-  def size: Int = foldLeft(0)((n, _) => n + 1)
+  def size: Int = fold(0)((n, _) => n + 1)
 
-  def find(f: (Int, A) => Boolean): Option[(Int, A)] = foldLeft(Option.empty[(Int, A)]) {
+  def find(f: (Int, A) => Boolean): Option[(Int, A)] = fold(Option.empty[(Int, A)]) {
     case (None, (k, v)) if f(k, v) => Some((k, v))
     case (acc, _) => acc
   }
@@ -52,10 +52,13 @@ private[data] case class Branch[+A](private val subforest: Array[SparseVector[A 
   }
 
 
-  override def foldLeft[B](init: B)(f: (B, (Int, A)) => B): B = {
+  /**
+    * Folds this trie in a depth-first manner.
+    */
+  override def fold[B](init: B)(f: (B, (Int, A)) => B): B = {
     var acc = init
     for ((subtree, prefix) <- subforest.zipWithIndex if !subtree.isEmpty) {
-      acc = subtree.foldLeft(acc) { case (acc, (suffix, v)) =>
+      acc = subtree.fold(acc) { case (acc, (suffix, v)) =>
         val key = (suffix << ChunkSize) ^ prefix
         f(acc, (key, v))
       }
@@ -79,7 +82,7 @@ private[data] case class Leaf[+A](key: Int, value: A) extends SparseVector[A] {
   }
 
 
-  override def foldLeft[B](init: B)(f: (B, (Int, A)) => B): B = f(init, (key, value))
+  override def fold[B](init: B)(f: (B, (Int, A)) => B): B = f(init, (key, value))
 
   override def isEmpty: Boolean = false
 }
@@ -90,7 +93,7 @@ private[data] case object Empty extends SparseVector[Nothing] {
 
   override def isEmpty: Boolean = true
 
-  override def foldLeft[B](init: B)(f: (B, (Int, Nothing)) => B): B = init
+  override def fold[B](init: B)(f: (B, (Int, Nothing)) => B): B = init
 }
 
 object SparseVector {

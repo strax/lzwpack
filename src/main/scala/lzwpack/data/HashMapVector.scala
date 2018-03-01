@@ -37,7 +37,7 @@ class HashMapVector[K, V] private[data](private val vector: SparseVector[HashMap
   def isEmpty: Boolean = vector.isEmpty
 
   def foldLeft[B](init: B)(f: (B, (K, V)) => B): B =
-    vector.foldLeft(init) { case (acc, (_, kvs)) => kvs.foldLeft(acc)(f) }
+    vector.fold(init) { case (acc, (_, kvs)) => kvs.foldLeft(acc)(f) }
 
   def find(f: (K, V) => Boolean): Option[(K, V)] = foldLeft(Option.empty[(K, V)]) {
     case (None, (k, v)) if f(k, v) => Some((k, v))

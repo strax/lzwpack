@@ -1,6 +1,8 @@
 package lzwpack.data
 
 import lzwpack.UnitSpec
+import cats.syntax.option._
+import cats.instances.all._
 
 class HashMapVectorSpec extends UnitSpec {
   describe("contains") {
@@ -30,8 +32,8 @@ class HashMapVectorSpec extends UnitSpec {
         override def hashCode(): Int = 2
       }
       val map = HashMapVector(a -> "a", b -> "b")
-      assert(map.get(a) === Some("a"))
-      assert(map.get(b) === Some("b"))
+      assert(map.get(a) === "a".some)
+      assert(map.get(b) === "b".some)
     }
   }
 }

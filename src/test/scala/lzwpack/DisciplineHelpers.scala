@@ -1,9 +1,18 @@
 package lzwpack
 
-import org.scalacheck.{Arbitrary, Prop}
+import org.scalacheck.Properties
+import org.scalactic.Prettifier
 import org.typelevel.discipline.Laws
+import org.scalatest.TestRegistration
+import org.scalatest.prop.Checkers
 
-trait DisciplineHelpers {
-  implicit def ruleSetToProp(rules: Laws#RuleSet): Prop =
-    rules.props.map { case (name, prop) => prop.label(name) }.reduce(_ && _)
+trait DisciplineHelpers extends Checkers { self: TestRegistration =>
+  // Conversion from a Discipline RuleSet to a Scalacheck Properties
+  implicit def ruleSetToProperties(rules: Laws#RuleSet): Properties = rules.all
+
+  def properties(props: Properties): Unit = {
+    for ((name, prop) <- props.properties) {
+      registerTest(name) { check(name |: prop) }
+    }
+  }
 }
