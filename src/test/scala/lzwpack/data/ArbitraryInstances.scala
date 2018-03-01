@@ -1,6 +1,6 @@
 package lzwpack.data
 
-import org.scalacheck.{Arbitrary, Cogen}
+import org.scalacheck.{Arbitrary, Cogen, Gen}
 import cats.implicits._
 
 /**
@@ -11,8 +11,9 @@ trait ArbitraryInstances {
 
   implicit def arbListVector[A: Arbitrary]: Arbitrary[ListVector[A]] = Arbitrary {
     for {
-      as <- arbitrary[List[A]]
-    } yield as.map(ListVector(_)).foldK
+      n <- Gen.chooseNum(0, 5)
+      as <- Gen.listOfN(n, arbitrary[A])
+    } yield as foldMap (ListVector(_))
   }
 
   // Given a Cogen[A] and a Gen[A] Scalacheck can automatically make a Gen[A => B]

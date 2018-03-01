@@ -3,11 +3,15 @@ package lzwpack.data
 import lzwpack.UnitSpec
 import org.scalacheck.Arbitrary
 import Arbitrary._
-import cats.kernel.laws.discipline.EqTests
-import cats.laws.discipline.{FoldableTests, FunctorTests, TraverseTests}
+import cats.Applicative
+import cats.kernel.laws.discipline.{EqTests, MonoidTests}
+import cats.laws.discipline.{ApplicativeTests, FoldableTests, SemigroupalTests, TraverseTests}
 import cats.instances.all._
+import cats.laws.discipline.SemigroupalTests.Isomorphisms
 
 class ListVectorSpec extends UnitSpec with ArbitraryInstances {
+  implicit val iso = SemigroupalTests.Isomorphisms.invariant[ListVector](Applicative[ListVector])
+
   describe("head") {
     it("returns the first element of the vector") {
       assert(ListVector(1, 2, 3).head == 1)
@@ -25,19 +29,8 @@ class ListVectorSpec extends UnitSpec with ArbitraryInstances {
     }
   }
 
-  describe("Eq") {
-    properties { EqTests[ListVector[String]].eqv }
-  }
-
-  describe("Functor") {
-    properties { FunctorTests[ListVector].functor[String, String, String] }
-  }
-
-  describe("Foldable") {
-    properties { FoldableTests[ListVector].foldable[Int, Int] }
-  }
-
-  describe("Traverse") {
-    properties { TraverseTests[ListVector].traverse[Int, Int, Int, Int, Option, Option] }
-  }
+  properties { EqTests[ListVector[String]].eqv }
+  properties { MonoidTests[ListVector[String]].monoid }
+  properties { TraverseTests[ListVector].traverse[Int, Int, Int, Int, Option, Option] }
+  properties { ApplicativeTests[ListVector].applicative[String, String, String] }
 }

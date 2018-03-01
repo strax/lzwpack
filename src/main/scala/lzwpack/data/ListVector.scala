@@ -4,52 +4,6 @@ import ListVector._
 import cats._
 import cats.implicits._
 
-// Note: we could use kittens to derive some of these, but let's do it manually for the sake of learning
-trait ListVectorInstances {
-  trait ListVectorFoldable extends Foldable[ListVector] {
-    override def foldLeft[A, B](fa: ListVector[A], b: B)(f: (B, A) => B): B =
-      fa.foldLeft(b)(f)
-
-    /**
-      * Lazy right fold. Using [[Eval]] is enforced by the typeclass, but it allows us to short-circuit some
-      * folds if necessary.
-      */
-    override def foldRight[A, B](fa: ListVector[A], init: Eval[B])(f: (A, Eval[B]) => Eval[B]): Eval[B] = fa match {
-      case h :: t => f(h, Eval.defer(foldRight(t, init)(f)))
-      case _ => init
-    }
-  }
-
-  implicit object ListVectorTraverse extends Traverse[ListVector] with ListVectorFoldable {
-    override def traverse[F[_]: Applicative, A, B](fa: ListVector[A])(f: A => F[B]): F[ListVector[B]] =
-      fa.foldLeft(empty[B].pure[F])((acc, a) => acc.map2(f(a))(_ + _))
-  }
-
-  implicit object ListVectorMonoidK extends MonoidK[ListVector] {
-    override def empty[A]: ListVector[A] = ListVector.empty[A]
-
-    override def combineK[A](x: ListVector[A], y: ListVector[A]): ListVector[A] =
-      y.foldLeft(x)(_ + _)
-  }
-
-  implicit def ListVectorShow[A: Show]: Show[ListVector[A]] = { as =>
-    s"ListVector(${as.map(_.show).intercalate(", ")})"
-  }
-
-  /**
-    * Strict equality for two list vectors. The implementation is O(n) as we
-    * go through each of the list elements and compare them.
-    *
-    * @note Could be implemented with foldRight
-    */
-  implicit def ListVectorEq[A: Eq]: Eq[ListVector[A]] = { (as, bs) =>
-    @annotation.tailrec
-    def iter(as: ListVector[A], bs: ListVector[A]): Boolean =
-      if (as.isEmpty && bs.isEmpty) true else as.head === bs.head && iter(as.tail, bs.tail)
-
-    as.size == bs.size && iter(as, bs)
-  }
-}
 
 /**
   * A [[ListVector]] is a list-like data structure in the sense that it provides
@@ -64,6 +18,11 @@ class ListVector[A] private[data](private[data] val trie: SparseVector[A], val s
     * then index 4 would become index 3. This is to preserve list-like semantics.
     */
   def filter(f: A => Boolean): ListVector[A] = foldLeft(empty[A])((as, a) => if (f(a)) as + a else as)
+
+  /**
+    * Concatenates the argument to this [[ListVector]].
+    */
+  def concat(as1: ListVector[A]): ListVector[A] = as1.foldLeft(this)(_ + _)
 
   /**
     * Returns the first element `a` in this [[ListVector]] for which `f(a)` returns true, wrapped in an [[Option]].
@@ -95,6 +54,18 @@ class ListVector[A] private[data](private[data] val trie: SparseVector[A], val s
   def tail: ListVector[A] = new ListVector[A](trie, size - 1, offset + 1)
 
   /**
+    * Returns a new [[ListVector]] without the first `n` items.
+    */
+  def drop(n: Int): ListVector[A] = {
+    if (n > size) empty[A] else new ListVector(trie, size - n, offset + n)
+  }
+
+  /**
+    * Returns a new [[ListVector]] with only the first `n` items present.
+    */
+  def take(n: Int): ListVector[A] = new ListVector[A](trie, Math.min(n, size), offset)
+
+  /**
     * Appends the given value to the end of this [[ListVector]].
     * Complexity: O(log n)
     */
@@ -116,6 +87,11 @@ class ListVector[A] private[data](private[data] val trie: SparseVector[A], val s
     * Alias for [[append]].
     */
   def +(a: A): ListVector[A] = append(a)
+
+  /**
+    * Alias for [[append]].
+    */
+  def :+(a: A): ListVector[A] = append(a)
 
   /**
     * Returns `true` if this [[ListVector]] is empty (i.e. contains no elements), `false` otherwise.
@@ -150,6 +126,9 @@ class ListVector[A] private[data](private[data] val trie: SparseVector[A], val s
     }
   }
 
+  /**
+    * Returns a new [[ListVector]] with each element applied to `f`.
+    */
   def map[B](f: A => B): ListVector[B] =
     foldLeft(empty[B])((acc, a) => acc + f(a))
 

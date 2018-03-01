@@ -3,7 +3,7 @@ package lzwpack
 import java.nio.charset.Charset
 
 import fs2._
-import lzwpack.data.BitBuffer
+import lzwpack.data.{BitBuffer, ListVector}
 
 import scala.reflect.ClassTag
 
@@ -54,13 +54,13 @@ object LZW extends Debugging {
         case None =>
           // Handle cases where the code is not yet inferred by the decoder;
           // if the previous value is xω then we can infer the next code to be xωx
-          val inferred = state.buffered ++ state.buffered.take(1)
+          val inferred = state.buffered |+| state.buffered.take(1)
           (CompressionState(state.dict.add(inferred), inferred), Some(inferred))
 
         case Some(block) =>
           if (!state.buffered.isEmpty) {
             // New dictionary entry is conjecture + first byte of the current key
-            (CompressionState(state.dict.add(state.buffered ++ block.take(1)), block), Some(block))
+            (CompressionState(state.dict.add(state.buffered |+| block.take(1)), block), Some(block))
           } else {
             (CompressionState(state.dict, block), Some(block))
           }
@@ -91,13 +91,13 @@ object LZW extends Debugging {
     stream => go(stream, CompressionState(makeDict[DictT], Bytes.empty)).stream
   }
 
-  def flatten[F[_], O](s: Stream[F, Seq[O]]) = s.flatMap(bs => Stream.emits(bs))
+  def flatten[F[_]](s: Stream[F, Bytes]): Stream[F, Byte] = s.flatMap(bs => Stream.emits(bs.toList))
 
   def makeDict[T[_]: MakeDict](implicit alphabet: Alphabet[Byte]) =
-    implicitly[MakeDict[T]].fromAlphabet(alphabet.pure[List])
+    implicitly[MakeDict[T]].fromAlphabet(alphabet.pure[ListVector])
 
   def compress[F[_]](implicit alphabet: Alphabet[Byte]): Pipe[F, Byte, BitBuffer] =
     codec[CompressionDict, F, Byte, BitBuffer](emit)
-  def decompress[F[_]](implicit alphabet: Alphabet[Byte]) =
+  def decompress[F[_]](implicit alphabet: Alphabet[Byte]): Pipe[F, Code, Byte] =
     codec[DecompressionDict, F, Code, Bytes](infer).andThen(flatten)
 }

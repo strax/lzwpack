@@ -1,10 +1,12 @@
 import cats.Applicative
 import fs2.Pipe
+import lzwpack.AlphabetSyntax
+import lzwpack.data.ListVector
 import lzwpack.implicits.AllImplicits
 
 import scala.collection.immutable.List
 
-package object lzwpack extends AllImplicits with DictInstances {
+package object lzwpack extends AllImplicits with DictInstances with AlphabetSyntax {
   val MaxCodeSize = 16 // bits
 
   /**
@@ -12,11 +14,11 @@ package object lzwpack extends AllImplicits with DictInstances {
     */
   type Code = Int
 
-  type Bytes = List[Byte]
+  type Bytes = ListVector[Byte]
 
   object Bytes {
-    def apply(b: Byte): Bytes = List(b)
-    def empty: Bytes = List()
+    def apply(b: Byte): Bytes = ListVector(b)
+    def empty: Bytes = ListVector()
   }
 
   /**
@@ -24,12 +26,7 @@ package object lzwpack extends AllImplicits with DictInstances {
     *
     * @todo Implement Set
     */
-  type Alphabet[A] = List[A]
-
-  /**
-    * Defines an implicit conversion to include Alphabet's methods by default.
-    */
-  implicit def alphabetOps[A](a: Alphabet[A]): Alphabet.Ops[A] = Alphabet.Ops(a)
+  type Alphabet[A] = ListVector[A]
 
   def compressAdaptive[F[_]](implicit alphabet: Alphabet[Byte]): Pipe[F, Byte, Byte] =
     stream => stream.through(LZW.compress).through(Format.pack)
