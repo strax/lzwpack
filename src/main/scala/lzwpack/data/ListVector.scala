@@ -143,7 +143,9 @@ class ListVector[A] private[data](private[data] val trie: SparseVector[A], val s
 object ListVector {
   def empty[A] = new ListVector(SparseVector.empty[A], 0)
 
-  def apply[A](as: A*): ListVector[A] = as.foldLeft(empty[A])(_ + _)
+  def apply[A](as: A*): ListVector[A] = seq(as)
+
+  def seq[A](as: Seq[A]): ListVector[A] = as.foldLeft(empty[A])(_ + _)
 }
 
 object :: {

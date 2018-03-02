@@ -2,8 +2,10 @@ package lzwpack.data
 
 import cats.{Applicative, Eq, Eval, Monoid, Show, Traverse, ~>}
 import lzwpack.data.ListVector.empty
-
 import cats.implicits._
+
+import scala.collection.{GenTraversable, TraversableLike}
+import scala.collection.generic.{IsSeqLike, IsTraversableLike}
 
 /**
   * Defines some generic type class instances for [[ListVector]].
@@ -60,9 +62,5 @@ trait ListVectorInstances {
       if (as.isEmpty && bs.isEmpty) true else as.head === bs.head && iter(as.tail, bs.tail)
 
     as.size == bs.size && iter(as, bs)
-  }
-
-  implicit val fromSeq: Seq ~> ListVector = new (Seq ~> ListVector) {
-    override def apply[A](fa: Seq[A]): ListVector[A] = fa.foldLeft(empty[A])(_ + _)
   }
 }
