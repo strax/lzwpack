@@ -63,4 +63,6 @@ trait ListVectorInstances {
 
     as.size == bs.size && iter(as, bs)
   }
+
+  implicit def toSeq[A](as: ListVector[A]): Seq[A] = as.toSeq
 }

@@ -138,6 +138,8 @@ class ListVector[A] private[data](private[data] val trie: SparseVector[A], val s
     * Hash code calculated as in [[java.util.List]].
     */
   override def hashCode(): Int = foldLeft(1)((acc, e) => 31 * acc + e.hashCode())
+
+  def toSeq: Seq[A] = iterator.toSeq
 }
 
 object ListVector {
