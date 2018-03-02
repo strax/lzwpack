@@ -9,7 +9,7 @@ import cats.syntax.eq._
   * [[SparseVector]], but instead of an integer key we can use any JVM object with
   * `hashCode` implemented as the key.
   */
-class HashMapVector[K: Eq, V] private[data](private val vector: SparseVector[HashMapVector[K, V]#Bucket]) {
+class HashMapVector[K: Eq, @specialized V] private[data](private val vector: SparseVector[HashMapVector[K, V]#Bucket]) {
   // Use overflow lists ("buckets") to handle hashCode collisions
   type Bucket = ListVector[(K, V)]
 

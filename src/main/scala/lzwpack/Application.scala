@@ -34,7 +34,7 @@ object Application {
   // Use compress(1) compatible alphabet by default
   import Alphabet.Compress
 
-  def inputStream(path: Path): Stream[IO, Byte] = fs2.io.file.readAll[IO](path, 4028)
+  def inputStream(path: Path): Stream[IO, Byte] = fs2.io.file.readAll[IO](path, 32224)
 
   def runCompress(path: Path, maxCodeSize: Int, sink: Sink[IO, Byte] = fs2.io.stdout): IO[Unit] = {
     inputStream(path)

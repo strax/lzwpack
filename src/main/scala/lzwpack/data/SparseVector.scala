@@ -9,7 +9,7 @@ import SparseVector._
   * A [[SparseVector]] is a bit-mapped trie with 32 branches at each node.
   * It supports O(log32(n)) insertion, updating and random access.
   */
-sealed trait SparseVector[+A] {
+sealed trait SparseVector[@specialized +A] {
   def apply(i: Int): A = get(i).getOrElse(throw new NoSuchElementException)
 
   def contains(i: Int): Boolean = get(i).nonEmpty

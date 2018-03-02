@@ -11,7 +11,7 @@ import cats.implicits._
   * Compared to a [[SparseVector]] this data structure is _bounded_ meaning that given a list with size |L| > 0
   * there is guaranteed to be an element in each k ∈ [0..|L| - 1]. Updates to indices outside of the index range are prohibited.
   */
-class ListVector[A] private[data](private[data] val trie: SparseVector[A], val size: Int, offset: Int = 0) {
+class ListVector[@specialized A] private[data](private[data] val trie: SparseVector[A], val size: Int, offset: Int = 0) {
   /**
     * Returns a new [[ListVector]] for which f(a) == true for all elements.
     * Note that indices are not preserved; for instance, if index 3 was filtered out and 4 was not,

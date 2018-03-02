@@ -1,19 +1,12 @@
 package lzwpack
 
-import java.nio.charset.Charset
-
 import fs2._
 import lzwpack.data._
 import lzwpack.data.{BitBuffer, ListVector}
-
-import scala.reflect.ClassTag
-
+import cats.implicits._
 
 object LZW extends Debugging {
   class CompressionException(cause: String) extends RuntimeException(cause)
-
-  import cats._
-  import cats.implicits._
 
   type Output = Code
 
@@ -70,8 +63,8 @@ object LZW extends Debugging {
 
   type CodecF[I, O] = (CompressionState, Option[I]) => (CompressionState, Segment[O, Unit])
 
-  private def codec[DictT[_]: MakeDict, F[_], I, O](f: => CodecF[I, O])(implicit alphabet: Alphabet[Byte]): Pipe[F, I, O] = {
-    def go(stream: Stream[F, I], s0: CompressionState): Pull[F, O, Unit] = {
+  private def codec[DictT[_]: MakeDict, I, O](f: => CodecF[I, O])(implicit alphabet: Alphabet[Byte]): Pipe[Pure, I, O] = {
+    def go(stream: Stream[Pure, I], s0: CompressionState): Pull[Pure, O, Unit] = {
       stream.pull.uncons1.flatMap {
         case Some((head, tail)) =>
           f(s0, Some(head)) match {
@@ -92,7 +85,7 @@ object LZW extends Debugging {
     implicitly[MakeDict[T]].fromAlphabet(alphabet.pure[ListVector])
 
   def compress[F[_]](implicit alphabet: Alphabet[Byte]): Pipe[F, Byte, BitBuffer] =
-    codec[CompressionDict, F, Byte, BitBuffer](emit)
+    codec[CompressionDict, Byte, BitBuffer](emit)
   def decompress[F[_]](implicit alphabet: Alphabet[Byte]): Pipe[F, Code, Byte] =
-    codec[DecompressionDict, F, Code, Byte](infer)
+    codec[DecompressionDict, Code, Byte](infer)
 }
