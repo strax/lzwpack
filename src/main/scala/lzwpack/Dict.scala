@@ -1,5 +1,7 @@
 package lzwpack
 
+import cats.Eq
+import cats.implicits._
 import lzwpack.data.{HashMapVector, SparseVector}
 
 /**
@@ -47,8 +49,8 @@ trait Dict[K] {
   * an empty T[A] or a T[A] that contains the given alphabet.
   */
 trait MakeDict[T[_]] {
-  def empty[A]: Dict[A]
-  def fromAlphabet[A](alphabet: Alphabet[A]): Dict[A] = alphabet.foldLeft(empty[A])((z, a) => z.add(a))
+  def empty[A: Eq]: Dict[A]
+  def fromAlphabet[A: Eq](alphabet: Alphabet[A]): Dict[A] = alphabet.foldLeft(empty[A])((z, a) => z.add(a))
 }
 
 /**
@@ -62,13 +64,13 @@ case class CompressionDict[K](map: HashMapVector[K, Code], currentCode: Int) ext
 
   override def get(key: K): Code = map(key)
 
-  override def find(code: Code): Option[K] = map find { case (_, other) => code == other } map (_._1)
+  override def find(code: Code): Option[K] = map find { case (_, other) => code === other } map (_._1)
 
   override def size: Code = map.size
 }
 
 object CompressionDict extends MakeDict[CompressionDict] {
-  def empty[K]: Dict[K] = CompressionDict(HashMapVector.empty[K, Code], 0)
+  def empty[K: Eq]: Dict[K] = CompressionDict(HashMapVector.empty[K, Code], 0)
 }
 
 /**
@@ -76,7 +78,7 @@ object CompressionDict extends MakeDict[CompressionDict] {
   * This is essentially the dual of [[CompressionDict]], so key lookup is O(n) while
   * code lookup and add are O(1) amortized.
   */
-case class DecompressionDict[K](map: SparseVector[K], currentCode: Int) extends Dict[K] {
+case class DecompressionDict[K: Eq](map: SparseVector[K], currentCode: Int) extends Dict[K] {
   override def contains(key: K): Boolean = getOption(key).nonEmpty
 
   override def add(key: K): Dict[K] = DecompressionDict(map + (nextCode -> key), nextCode)
@@ -87,11 +89,11 @@ case class DecompressionDict[K](map: SparseVector[K], currentCode: Int) extends 
 
   override def size: Code = map.size
 
-  def getOption(key: K): Option[Code] = map find { case (_, k) => k == key } map (_._1)
+  def getOption(key: K): Option[Code] = map find { case (_, k) => k === key } map (_._1)
 }
 
 object DecompressionDict extends MakeDict[DecompressionDict] {
-  override def empty[K]: Dict[K] = DecompressionDict(SparseVector.empty[K], 0)
+  override def empty[K: Eq]: Dict[K] = DecompressionDict(SparseVector.empty[K], 0)
 }
 
 // Provide implicit MakeDict instances to support generic Dict creation

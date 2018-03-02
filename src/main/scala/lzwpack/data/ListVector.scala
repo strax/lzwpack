@@ -51,7 +51,7 @@ class ListVector[A] private[data](private[data] val trie: SparseVector[A], val s
     *   ListVector(1,2,3).tail.get(0) == Some(2)
     * }}}
     */
-  def tail: ListVector[A] = new ListVector[A](trie, size - 1, offset + 1)
+  def tail: ListVector[A] = drop(1)
 
   /**
     * Returns a new [[ListVector]] without the first `n` items.
@@ -76,7 +76,7 @@ class ListVector[A] private[data](private[data] val trie: SparseVector[A], val s
     * an empty option otherwise.
     * Complexity: O(log n)
     */
-  def get(i: Int): Option[A] = trie get (offset + i)
+  def get(i: Int): Option[A] = if (i < size) trie get (offset + i) else none[A]
 
   /**
     * Returns true if this [[ListVector]] contains an element at index `i`, `false` otherwise.
@@ -133,6 +133,11 @@ class ListVector[A] private[data](private[data] val trie: SparseVector[A], val s
     foldLeft(empty[B])((acc, a) => acc + f(a))
 
   override def toString: String = s"ListVector(${this.map(_.toString).intercalate(", ")})"
+
+  /**
+    * Hash code calculated as in [[java.util.List]].
+    */
+  override def hashCode(): Int = foldLeft(1)((acc, e) => 31 * acc + e.hashCode())
 }
 
 object ListVector {

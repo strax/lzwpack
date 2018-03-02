@@ -3,6 +3,7 @@ package lzwpack.data
 import lzwpack.UnitSpec
 import cats.syntax.option._
 import cats.instances.all._
+import cats.Eq
 
 class HashMapVectorSpec extends UnitSpec {
   describe("contains") {
@@ -25,12 +26,14 @@ class HashMapVectorSpec extends UnitSpec {
     }
 
     it("puts two elements with the same hashCode() but for which a != b to an overflow list") {
-      val a = new {
+      sealed trait Mock
+      val a = new Mock {
         override def hashCode(): Int = 2
       }
-      val b = new {
+      val b = new Mock {
         override def hashCode(): Int = 2
       }
+      implicit val mockEq: Eq[Mock] = Eq.fromUniversalEquals
       val map = HashMapVector(a -> "a", b -> "b")
       assert(map.get(a) === "a".some)
       assert(map.get(b) === "b".some)

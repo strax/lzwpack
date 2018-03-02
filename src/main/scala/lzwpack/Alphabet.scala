@@ -12,7 +12,7 @@ object Alphabet {
   /**
     * Returns a new alphabet from some foldable sequence.
     */
-  def apply[A: Ordering](as: Seq[A])(implicit arrow: Seq ~> ListVector): Alphabet[A] = arrow(as)
+  def apply[A](as: Seq[A])(implicit arrow: Seq ~> ListVector): Alphabet[A] = arrow(as)
 
   implicit val Alphanumeric: Alphabet[Char] = Alphabet(('0' to '9') ++ ('a' to 'z') ++ ('A' to 'Z'))
   implicit val AllChars: Alphabet[Char] = Alphabet(Char.MinValue to Char.MaxValue)

@@ -1,12 +1,15 @@
 package lzwpack.data
 
+import cats.Eq
+import cats.syntax.eq._
+
 /**
   * A [[HashMapVector]] is a hash map implementation on top of a bit-indexed trie.
   * As such, it provides the same functionality and performance characteristics as
   * [[SparseVector]], but instead of an integer key we can use any JVM object with
   * `hashCode` implemented as the key.
   */
-class HashMapVector[K, V] private[data](private val vector: SparseVector[HashMapVector[K, V]#Bucket]) {
+class HashMapVector[K: Eq, V] private[data](private val vector: SparseVector[HashMapVector[K, V]#Bucket]) {
   // Use overflow lists ("buckets") to handle hashCode collisions
   type Bucket = ListVector[(K, V)]
 
@@ -24,7 +27,7 @@ class HashMapVector[K, V] private[data](private val vector: SparseVector[HashMap
   def contains(key: K): Boolean = get(key).nonEmpty
 
   def get(key: K): Option[V] = for {
-    (_, value) <- bucketForKey(key).find(_._1 == key)
+    (_, value) <- bucketForKey(key).find(_._1 === key)
   } yield value
 
   def updated(kv: (K, V)): HashMapVector[K, V] =
@@ -36,19 +39,21 @@ class HashMapVector[K, V] private[data](private val vector: SparseVector[HashMap
 
   def isEmpty: Boolean = vector.isEmpty
 
-  def foldLeft[B](init: B)(f: (B, (K, V)) => B): B =
+  def fold[B](init: B)(f: (B, (K, V)) => B): B =
     vector.fold(init) { case (acc, (_, kvs)) => kvs.foldLeft(acc)(f) }
 
-  def find(f: (K, V) => Boolean): Option[(K, V)] = foldLeft(Option.empty[(K, V)]) {
+  def find(f: (K, V) => Boolean): Option[(K, V)] = fold(Option.empty[(K, V)]) {
     case (None, (k, v)) if f(k, v) => Some((k, v))
     case (acc, _) => acc
   }
+
+  override def toString: String = s"HashMapVector($size elements)"
 }
 
 object HashMapVector {
-  def apply[K, V](kvs: (K, V)*): HashMapVector[K, V] = {
+  def apply[K: Eq, V](kvs: (K, V)*): HashMapVector[K, V] = {
     kvs.foldLeft(empty[K, V])((map, kv) => map + kv)
   }
 
-  def empty[K, V] = new HashMapVector[K, V](SparseVector.empty)
+  def empty[K: Eq, V] = new HashMapVector[K, V](SparseVector.empty)
 }
