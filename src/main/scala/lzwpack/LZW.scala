@@ -5,11 +5,7 @@ import lzwpack.data._
 import lzwpack.data.{BitBuffer, ListVector}
 import cats.implicits._
 
-object LZW extends Debugging {
-  class CompressionException(cause: String) extends RuntimeException(cause)
-
-  type Output = Code
-
+object LZW {
   case class CompressionState(dict: Dict[ListVector[Byte]], buffered: ListVector[Byte])
 
   private def makeBitBuffer(code: Code, dict: Dict[_]) = BitBuffer(code, dict.currentCode.bitsize)
@@ -17,8 +13,6 @@ object LZW extends Debugging {
   /**
     * Processes the given block (given as head and tail) and returns a tuple of a potentially changed
     * dictionary and an Option indicating whether to emit a code to the output.
-    *
-    * @todo Refactor: can remove Option from output type?
     */
   private def emit(state: CompressionState, head: Option[Byte]): (CompressionState, Chunk[BitBuffer]) = {
     val dict = state.dict

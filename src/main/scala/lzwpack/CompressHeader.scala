@@ -1,7 +1,6 @@
 package lzwpack
 
-import cats.Applicative
-import fs2.{Pull, Segment, Stream}
+import fs2.{Segment, Stream}
 
 /**
   * Provides compress(1) compatible file header coding and decoding.

@@ -6,7 +6,7 @@ import lzwpack.data.BitBuffer
 /**
   * Packs a stream of bits into a byte sequence so that a byte can contain multiple bit sequences.
   */
-object Format extends Debugging {
+object Format {
   /**
     * Returns a new [[Pipe]] that packs input [[BitBuffer]]s across byte boundaries.
     */

@@ -1,4 +1,3 @@
 package lzwpack
 
-package object data extends BufferInstances with ListVectorInstances {
-}
+package object data extends BufferInstances with ListVectorInstances

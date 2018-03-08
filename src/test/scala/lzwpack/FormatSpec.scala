@@ -17,7 +17,7 @@ class FormatSpec extends UnitSpec {
       )
 
       assertResult(List(b"00100001", b"111111 00", b"111111 11", b"0 001001 01")) {
-        Stream.emits(sequence).through(pack).toList.unsigned
+        Stream.emits(sequence).through(pack).toList.map(_.unsigned)
       }
     }
   }
