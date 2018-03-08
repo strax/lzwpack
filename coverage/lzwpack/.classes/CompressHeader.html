@@ -81,31 +81,30 @@
 
 <div class="sourceCode"><i>1</i>&nbsp;package lzwpack
 <i>2</i>&nbsp;
-<i>3</i>&nbsp;import cats.Applicative
-<i>4</i>&nbsp;import fs2.{Pull, Segment, Stream}
-<i>5</i>&nbsp;
-<i>6</i>&nbsp;/**
-<i>7</i>&nbsp;  * Provides compress(1) compatible file header coding and decoding.
-<i>8</i>&nbsp;  */
-<b class="fc"><i>9</i>&nbsp;object CompressHeader {</b>
-<b class="fc"><i>10</i>&nbsp;  val Header: List[Byte] = List(0x1f.toByte, 0x9d.toByte)</b>
-<b class="fc"><i>11</i>&nbsp;  val CodeSizeMarker = 0x90.toByte</b>
-<i>12</i>&nbsp;
-<b class="fc"><i>13</i>&nbsp;  def decode[F[_]](stream: Stream[F, Byte]): Stream[F, Byte] = stream.take(2).segmentN(2).flatMap { segment =&gt;</b>
-<b class="fc"><i>14</i>&nbsp;    if (segment.force.toList == Header)</b>
-<b class="fc"><i>15</i>&nbsp;      stream.drop(3)</b>
-<i>16</i>&nbsp;    else
-<b class="nc"><i>17</i>&nbsp;      stream</b>
-<i>18</i>&nbsp;  }
-<i>19</i>&nbsp;
-<b class="fc"><i>20</i>&nbsp;  def encode[F[_]](stream: Stream[F, Byte]): Stream[F, Byte] = stream.cons(Segment.seq(Header) ++ Segment(CodeSizeMarker))</b>
-<b class="fc"><i>21</i>&nbsp;}</b>
+<i>3</i>&nbsp;import fs2.{Segment, Stream}
+<i>4</i>&nbsp;
+<i>5</i>&nbsp;/**
+<i>6</i>&nbsp;  * Provides compress(1) compatible file header coding and decoding.
+<i>7</i>&nbsp;  */
+<b class="fc"><i>8</i>&nbsp;object CompressHeader {</b>
+<b class="fc"><i>9</i>&nbsp;  val Header: List[Byte] = List(0x1f.toByte, 0x9d.toByte)</b>
+<b class="fc"><i>10</i>&nbsp;  val CodeSizeMarker = 0x90.toByte</b>
+<i>11</i>&nbsp;
+<b class="fc"><i>12</i>&nbsp;  def decode[F[_]](stream: Stream[F, Byte]): Stream[F, Byte] = stream.take(2).segmentN(2).flatMap { segment =&gt;</b>
+<b class="fc"><i>13</i>&nbsp;    if (segment.force.toList == Header)</b>
+<b class="fc"><i>14</i>&nbsp;      stream.drop(3)</b>
+<i>15</i>&nbsp;    else
+<b class="nc"><i>16</i>&nbsp;      stream</b>
+<i>17</i>&nbsp;  }
+<i>18</i>&nbsp;
+<b class="fc"><i>19</i>&nbsp;  def encode[F[_]](stream: Stream[F, Byte]): Stream[F, Byte] = stream.cons(Segment.seq(Header) ++ Segment(CodeSizeMarker))</b>
+<b class="fc"><i>20</i>&nbsp;}</b>
 </div>
 </div>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2018-02-17 20:57</div>
+    <div style="float:right;">generated on 2018-03-08 10:21</div>
 </div>
 </body>
 </html>

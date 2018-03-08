@@ -229,7 +229,7 @@
 <i>34</i>&nbsp;  // Use compress(1) compatible alphabet by default
 <i>35</i>&nbsp;  import Alphabet.Compress
 <i>36</i>&nbsp;
-<b class="nc"><i>37</i>&nbsp;  def inputStream(path: Path): Stream[IO, Byte] = fs2.io.file.readAll[IO](path, 4028)</b>
+<b class="nc"><i>37</i>&nbsp;  def inputStream(path: Path): Stream[IO, Byte] = fs2.io.file.readAll[IO](path, 32768)</b>
 <i>38</i>&nbsp;
 <b class="nc"><i>39</i>&nbsp;  def runCompress(path: Path, maxCodeSize: Int, sink: Sink[IO, Byte] = fs2.io.stdout): IO[Unit] = {</b>
 <b class="nc"><i>40</i>&nbsp;    inputStream(path)</b>
@@ -271,7 +271,7 @@
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2018-02-17 20:57</div>
+    <div style="float:right;">generated on 2018-03-08 10:21</div>
 </div>
 </body>
 </html>

@@ -47,10 +47,10 @@
 </td>
 <td class="coverageStat">
   <span class="percent">
-    61.5%
+    72.7%
   </span>
   <span class="absValue">
-    (8/ 13)
+    (8/ 11)
   </span>
 </td>
 </tr>
@@ -85,10 +85,10 @@
 </td>
 <td class="coverageStat">
   <span class="percent">
-    77.3%
+    85%
   </span>
   <span class="absValue">
-    (17/ 22)
+    (17/ 20)
   </span>
 </td>
 </tr>
@@ -104,125 +104,119 @@
 <i>4</i>&nbsp;
 <i>5</i>&nbsp;import scala.annotation.unchecked.uncheckedVariance
 <i>6</i>&nbsp;import SparseVector._
-<i>7</i>&nbsp;
-<i>8</i>&nbsp;/**
-<i>9</i>&nbsp;  * A [[SparseVector]] is a bit-mapped trie with 32 branches at each node.
-<i>10</i>&nbsp;  * It supports O(log32(n)) insertion, updating and random access.
-<i>11</i>&nbsp;  */
-<b class="fc"><i>12</i>&nbsp;sealed trait SparseVector[+A] {</b>
-<b class="nc"><i>13</i>&nbsp;  def apply(i: Int): A = get(i).getOrElse(throw new NoSuchElementException)</b>
-<i>14</i>&nbsp;
-<b class="fc"><i>15</i>&nbsp;  def contains(i: Int): Boolean = get(i).nonEmpty</b>
-<i>16</i>&nbsp;
-<i>17</i>&nbsp;  def get(i: Int): Option[A]
-<i>18</i>&nbsp;
-<i>19</i>&nbsp;  def updated[AA &gt;: A](i: Int, a: AA): SparseVector[AA]
-<i>20</i>&nbsp;
-<b class="fc"><i>21</i>&nbsp;  def +[AA &gt;: A](kv: (Int, AA)): SparseVector[AA] = kv match {</b>
-<b class="fc"><i>22</i>&nbsp;    case (k, v) =&gt; updated(k, v)</b>
-<i>23</i>&nbsp;  }
-<i>24</i>&nbsp;
-<i>25</i>&nbsp;  /**
-<i>26</i>&nbsp;    * Returns a new [[SparseVector]] with the element at the given index applied to f.
-<i>27</i>&nbsp;    * If no element exists at the given index, this is a no-op.
-<i>28</i>&nbsp;    */
-<b class="nc"><i>29</i>&nbsp;  def transform[AA &gt;: A](i: Int)(f: A =&gt; AA): SparseVector[AA] = {</b>
-<b class="nc"><i>30</i>&nbsp;    if (this contains i)</b>
-<b class="nc"><i>31</i>&nbsp;      this.updated(i, f(apply(i)))</b>
-<i>32</i>&nbsp;    else
-<b class="nc"><i>33</i>&nbsp;      this</b>
+<i>7</i>&nbsp;import cats.Eval
+<i>8</i>&nbsp;
+<i>9</i>&nbsp;/**
+<i>10</i>&nbsp;  * A [[SparseVector]] is a bit-mapped trie with 32 branches at each node.
+<i>11</i>&nbsp;  * It supports O(log32(n)) insertion, updating and random access.
+<i>12</i>&nbsp;  */
+<b class="fc"><i>13</i>&nbsp;sealed trait SparseVector[@specialized +A] {</b>
+<b class="nc"><i>14</i>&nbsp;  def apply(i: Int): A = get(i).getOrElse(throw new NoSuchElementException)</b>
+<i>15</i>&nbsp;
+<b class="fc"><i>16</i>&nbsp;  def contains(i: Int): Boolean = get(i).nonEmpty</b>
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;  def get(i: Int): Option[A]
+<i>19</i>&nbsp;
+<b class="nc"><i>20</i>&nbsp;  def updated[AA &gt;: A](i: Int, a: AA): SparseVector[AA]</b>
+<i>21</i>&nbsp;
+<b class="fc"><i>22</i>&nbsp;  def +[AA &gt;: A](kv: (Int, AA)): SparseVector[AA] = kv match {</b>
+<b class="fc"><i>23</i>&nbsp;    case (k, v) =&gt; updated(k, v)</b>
+<i>24</i>&nbsp;  }
+<i>25</i>&nbsp;
+<b class="nc"><i>26</i>&nbsp;  def fold[B](init: =&gt; B)(f: ((Int, A), =&gt; B) =&gt; B): B</b>
+<i>27</i>&nbsp;
+<i>28</i>&nbsp;  // Note: O(n) complexity because we don&#39;t really keep track of the bounds
+<b class="fc"><i>29</i>&nbsp;  lazy val size: Int = fold(0)((_, n) =&gt; n + 1)</b>
+<i>30</i>&nbsp;
+<b class="fc"><i>31</i>&nbsp;  def find(f: (Int, A) =&gt; Boolean): Option[(Int, A)] = fold(Option.empty[(Int, A)]) {</b>
+<b class="fc"><i>32</i>&nbsp;    case ((k, v), _) if f(k, v) =&gt; Some((k, v))</b>
+<b class="fc"><i>33</i>&nbsp;    case (_, acc) =&gt; acc</b>
 <i>34</i>&nbsp;  }
 <i>35</i>&nbsp;
-<i>36</i>&nbsp;  def foldLeft[B](init: B)(f: (B, (Int, A)) =&gt; B): B
-<i>37</i>&nbsp;
-<b class="fc"><i>38</i>&nbsp;  def size: Int = foldLeft(0)((n, _) =&gt; n + 1)</b>
-<i>39</i>&nbsp;
-<b class="fc"><i>40</i>&nbsp;  def find(f: (Int, A) =&gt; Boolean): Option[(Int, A)] = foldLeft(Option.empty[(Int, A)]) {</b>
-<b class="fc"><i>41</i>&nbsp;    case (None, (k, v)) if f(k, v) =&gt; Some((k, v))</b>
-<b class="fc"><i>42</i>&nbsp;    case (acc, _) =&gt; acc</b>
-<i>43</i>&nbsp;  }
-<i>44</i>&nbsp;
-<i>45</i>&nbsp;  def isEmpty: Boolean
-<i>46</i>&nbsp;}
-<i>47</i>&nbsp;
-<i>48</i>&nbsp;// Type parameter variance on Array is suppressed due to it being invariant; we can maintain the invariant ourselves
-<i>49</i>&nbsp;// by never mutating the array
-<i>50</i>&nbsp;private[data] case class Branch[+A](private val subforest: Array[SparseVector[A @uncheckedVariance]]) extends SparseVector[A] {
-<i>51</i>&nbsp;  def get(i: Int): Option[A] = {
-<i>52</i>&nbsp;    subforest(i &amp; Bitmask).get(i &gt;&gt;&gt; ChunkSize)
+<i>36</i>&nbsp;  def isEmpty: Boolean
+<i>37</i>&nbsp;}
+<i>38</i>&nbsp;
+<i>39</i>&nbsp;// Type parameter variance on Array is suppressed due to it being invariant; we can maintain the invariant ourselves
+<i>40</i>&nbsp;// by never mutating the array
+<i>41</i>&nbsp;private[data] case class Branch[+A](private val subforest: Array[SparseVector[A @uncheckedVariance]]) extends SparseVector[A] {
+<i>42</i>&nbsp;  def get(i: Int): Option[A] = {
+<i>43</i>&nbsp;    subforest(i &amp; Bitmask).get(i &gt;&gt;&gt; ChunkSize)
+<i>44</i>&nbsp;  }
+<i>45</i>&nbsp;
+<i>46</i>&nbsp;  def updated[AA &gt;: A](i: Int, a: AA): SparseVector[AA] = {
+<i>47</i>&nbsp;    // Make a new copy of the array to preserve persistence
+<i>48</i>&nbsp;    val copy = new Array[SparseVector[AA]](Radix)
+<i>49</i>&nbsp;    subforest.copyToArray(copy)
+<i>50</i>&nbsp;    copy.update(i &amp; Bitmask, copy(i &amp; Bitmask).updated(i &gt;&gt;&gt; ChunkSize, a))
+<i>51</i>&nbsp;
+<i>52</i>&nbsp;    Branch[AA](copy)
 <i>53</i>&nbsp;  }
 <i>54</i>&nbsp;
-<i>55</i>&nbsp;  def updated[AA &gt;: A](i: Int, a: AA): SparseVector[AA] = {
-<i>56</i>&nbsp;    // Make a new copy of the array to preserve persistence
-<i>57</i>&nbsp;    val copy = new Array[SparseVector[AA]](Radix)
-<i>58</i>&nbsp;    subforest.copyToArray(copy)
-<i>59</i>&nbsp;    copy.update(i &amp; Bitmask, copy(i &amp; Bitmask).updated(i &gt;&gt;&gt; ChunkSize, a))
-<i>60</i>&nbsp;
-<i>61</i>&nbsp;    Branch[AA](copy)
-<i>62</i>&nbsp;  }
-<i>63</i>&nbsp;
-<i>64</i>&nbsp;
-<i>65</i>&nbsp;  override def foldLeft[B](init: B)(f: (B, (Int, A)) =&gt; B): B = {
-<i>66</i>&nbsp;    var acc = init
-<i>67</i>&nbsp;    for ((subtree, prefix) &lt;- subforest.zipWithIndex if !subtree.isEmpty) {
-<i>68</i>&nbsp;      acc = subtree.foldLeft(acc) { case (acc, (suffix, v)) =&gt;
-<i>69</i>&nbsp;        val key = (suffix &lt;&lt; ChunkSize) ^ prefix
-<i>70</i>&nbsp;        f(acc, (key, v))
-<i>71</i>&nbsp;      }
-<i>72</i>&nbsp;    }
-<i>73</i>&nbsp;    acc
-<i>74</i>&nbsp;  }
-<i>75</i>&nbsp;
-<i>76</i>&nbsp;  override def isEmpty: Boolean = false
-<i>77</i>&nbsp;}
-<i>78</i>&nbsp;
-<i>79</i>&nbsp;private[data] case class Leaf[+A](key: Int, value: A) extends SparseVector[A] {
-<i>80</i>&nbsp;  def get(i: Int) = if (key == i) Some(value) else None
-<i>81</i>&nbsp;  def updated[AA &gt;: A](i: Int, a: AA): SparseVector[AA] = {
-<i>82</i>&nbsp;    if (key == i) {
-<i>83</i>&nbsp;      // Update the existing element
-<i>84</i>&nbsp;      Leaf(key, a)
-<i>85</i>&nbsp;    } else {
-<i>86</i>&nbsp;      // Convert this Leaf to a Branch with the new and current values as leaves
-<i>87</i>&nbsp;      EmptyBranch.updated(key, value).updated(i, a)
-<i>88</i>&nbsp;    }
-<i>89</i>&nbsp;  }
+<i>55</i>&nbsp;
+<i>56</i>&nbsp;  /**
+<i>57</i>&nbsp;    * Folds this trie in a depth-first manner.
+<i>58</i>&nbsp;    */
+<i>59</i>&nbsp;  override def fold[B](init: =&gt; B)(f: ((Int, A), =&gt; B) =&gt; B): B = {
+<i>60</i>&nbsp;    var acc = init
+<i>61</i>&nbsp;    for ((subtree, prefix) &lt;- subforest.zipWithIndex if !subtree.isEmpty) {
+<i>62</i>&nbsp;      acc = subtree.fold(acc) { case ((suffix, v), acc) =&gt;
+<i>63</i>&nbsp;        val key = (suffix &lt;&lt; ChunkSize) ^ prefix
+<i>64</i>&nbsp;        f((key, v), acc)
+<i>65</i>&nbsp;      }
+<i>66</i>&nbsp;    }
+<i>67</i>&nbsp;    acc
+<i>68</i>&nbsp;  }
+<i>69</i>&nbsp;
+<i>70</i>&nbsp;  override val isEmpty: Boolean = false
+<i>71</i>&nbsp;}
+<i>72</i>&nbsp;
+<i>73</i>&nbsp;private[data] case class Leaf[+A](key: Int, value: A) extends SparseVector[A] {
+<i>74</i>&nbsp;  def get(i: Int) = if (key == i) Some(value) else None
+<i>75</i>&nbsp;  def updated[AA &gt;: A](i: Int, a: AA): SparseVector[AA] = {
+<i>76</i>&nbsp;    if (key == i) {
+<i>77</i>&nbsp;      // Update the existing element
+<i>78</i>&nbsp;      Leaf(key, a)
+<i>79</i>&nbsp;    } else {
+<i>80</i>&nbsp;      // Convert this Leaf to a Branch with the new and current values as leaves
+<i>81</i>&nbsp;      EmptyBranch.updated(key, value).updated(i, a)
+<i>82</i>&nbsp;    }
+<i>83</i>&nbsp;  }
+<i>84</i>&nbsp;
+<i>85</i>&nbsp;
+<i>86</i>&nbsp;  override def fold[B](init: =&gt; B)(f: ((Int, A), =&gt; B) =&gt; B): B = f((key, value), init)
+<i>87</i>&nbsp;
+<i>88</i>&nbsp;  override val isEmpty: Boolean = false
+<i>89</i>&nbsp;}
 <i>90</i>&nbsp;
-<i>91</i>&nbsp;
-<i>92</i>&nbsp;  override def foldLeft[B](init: B)(f: (B, (Int, A)) =&gt; B): B = f(init, (key, value))
-<i>93</i>&nbsp;
-<i>94</i>&nbsp;  override def isEmpty: Boolean = false
-<i>95</i>&nbsp;}
+<i>91</i>&nbsp;private[data] case object Empty extends SparseVector[Nothing] {
+<i>92</i>&nbsp;  def get(i: Int): Option[Nothing] = None
+<i>93</i>&nbsp;  def updated[A](i: Int, a: A): SparseVector[A] = Leaf(i, a)
+<i>94</i>&nbsp;
+<i>95</i>&nbsp;  override val isEmpty: Boolean = true
 <i>96</i>&nbsp;
-<i>97</i>&nbsp;private[data] case object Empty extends SparseVector[Nothing] {
-<i>98</i>&nbsp;  def get(i: Int): Option[Nothing] = None
-<i>99</i>&nbsp;  def updated[A](i: Int, a: A): SparseVector[A] = Leaf(i, a)
-<i>100</i>&nbsp;
-<i>101</i>&nbsp;  override def isEmpty: Boolean = true
-<i>102</i>&nbsp;
-<i>103</i>&nbsp;  override def foldLeft[B](init: B)(f: (B, (Int, Nothing)) =&gt; B): B = init
-<i>104</i>&nbsp;}
-<i>105</i>&nbsp;
-<b class="fc"><i>106</i>&nbsp;object SparseVector {</b>
-<b class="fc"><i>107</i>&nbsp;  val Radix = 32</b>
-<b class="fc"><i>108</i>&nbsp;  private[data] val ChunkSize = Radix.bitsize - 1</b>
-<b class="fc"><i>109</i>&nbsp;  private[data] val Bitmask = Radix - 1 // Radix must be a power of 2, so (Radix - 1) masks values 0..Radix</b>
+<i>97</i>&nbsp;  override def fold[B](init: =&gt; B)(f: ((Int, Nothing), =&gt; B) =&gt; B): B = init
+<i>98</i>&nbsp;}
+<i>99</i>&nbsp;
+<b class="fc"><i>100</i>&nbsp;object SparseVector {</b>
+<b class="fc"><i>101</i>&nbsp;  val Radix = 32</b>
+<b class="fc"><i>102</i>&nbsp;  private[data] val ChunkSize = Radix.bitsize - 1</b>
+<b class="fc"><i>103</i>&nbsp;  private[data] val Bitmask = Radix - 1 // Radix must be a power of 2, so (Radix - 1) masks values 0..Radix</b>
+<i>104</i>&nbsp;
+<b class="fc"><i>105</i>&nbsp;  def apply[A](as: A*): SparseVector[A] = as.zipWithIndex.foldLeft(EmptyBranch: SparseVector[A]) {</b>
+<b class="fc"><i>106</i>&nbsp;    case (acc, (a, i)) =&gt; acc.updated(i, a)</b>
+<i>107</i>&nbsp;  }
+<i>108</i>&nbsp;
+<b class="fc"><i>109</i>&nbsp;  def empty[A]: SparseVector[A] = Empty</b>
 <i>110</i>&nbsp;
-<b class="fc"><i>111</i>&nbsp;  def apply[A](as: A*): SparseVector[A] = as.zipWithIndex.foldLeft(EmptyBranch: SparseVector[A]) {</b>
-<b class="fc"><i>112</i>&nbsp;    case (acc, (a, i)) =&gt; acc.updated(i, a)</b>
-<i>113</i>&nbsp;  }
-<i>114</i>&nbsp;
-<b class="fc"><i>115</i>&nbsp;  def empty[A]: SparseVector[A] = Empty</b>
-<i>116</i>&nbsp;
-<i>117</i>&nbsp;  // we only need a single empty branch instance
-<b class="fc"><i>118</i>&nbsp;  private[data] val EmptyBranch: SparseVector[Nothing] = Branch(Array.fill(Radix)(empty))</b>
-<b class="fc"><i>119</i>&nbsp;}</b>
+<i>111</i>&nbsp;  // we only need a single empty branch instance
+<b class="fc"><i>112</i>&nbsp;  private[data] val EmptyBranch: SparseVector[Nothing] = Branch(Array.fill(Radix)(empty))</b>
+<b class="fc"><i>113</i>&nbsp;}</b>
 </div>
 </div>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2018-02-17 20:57</div>
+    <div style="float:right;">generated on 2018-03-08 10:21</div>
 </div>
 </body>
 </html>

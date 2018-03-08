@@ -74,46 +74,46 @@
 
 <div class="sourceCode"><i>1</i>&nbsp;package lzwpack
 <i>2</i>&nbsp;
-<i>3</i>&nbsp;import lzwpack.data.{HashMapVector, SparseVector}
-<i>4</i>&nbsp;
-<i>5</i>&nbsp;/**
-<i>6</i>&nbsp;  * A dict is a set of keys that have an associated monotonic unique code.
-<i>7</i>&nbsp;  *
-<i>8</i>&nbsp;  * @tparam K the type of keys in the dict
-<i>9</i>&nbsp;  */
-<i>10</i>&nbsp;trait Dict[K] {
-<i>11</i>&nbsp;  /**
-<i>12</i>&nbsp;    * Returns true if this Dict contains the given key.
-<i>13</i>&nbsp;    */
-<i>14</i>&nbsp;  def contains(key: K): Boolean
-<i>15</i>&nbsp;
-<i>16</i>&nbsp;  /**
-<i>17</i>&nbsp;    * Returns a new Dict that contains the given key mapped to the next code.
-<i>18</i>&nbsp;    */
-<i>19</i>&nbsp;  def add(key: K): Dict[K]
-<i>20</i>&nbsp;
-<i>21</i>&nbsp;  /**
-<i>22</i>&nbsp;    * Returns the code that was previously added to this Dict.
-<i>23</i>&nbsp;    */
-<i>24</i>&nbsp;  def currentCode: Int
-<i>25</i>&nbsp;
-<i>26</i>&nbsp;  /**
-<i>27</i>&nbsp;    * Returns the next code to assign to a value.
-<i>28</i>&nbsp;    */
-<i>29</i>&nbsp;  def nextCode: Int = currentCode + 1
-<i>30</i>&nbsp;
-<i>31</i>&nbsp;  /**
-<i>32</i>&nbsp;    * Returns the associated code for the given value.
-<i>33</i>&nbsp;    * @throws NoSuchElementException if the key does not exist in this Dict
-<i>34</i>&nbsp;    */
-<i>35</i>&nbsp;  def get(key: K): Code
-<i>36</i>&nbsp;
-<i>37</i>&nbsp;  /**
-<i>38</i>&nbsp;    * Returns the key with the given code or [[None]] if the code does not exist in this Dict.
-<i>39</i>&nbsp;    */
-<i>40</i>&nbsp;  def find(code: Code): Option[K]
-<i>41</i>&nbsp;
-<i>42</i>&nbsp;  def size: Int
+<i>3</i>&nbsp;import cats.{Eq, Hash}
+<i>4</i>&nbsp;import cats.implicits._
+<i>5</i>&nbsp;import lzwpack.data.{HashMapVector, SparseVector}
+<i>6</i>&nbsp;
+<i>7</i>&nbsp;/**
+<i>8</i>&nbsp;  * A dict is a set of keys that have an associated monotonic unique code.
+<i>9</i>&nbsp;  *
+<i>10</i>&nbsp;  * @tparam K the type of keys in the dict
+<i>11</i>&nbsp;  */
+<i>12</i>&nbsp;trait Dict[K] {
+<i>13</i>&nbsp;  /**
+<i>14</i>&nbsp;    * Returns true if this Dict contains the given key.
+<i>15</i>&nbsp;    */
+<i>16</i>&nbsp;  def contains(key: K): Boolean
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;  /**
+<i>19</i>&nbsp;    * Returns a new Dict that contains the given key mapped to the next code.
+<i>20</i>&nbsp;    */
+<i>21</i>&nbsp;  def add(key: K): Dict[K]
+<i>22</i>&nbsp;
+<i>23</i>&nbsp;  /**
+<i>24</i>&nbsp;    * Returns the code that was previously added to this Dict.
+<i>25</i>&nbsp;    */
+<i>26</i>&nbsp;  def currentCode: Int
+<i>27</i>&nbsp;
+<i>28</i>&nbsp;  /**
+<i>29</i>&nbsp;    * Returns the next code to assign to a value.
+<i>30</i>&nbsp;    */
+<i>31</i>&nbsp;  def nextCode: Int = currentCode + 1
+<i>32</i>&nbsp;
+<i>33</i>&nbsp;  /**
+<i>34</i>&nbsp;    * Returns the associated code for the given value.
+<i>35</i>&nbsp;    * @throws NoSuchElementException if the key does not exist in this Dict
+<i>36</i>&nbsp;    */
+<i>37</i>&nbsp;  def get(key: K): Code
+<i>38</i>&nbsp;
+<i>39</i>&nbsp;  /**
+<i>40</i>&nbsp;    * Returns the key with the given code or [[None]] if the code does not exist in this Dict.
+<i>41</i>&nbsp;    */
+<i>42</i>&nbsp;  def find(code: Code): Option[K]
 <i>43</i>&nbsp;}
 <i>44</i>&nbsp;
 <i>45</i>&nbsp;/**
@@ -121,8 +121,8 @@
 <i>47</i>&nbsp;  * an empty T[A] or a T[A] that contains the given alphabet.
 <i>48</i>&nbsp;  */
 <i>49</i>&nbsp;trait MakeDict[T[_]] {
-<i>50</i>&nbsp;  def empty[A]: Dict[A]
-<i>51</i>&nbsp;  def fromAlphabet[A](alphabet: Alphabet[A]): Dict[A] = alphabet.foldLeft(empty[A])((z, a) =&gt; z.add(a))
+<i>50</i>&nbsp;  def empty[A: Hash]: Dict[A]
+<i>51</i>&nbsp;  def fromAlphabet[A: Hash](alphabet: Alphabet[A]): Dict[A] = alphabet.foldLeft(empty[A])((z, a) =&gt; z.add(a))
 <i>52</i>&nbsp;}
 <i>53</i>&nbsp;
 <i>54</i>&nbsp;/**
@@ -136,50 +136,46 @@
 <i>62</i>&nbsp;
 <i>63</i>&nbsp;  override def get(key: K): Code = map(key)
 <i>64</i>&nbsp;
-<i>65</i>&nbsp;  override def find(code: Code): Option[K] = map find { case (_, other) =&gt; code == other } map (_._1)
-<i>66</i>&nbsp;
-<i>67</i>&nbsp;  override def size: Code = map.size
-<i>68</i>&nbsp;}
-<i>69</i>&nbsp;
-<i>70</i>&nbsp;object CompressionDict extends MakeDict[CompressionDict] {
-<i>71</i>&nbsp;  def empty[K]: Dict[K] = CompressionDict(HashMapVector.empty[K, Code], 0)
-<i>72</i>&nbsp;}
-<i>73</i>&nbsp;
-<i>74</i>&nbsp;/**
-<i>75</i>&nbsp;  * A [[Dict]] optimized for decompression.
-<i>76</i>&nbsp;  * This is essentially the dual of [[CompressionDict]], so key lookup is O(n) while
-<i>77</i>&nbsp;  * code lookup and add are O(1) amortized.
-<i>78</i>&nbsp;  */
-<i>79</i>&nbsp;case class DecompressionDict[K](map: SparseVector[K], currentCode: Int) extends Dict[K] {
-<i>80</i>&nbsp;  override def contains(key: K): Boolean = getOption(key).nonEmpty
+<i>65</i>&nbsp;  override def find(code: Code): Option[K] = map find { case (_, other) =&gt; code === other } map (_._1)
+<i>66</i>&nbsp;}
+<i>67</i>&nbsp;
+<i>68</i>&nbsp;object CompressionDict extends MakeDict[CompressionDict] {
+<i>69</i>&nbsp;  def empty[K: Hash]: Dict[K] = CompressionDict(HashMapVector.empty[K, Code], 0)
+<i>70</i>&nbsp;}
+<i>71</i>&nbsp;
+<i>72</i>&nbsp;/**
+<i>73</i>&nbsp;  * A [[Dict]] optimized for decompression.
+<i>74</i>&nbsp;  * This is essentially the dual of [[CompressionDict]], so key lookup is O(n) while
+<i>75</i>&nbsp;  * code lookup and add are O(1) amortized.
+<i>76</i>&nbsp;  */
+<i>77</i>&nbsp;case class DecompressionDict[K: Hash](map: SparseVector[K], currentCode: Int) extends Dict[K] {
+<i>78</i>&nbsp;  override def contains(key: K): Boolean = getOption(key).nonEmpty
+<i>79</i>&nbsp;
+<i>80</i>&nbsp;  override def add(key: K): Dict[K] = DecompressionDict(map + (nextCode -&gt; key), nextCode)
 <i>81</i>&nbsp;
-<i>82</i>&nbsp;  override def add(key: K): Dict[K] = DecompressionDict(map + (nextCode -&gt; key), nextCode)
+<i>82</i>&nbsp;  override def get(key: K): Code = getOption(key) getOrElse (throw new NoSuchElementException())
 <i>83</i>&nbsp;
-<i>84</i>&nbsp;  override def get(key: K): Code = getOption(key) getOrElse (throw new NoSuchElementException())
+<i>84</i>&nbsp;  override def find(code: Code): Option[K] = map get code
 <i>85</i>&nbsp;
-<i>86</i>&nbsp;  override def find(code: Code): Option[K] = map get code
-<i>87</i>&nbsp;
-<i>88</i>&nbsp;  override def size: Code = map.size
-<i>89</i>&nbsp;
-<i>90</i>&nbsp;  def getOption(key: K): Option[Code] = map find { case (_, k) =&gt; k == key } map (_._1)
+<i>86</i>&nbsp;  def getOption(key: K): Option[Code] = map find { case (_, k) =&gt; k === key } map (_._1)
+<i>87</i>&nbsp;}
+<i>88</i>&nbsp;
+<i>89</i>&nbsp;object DecompressionDict extends MakeDict[DecompressionDict] {
+<i>90</i>&nbsp;  override def empty[K: Hash]: Dict[K] = DecompressionDict(SparseVector.empty[K], 0)
 <i>91</i>&nbsp;}
 <i>92</i>&nbsp;
-<i>93</i>&nbsp;object DecompressionDict extends MakeDict[DecompressionDict] {
-<i>94</i>&nbsp;  override def empty[K]: Dict[K] = DecompressionDict(SparseVector.empty[K], 0)
-<i>95</i>&nbsp;}
-<i>96</i>&nbsp;
-<i>97</i>&nbsp;// Provide implicit MakeDict instances to support generic Dict creation
-<i>98</i>&nbsp;// The MakeDict instances are also companion objects to provide nicer syntax when calling concrete instances
-<b class="fc"><i>99</i>&nbsp;trait DictInstances {</b>
-<b class="fc"><i>100</i>&nbsp;  implicit val makeCompressionDict: MakeDict[CompressionDict] = CompressionDict</b>
-<b class="fc"><i>101</i>&nbsp;  implicit val makeDecompressionDict: MakeDict[DecompressionDict] = DecompressionDict</b>
-<i>102</i>&nbsp;}
+<i>93</i>&nbsp;// Provide implicit MakeDict instances to support generic Dict creation
+<i>94</i>&nbsp;// The MakeDict instances are also companion objects to provide nicer syntax when calling concrete instances
+<b class="fc"><i>95</i>&nbsp;trait DictInstances {</b>
+<b class="fc"><i>96</i>&nbsp;  implicit val makeCompressionDict: MakeDict[CompressionDict] = CompressionDict</b>
+<b class="fc"><i>97</i>&nbsp;  implicit val makeDecompressionDict: MakeDict[DecompressionDict] = DecompressionDict</b>
+<i>98</i>&nbsp;}
 </div>
 </div>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2018-02-17 20:57</div>
+    <div style="float:right;">generated on 2018-03-08 10:21</div>
 </div>
 </body>
 </html>

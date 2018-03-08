@@ -47,10 +47,10 @@
 </td>
 <td class="coverageStat">
   <span class="percent">
-    94.7%
+    95%
   </span>
   <span class="absValue">
-    (18/ 19)
+    (19/ 20)
   </span>
 </td>
   </tr>
@@ -104,10 +104,10 @@
 </td>
 <td class="coverageStat">
   <span class="percent">
-    91.3%
+    91.7%
   </span>
   <span class="absValue">
-    (21/ 23)
+    (22/ 24)
   </span>
 </td>
 </tr>
@@ -119,66 +119,63 @@
 
 <div class="sourceCode"><i>1</i>&nbsp;package lzwpack
 <i>2</i>&nbsp;
-<i>3</i>&nbsp;import cats.data.{State, StateT}
-<i>4</i>&nbsp;import fs2.{Chunk, Pipe, Pull, Segment, Stream}
-<i>5</i>&nbsp;import cats.implicits._
-<i>6</i>&nbsp;import cats.kernel.Monoid
-<i>7</i>&nbsp;import lzwpack.data.BitBuffer
-<i>8</i>&nbsp;
-<i>9</i>&nbsp;/**
-<i>10</i>&nbsp;  * Packs a stream of bits into a byte sequence so that a byte can contain multiple bit sequences.
-<i>11</i>&nbsp;  */
-<b class="fc"><i>12</i>&nbsp;object Format extends Debugging {</b>
-<i>13</i>&nbsp;  /**
-<i>14</i>&nbsp;    * Returns a new [[Pipe]] that packs input [[BitBuffer]]s across byte boundaries.
-<i>15</i>&nbsp;    */
-<b class="fc"><i>16</i>&nbsp;  def pack[F[_]]: Pipe[F, BitBuffer, Byte] = stream =&gt; {</b>
-<b class="fc"><i>17</i>&nbsp;    stream.scanSegments(BitBuffer.empty) { case (buffer, segment) =&gt;</b>
-<b class="fc"><i>18</i>&nbsp;      combinedBuffer(segment)(buffer) flatMapResult { buffer =&gt;</b>
-<b class="fc"><i>19</i>&nbsp;        val (rest, bytes) = buffer.drain(8)</b>
-<b class="fc"><i>20</i>&nbsp;        Segment.array(bytes.map(_.toByte)).asResult(rest)</b>
-<i>21</i>&nbsp;      }
-<i>22</i>&nbsp;    }
-<i>23</i>&nbsp;  }
-<i>24</i>&nbsp;
-<b class="pc"><i>25</i>&nbsp;  case class UnpackState(buffer: BitBuffer, counter: Int) {</b>
-<b class="fc"><i>26</i>&nbsp;    def codeSize: Int = Math.min((counter).bitsize, MaxCodeSize)</b>
-<b class="fc"><i>27</i>&nbsp;    def set(bb: BitBuffer) = UnpackState(bb, counter)</b>
-<i>28</i>&nbsp;  }
-<i>29</i>&nbsp;
-<i>30</i>&nbsp;  def unpack1(state: UnpackState): Option[(UnpackState, Code)] = {
-<b class="fc"><i>31</i>&nbsp;    state.buffer.readOption(state.codeSize).map { case (bb, code) =&gt;</b>
-<b class="fc"><i>32</i>&nbsp;      (UnpackState(bb, state.counter + 1), code)</b>
-<i>33</i>&nbsp;    }
-<i>34</i>&nbsp;  }
-<i>35</i>&nbsp;
-<i>36</i>&nbsp;  def unpackSegment(state: UnpackState): Segment[Code, Option[UnpackState]] =
-<b class="fc"><i>37</i>&nbsp;    unpack1(state).fold(Segment.pure[Code, Option[UnpackState]](None)) { case (state_, code) =&gt;</b>
-<b class="fc"><i>38</i>&nbsp;      Segment(code).asResult(Some(state_))</b>
-<i>39</i>&nbsp;    }
+<i>3</i>&nbsp;import fs2.{Pipe, Segment}
+<i>4</i>&nbsp;import lzwpack.data.BitBuffer
+<i>5</i>&nbsp;
+<i>6</i>&nbsp;/**
+<i>7</i>&nbsp;  * Packs a stream of bits into a byte sequence so that a byte can contain multiple bit sequences.
+<i>8</i>&nbsp;  */
+<b class="fc"><i>9</i>&nbsp;object Format {</b>
+<i>10</i>&nbsp;  /**
+<i>11</i>&nbsp;    * Returns a new [[Pipe]] that packs input [[BitBuffer]]s across byte boundaries.
+<i>12</i>&nbsp;    */
+<b class="fc"><i>13</i>&nbsp;  def pack[F[_]]: Pipe[F, BitBuffer, Byte] = stream =&gt; {</b>
+<b class="fc"><i>14</i>&nbsp;    stream.scanSegments(BitBuffer.empty) { case (buffer, segment) =&gt;</b>
+<b class="fc"><i>15</i>&nbsp;      combinedBuffer(segment)(buffer) flatMapResult { buffer =&gt;</b>
+<b class="fc"><i>16</i>&nbsp;        val (rest, bytes) = buffer.drain(8)</b>
+<b class="fc"><i>17</i>&nbsp;        Segment.array(bytes.map(_.toByte)).asResult(rest)</b>
+<i>18</i>&nbsp;      }
+<i>19</i>&nbsp;    }
+<i>20</i>&nbsp;  }
+<i>21</i>&nbsp;
+<b class="pc"><i>22</i>&nbsp;  case class UnpackState(buffer: BitBuffer, counter: Int) {</b>
+<b class="fc"><i>23</i>&nbsp;    def codeSize: Int = Math.min(counter.bitsize, MaxCodeSize)</b>
+<b class="fc"><i>24</i>&nbsp;    def set(bb: BitBuffer) = UnpackState(bb, counter)</b>
+<i>25</i>&nbsp;  }
+<i>26</i>&nbsp;
+<i>27</i>&nbsp;  def unpack1(state: UnpackState): Option[(UnpackState, Code)] = {
+<b class="fc"><i>28</i>&nbsp;    state.buffer.readOption(state.codeSize).map { case (bb, code) =&gt;</b>
+<b class="fc"><i>29</i>&nbsp;      (UnpackState(bb, state.counter + 1), code)</b>
+<i>30</i>&nbsp;    }
+<i>31</i>&nbsp;  }
+<i>32</i>&nbsp;
+<i>33</i>&nbsp;  def unpackSegment(state: UnpackState): Segment[Code, Option[UnpackState]] =
+<b class="fc"><i>34</i>&nbsp;    unpack1(state).fold(Segment.pure[Code, Option[UnpackState]](None)) { case (state_, code) =&gt;</b>
+<b class="fc"><i>35</i>&nbsp;      Segment(code).asResult(Some(state_))</b>
+<i>36</i>&nbsp;    }
+<i>37</i>&nbsp;
+<b class="nc"><i>38</i>&nbsp;  def combinedBuffer(segment: Segment[BitBuffer, _])(init: BitBuffer = BitBuffer.empty): Segment[Nothing, BitBuffer] =</b>
+<b class="fc"><i>39</i>&nbsp;    segment.fold(init)(_ ++ _).mapResult(_._2)</b>
 <i>40</i>&nbsp;
-<b class="nc"><i>41</i>&nbsp;  def combinedBuffer(segment: Segment[BitBuffer, _])(init: BitBuffer = BitBuffer.empty): Segment[Nothing, BitBuffer] =</b>
-<b class="fc"><i>42</i>&nbsp;    segment.fold(init)(_ ++ _).mapResult(_._2)</b>
-<i>43</i>&nbsp;
-<b class="fc"><i>44</i>&nbsp;  def unpack[F[_]](implicit alphabet: Alphabet[Byte]): Pipe[F, Byte, Code] = stream =&gt; {</b>
-<b class="fc"><i>45</i>&nbsp;    stream</b>
-<b class="fc"><i>46</i>&nbsp;      .buffer(4)</b>
-<b class="fc"><i>47</i>&nbsp;      .map(b =&gt; BitBuffer(b))</b>
-<b class="fc"><i>48</i>&nbsp;      .scanSegments(UnpackState(BitBuffer.empty, alphabet.size)) { case (state, segment) =&gt;</b>
-<i>49</i>&nbsp;        def drain(state: UnpackState): Segment[Code, UnpackState] = {
-<b class="fc"><i>50</i>&nbsp;          unpackSegment(state).flatMapResult(_.fold(Segment.pure[Code, UnpackState](state))(drain))</b>
-<i>51</i>&nbsp;        }
-<i>52</i>&nbsp;
-<b class="fc"><i>53</i>&nbsp;        combinedBuffer(segment)(state.buffer) flatMapResult (bb =&gt; drain(state.set(bb)))</b>
-<i>54</i>&nbsp;      }
-<i>55</i>&nbsp;  }
-<i>56</i>&nbsp;}
+<b class="fc"><i>41</i>&nbsp;  def unpack[F[_]](implicit alphabet: Alphabet[Byte]): Pipe[F, Byte, Code] = stream =&gt; {</b>
+<b class="fc"><i>42</i>&nbsp;    stream</b>
+<b class="fc"><i>43</i>&nbsp;      .buffer(4)</b>
+<b class="fc"><i>44</i>&nbsp;      .map(b =&gt; BitBuffer(b))</b>
+<b class="fc"><i>45</i>&nbsp;      .scanSegments(UnpackState(BitBuffer.empty, alphabet.size)) { case (state, segment) =&gt;</b>
+<i>46</i>&nbsp;        def drain(state: UnpackState): Segment[Code, UnpackState] = {
+<b class="fc"><i>47</i>&nbsp;          unpackSegment(state).flatMapResult(_.fold(Segment.pure[Code, UnpackState](state))(drain))</b>
+<i>48</i>&nbsp;        }
+<i>49</i>&nbsp;
+<b class="fc"><i>50</i>&nbsp;        combinedBuffer(segment)(state.buffer) flatMapResult (bb =&gt; drain(state.set(bb)))</b>
+<i>51</i>&nbsp;      }
+<i>52</i>&nbsp;  }
+<b class="fc"><i>53</i>&nbsp;}</b>
 </div>
 </div>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2018-02-17 20:57</div>
+    <div style="float:right;">generated on 2018-03-08 10:21</div>
 </div>
 </body>
 </html>

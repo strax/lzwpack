@@ -5,7 +5,7 @@
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html id="htmlId">
 <head>
-  <title>Coverage Report :: Alphabet</title>
+  <title>Coverage Report :: AlphabetSyntax</title>
   <style type="text/css">
     @import "../../.css/coverage.css";
   </style>
@@ -20,7 +20,7 @@
     [ <a href="../index.html">lzwpack</a> ]
 </div>
 
-<h1>Coverage Summary for Class: Alphabet (lzwpack)</h1>
+<h1>Coverage Summary for Class: AlphabetSyntax (lzwpack)</h1>
 
 <table class="coverageStats">
 
@@ -35,14 +35,14 @@
   Line, %
 </th>
 </tr>
-  <tr>
-    <td class="name">Alphabet$</td>
+<tr>
+  <td class="name">AlphabetSyntax</td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (6/ 6)
+    (2/ 2)
   </span>
 </td>
 <td class="coverageStat">
@@ -50,7 +50,26 @@
     100%
   </span>
   <span class="absValue">
-    (7/ 7)
+    (2/ 2)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">AlphabetSyntax$Ops</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/ 3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/ 3)
   </span>
 </td>
   </tr>
@@ -61,7 +80,7 @@
     100%
   </span>
   <span class="absValue">
-    (6/ 6)
+    (5/ 5)
   </span>
 </td>
 <td class="coverageStat">
@@ -69,7 +88,7 @@
     100%
   </span>
   <span class="absValue">
-    (7/ 7)
+    (5/ 5)
   </span>
 </td>
 </tr>
@@ -88,38 +107,38 @@
 <i>7</i>&nbsp;/**
 <i>8</i>&nbsp;  * Companion object for [[Alphabet]]
 <i>9</i>&nbsp;  */
-<b class="fc"><i>10</i>&nbsp;object Alphabet {</b>
+<i>10</i>&nbsp;object Alphabet {
 <i>11</i>&nbsp;  import ListVector.range
 <i>12</i>&nbsp;
 <i>13</i>&nbsp;  /**
 <i>14</i>&nbsp;    * Returns a new alphabet from some foldable sequence.
 <i>15</i>&nbsp;    */
-<b class="fc"><i>16</i>&nbsp;  def apply[A](as: Seq[A]): Alphabet[A] = ListVector.seq(as)</b>
+<i>16</i>&nbsp;  def apply[A](as: Seq[A]): Alphabet[A] = ListVector.seq(as)
 <i>17</i>&nbsp;
-<b class="fc"><i>18</i>&nbsp;  implicit val Alphanumeric: Alphabet[Char] = Alphabet(range(&#39;0&#39;, &#39;9&#39;) ++ range(&#39;a&#39;, &#39;z&#39;) ++ range(&#39;A&#39;, &#39;Z&#39;))</b>
-<b class="fc"><i>19</i>&nbsp;  implicit val AllChars: Alphabet[Char] = Alphabet(range(Char.MinValue, Char.MaxValue))</b>
+<i>18</i>&nbsp;  implicit val Alphanumeric: Alphabet[Char] = Alphabet(range(&#39;0&#39;, &#39;9&#39;) ++ range(&#39;a&#39;, &#39;z&#39;) ++ range(&#39;A&#39;, &#39;Z&#39;))
+<i>19</i>&nbsp;  implicit val AllChars: Alphabet[Char] = Alphabet(range(Char.MinValue, Char.MaxValue))
 <i>20</i>&nbsp;  // Instead of bytes (8-bit signed integers), we represent byte values by their unsigned int (32-bit) representation.
-<b class="fc"><i>21</i>&nbsp;  implicit val AllBytes: Alphabet[Byte] = Alphabet(range(1, 255)).map(_.toByte)</b>
+<i>21</i>&nbsp;  implicit val AllBytes: Alphabet[Byte] = Alphabet(range(1, 255)).map(_.toByte)
 <i>22</i>&nbsp;
 <i>23</i>&nbsp;  // This alphabet is compatible with compress(1) tool as we reserve a code outside the dictionary
-<b class="fc"><i>24</i>&nbsp;  implicit val Compress: Alphabet[Byte] = AllBytes + (0: Byte)</b>
+<i>24</i>&nbsp;  implicit val Compress: Alphabet[Byte] = AllBytes + (0: Byte)
 <i>25</i>&nbsp;}
 <i>26</i>&nbsp;
-<b class="fc"><i>27</i>&nbsp;trait AlphabetInstances {</b>
+<i>27</i>&nbsp;trait AlphabetInstances {
 <i>28</i>&nbsp;  def alphabetEq[A: Eq]: Eq[Alphabet[A]] = Eq.by[Alphabet[A], ListVector[A]](identity)
 <i>29</i>&nbsp;}
 <i>30</i>&nbsp;
-<i>31</i>&nbsp;trait AlphabetSyntax {
+<b class="fc"><i>31</i>&nbsp;trait AlphabetSyntax {</b>
 <i>32</i>&nbsp;  /**
 <i>33</i>&nbsp;    * Extension methods for [[Alphabet]].
 <i>34</i>&nbsp;    */
-<i>35</i>&nbsp;  implicit class Ops[A](a: Alphabet[A]) {
+<b class="fc"><i>35</i>&nbsp;  implicit class Ops[A](a: Alphabet[A]) {</b>
 <i>36</i>&nbsp;    /**
 <i>37</i>&nbsp;      * Lifts this alphabet into an alphabet of applicative functors.
 <i>38</i>&nbsp;      */
-<i>39</i>&nbsp;    def pure[F[_]](implicit F: Applicative[F]): Alphabet[F[A]] = a.map(F.pure)
+<b class="fc"><i>39</i>&nbsp;    def pure[F[_]](implicit F: Applicative[F]): Alphabet[F[A]] = a.map(F.pure)</b>
 <i>40</i>&nbsp;  }
-<i>41</i>&nbsp;}
+<b class="fc"><i>41</i>&nbsp;}</b>
 <i>42</i>&nbsp;
 </div>
 </div>

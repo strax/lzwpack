@@ -39,18 +39,18 @@
   <td class="name">HashMapVector</td>
 <td class="coverageStat">
   <span class="percent">
-    69.2%
+    55.6%
   </span>
   <span class="absValue">
-    (9/ 13)
+    (10/ 18)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    66.7%
+    55%
   </span>
   <span class="absValue">
-    (10/ 15)
+    (11/ 20)
   </span>
 </td>
 </tr>
@@ -73,22 +73,193 @@
   </span>
 </td>
   </tr>
-<tr>
-  <td class="name"><strong>total</strong></td>
+  <tr>
+    <td class="name">HashMapVector$mcB$sp</td>
 <td class="coverageStat">
   <span class="percent">
-    75%
+    0%
   </span>
   <span class="absValue">
-    (12/ 16)
+    (0/ 11)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    73.7%
+    0%
   </span>
   <span class="absValue">
-    (14/ 19)
+    (0/ 13)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">HashMapVector$mcC$sp</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 13)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">HashMapVector$mcD$sp</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 13)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">HashMapVector$mcF$sp</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 13)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">HashMapVector$mcI$sp</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 13)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">HashMapVector$mcJ$sp</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 13)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">HashMapVector$mcS$sp</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 13)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">HashMapVector$mcV$sp</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 13)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">HashMapVector$mcZ$sp</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 13)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    10.8%
+  </span>
+  <span class="absValue">
+    (13/ 120)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    10.6%
+  </span>
+  <span class="absValue">
+    (15/ 141)
   </span>
 </td>
 </tr>
@@ -100,55 +271,67 @@
 
 <div class="sourceCode"><i>1</i>&nbsp;package lzwpack.data
 <i>2</i>&nbsp;
-<i>3</i>&nbsp;/**
-<i>4</i>&nbsp;  * A [[HashMapVector]] is a hash map implementation on top of a bit-indexed trie.
-<i>5</i>&nbsp;  * As such, it provides the same functionality and performance characteristics as
-<i>6</i>&nbsp;  * [[SparseVector]], but instead of an integer key we can use any JVM object with
-<i>7</i>&nbsp;  * `hashCode` implemented as the key.
-<i>8</i>&nbsp;  *
-<i>9</i>&nbsp;  * @todo Handle overflow scenario when two distinct objects with the same hashCode() are added to the map
-<i>10</i>&nbsp;  */
-<b class="fc"><i>11</i>&nbsp;class HashMapVector[K, +V] private[data](private val vector: SparseVector[(K, V)]) {</b>
-<b class="fc"><i>12</i>&nbsp;  private def hash(key: K): Int = key.hashCode</b>
-<i>13</i>&nbsp;
-<b class="fc"><i>14</i>&nbsp;  def apply(key: K): V = get(key).getOrElse(throw new NoSuchElementException)</b>
+<i>3</i>&nbsp;import cats.{Eval, Now, Hash}
+<i>4</i>&nbsp;import cats.implicits._
+<i>5</i>&nbsp;
+<i>6</i>&nbsp;/**
+<i>7</i>&nbsp;  * A [[HashMapVector]] is a hash map implementation on top of a bit-indexed trie.
+<i>8</i>&nbsp;  * As such, it provides the same functionality and performance characteristics as
+<i>9</i>&nbsp;  * [[SparseVector]], but instead of an integer key we can use any JVM object with
+<i>10</i>&nbsp;  * `hashCode` implemented as the key.
+<i>11</i>&nbsp;  */
+<b class="pc"><i>12</i>&nbsp;class HashMapVector[K: Hash, @specialized V] private[data](private val vector: SparseVector[HashMapVector[K, V]#Bucket]) {</b>
+<i>13</i>&nbsp;  // Use overflow lists (&quot;buckets&quot;) to handle hashCode collisions
+<i>14</i>&nbsp;  type Bucket = ListVector[(K, V)]
 <i>15</i>&nbsp;
-<b class="fc"><i>16</i>&nbsp;  def contains(key: K): Boolean = get(key).nonEmpty</b>
+<b class="pc"><i>16</i>&nbsp;  private def bucketForKey(key: K): Bucket = vector.get(key.hash).getOrElse(ListVector.empty)</b>
 <i>17</i>&nbsp;
-<b class="fc"><i>18</i>&nbsp;  def get(key: K): Option[V] = vector.get(hash(key)).map(_._2)</b>
-<i>19</i>&nbsp;
-<b class="fc"><i>20</i>&nbsp;  def updated[VV &gt;: V](kv: (K, VV)): HashMapVector[K, VV] = kv match {</b>
-<b class="fc"><i>21</i>&nbsp;    case (k, v) =&gt; new HashMapVector(vector.updated[(K, VV)](hash(k), (k, v)))</b>
-<i>22</i>&nbsp;  }
-<i>23</i>&nbsp;
-<b class="fc"><i>24</i>&nbsp;  def +[VV &gt;: V](kv: (K, VV)): HashMapVector[K, VV] = updated(kv)</b>
-<i>25</i>&nbsp;
-<b class="fc"><i>26</i>&nbsp;  def size: Int = vector.size</b>
-<i>27</i>&nbsp;
-<b class="nc"><i>28</i>&nbsp;  def isEmpty: Boolean = vector.isEmpty</b>
-<i>29</i>&nbsp;
-<i>30</i>&nbsp;  def foldLeft[B](init: B)(f: (B, (K, V)) =&gt; B): B =
-<b class="nc"><i>31</i>&nbsp;    vector.foldLeft(init) { case (acc, (_, kv)) =&gt; f(acc, kv) }</b>
-<i>32</i>&nbsp;
-<b class="nc"><i>33</i>&nbsp;  def find(f: (K, V) =&gt; Boolean): Option[(K, V)] = foldLeft(Option.empty[(K, V)]) {</b>
-<b class="nc"><i>34</i>&nbsp;    case (None, (k, v)) if f(k, v) =&gt; Some((k, v))</b>
-<b class="nc"><i>35</i>&nbsp;    case (acc, _) =&gt; acc</b>
-<i>36</i>&nbsp;  }
-<i>37</i>&nbsp;}
-<i>38</i>&nbsp;
-<b class="fc"><i>39</i>&nbsp;object HashMapVector {</b>
-<i>40</i>&nbsp;  def apply[K, V](kvs: (K, V)*): HashMapVector[K, V] = {
-<b class="fc"><i>41</i>&nbsp;    kvs.foldLeft(empty[K, V])((map, kv) =&gt; map + kv)</b>
-<i>42</i>&nbsp;  }
-<i>43</i>&nbsp;
-<b class="fc"><i>44</i>&nbsp;  def empty[K, V] = new HashMapVector[K, V](SparseVector.empty)</b>
-<b class="fc"><i>45</i>&nbsp;}</b>
+<i>18</i>&nbsp;  // Sets (k -&gt; v) in the given bucket
+<b class="pc"><i>19</i>&nbsp;  private def addOrReplaceInBucket(bucket: Bucket)(kv: (K, V)): Bucket = kv match {</b>
+<b class="pc"><i>20</i>&nbsp;    case (key, _) =&gt; bucket.filter(_._1 =!= key) + kv</b>
+<i>21</i>&nbsp;  }
+<i>22</i>&nbsp;
+<b class="pc"><i>23</i>&nbsp;  def apply(key: K): V = get(key).getOrElse(throw new NoSuchElementException)</b>
+<i>24</i>&nbsp;
+<b class="fc"><i>25</i>&nbsp;  def contains(key: K): Boolean = get(key).nonEmpty</b>
+<i>26</i>&nbsp;
+<i>27</i>&nbsp;  def get(key: K): Option[V] = for {
+<b class="fc"><i>28</i>&nbsp;    (_, value) &lt;- bucketForKey(key).find(_._1 === key)</b>
+<b class="fc"><i>29</i>&nbsp;  } yield value</b>
+<i>30</i>&nbsp;
+<b class="nc"><i>31</i>&nbsp;  def updated(kv: (K, V)): HashMapVector[K, V] =</b>
+<b class="pc"><i>32</i>&nbsp;    new HashMapVector(vector.updated(kv._1.hash, addOrReplaceInBucket(bucketForKey(kv._1))(kv)))</b>
+<i>33</i>&nbsp;
+<b class="pc"><i>34</i>&nbsp;  def +(kv: (K, V)): HashMapVector[K, V] = updated(kv)</b>
+<i>35</i>&nbsp;
+<b class="nc"><i>36</i>&nbsp;  lazy val size: Int = vector.fold(0) { case ((_, xs), acc) =&gt; xs.size + acc }</b>
+<i>37</i>&nbsp;
+<b class="nc"><i>38</i>&nbsp;  def isEmpty: Boolean = vector.isEmpty</b>
+<i>39</i>&nbsp;
+<b class="nc"><i>40</i>&nbsp;  def fold[B](init: =&gt; B)(f: ((K, V), =&gt; B) =&gt; B): B =</b>
+<b class="nc"><i>41</i>&nbsp;    vector.fold(init) { case ((_, kvs), rest) =&gt; kvs.foldRight(Eval.later(rest))((h, t) =&gt; Now(f(h, t.value))).value }</b>
+<i>42</i>&nbsp;
+<b class="nc"><i>43</i>&nbsp;  def find(f: (K, V) =&gt; Boolean): Option[(K, V)] = fold(Option.empty[(K, V)]) {</b>
+<b class="nc"><i>44</i>&nbsp;    case ((k, v), acc) if f(k, v) =&gt; Some((k, v))</b>
+<b class="nc"><i>45</i>&nbsp;    case (_, acc) =&gt; acc</b>
+<i>46</i>&nbsp;  }
+<i>47</i>&nbsp;
+<b class="nc"><i>48</i>&nbsp;  override def toString: String = s&quot;HashMapVector($size elements)&quot;</b>
+<i>49</i>&nbsp;}
+<i>50</i>&nbsp;
+<b class="fc"><i>51</i>&nbsp;object HashMapVector {</b>
+<i>52</i>&nbsp;  def apply[K: Hash, V](kvs: (K, V)*): HashMapVector[K, V] = {
+<b class="fc"><i>53</i>&nbsp;    kvs.foldLeft(empty[K, V])((map, kv) =&gt; map + kv)</b>
+<i>54</i>&nbsp;  }
+<i>55</i>&nbsp;
+<b class="fc"><i>56</i>&nbsp;  def empty[K: Hash, V] = new HashMapVector[K, V](SparseVector.empty)</b>
+<b class="fc"><i>57</i>&nbsp;}</b>
 </div>
 </div>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2018-02-17 20:57</div>
+    <div style="float:right;">generated on 2018-03-08 10:21</div>
 </div>
 </body>
 </html>

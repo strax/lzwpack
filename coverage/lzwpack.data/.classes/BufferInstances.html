@@ -140,7 +140,7 @@
 <i>40</i>&nbsp;    * Returns a new buffer that contains this buffer preceded by the other buffer.
 <i>41</i>&nbsp;    */
 <i>42</i>&nbsp;  def append(other: BitBuffer): BitBuffer = {
-<i>43</i>&nbsp;    assert(other.size + size &lt; JavaLong.SIZE)
+<i>43</i>&nbsp;    require(other.size + size &lt; JavaLong.SIZE, s&quot;${other.size} + ${size} &lt; 64&quot;)
 <i>44</i>&nbsp;    val bb = other.data
 <i>45</i>&nbsp;    BitBuffer((bb &lt;&lt; size) ^ data, other.size + size)
 <i>46</i>&nbsp;  }
@@ -198,7 +198,7 @@
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2018-02-17 20:57</div>
+    <div style="float:right;">generated on 2018-03-08 10:21</div>
 </div>
 </body>
 </html>

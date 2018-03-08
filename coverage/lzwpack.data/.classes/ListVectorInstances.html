@@ -1,0 +1,261 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: ListVectorInstances</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">lzwpack.data</a> ]
+</div>
+
+<h1>Coverage Summary for Class: ListVectorInstances (lzwpack.data)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ListVectorInstances</td>
+<td class="coverageStat">
+  <span class="percent">
+    77.8%
+  </span>
+  <span class="absValue">
+    (7/ 9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    77.8%
+  </span>
+  <span class="absValue">
+    (7/ 9)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ListVectorInstances$$anon$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/ 3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/ 3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ListVectorInstances$$anon$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/ 3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/ 3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ListVectorInstances$$anonfun$ListVectorEq$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ListVectorInstances$ListVectorApplicative$</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/ 3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/ 3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ListVectorInstances$ListVectorTraverse$</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/ 4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/ 6)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    91.3%
+  </span>
+  <span class="absValue">
+    (21/ 23)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    92%
+  </span>
+  <span class="absValue">
+    (23/ 25)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package lzwpack.data
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import cats.{Applicative, Eq, Eval, Monoid, Show, Traverse, ~&gt;}
+<i>4</i>&nbsp;import lzwpack.data.ListVector.empty
+<i>5</i>&nbsp;import cats.implicits._
+<i>6</i>&nbsp;import cats.kernel.Hash
+<i>7</i>&nbsp;
+<i>8</i>&nbsp;import scala.collection.{GenTraversable, TraversableLike}
+<i>9</i>&nbsp;import scala.collection.generic.{IsSeqLike, IsTraversableLike}
+<i>10</i>&nbsp;
+<i>11</i>&nbsp;/**
+<i>12</i>&nbsp;  * Defines some generic type class instances for [[ListVector]].
+<i>13</i>&nbsp;  */
+<b class="fc"><i>14</i>&nbsp;trait ListVectorInstances {</b>
+<b class="fc"><i>15</i>&nbsp;  implicit object ListVectorTraverse extends Traverse[ListVector] {</b>
+<i>16</i>&nbsp;    override def traverse[F[_]: Applicative, A, B](fa: ListVector[A])(f: A =&gt; F[B]): F[ListVector[B]] =
+<b class="fc"><i>17</i>&nbsp;      fa.foldLeft(empty[B].pure[F])((acc, a) =&gt; acc.map2(f(a))(_ + _))</b>
+<i>18</i>&nbsp;
+<i>19</i>&nbsp;    override def foldLeft[A, B](fa: ListVector[A], b: B)(f: (B, A) =&gt; B): B =
+<b class="fc"><i>20</i>&nbsp;      fa.foldLeft(b)(f)</b>
+<i>21</i>&nbsp;
+<i>22</i>&nbsp;    /**
+<i>23</i>&nbsp;      * Lazy right fold. Using [[Eval]] is enforced by the typeclass, but it allows us to short-circuit some
+<i>24</i>&nbsp;      * folds if necessary.
+<i>25</i>&nbsp;      */
+<b class="fc"><i>26</i>&nbsp;    override def foldRight[A, B](fa: ListVector[A], init: Eval[B])(f: (A, Eval[B]) =&gt; Eval[B]): Eval[B] = fa match {</b>
+<b class="fc"><i>27</i>&nbsp;      case h :: t =&gt; f(h, Eval.defer(foldRight(t, init)(f)))</b>
+<b class="fc"><i>28</i>&nbsp;      case _ =&gt; init</b>
+<i>29</i>&nbsp;    }
+<i>30</i>&nbsp;  }
+<i>31</i>&nbsp;
+<i>32</i>&nbsp;  /**
+<i>33</i>&nbsp;    * ListVector forms a monoid for all A types. It&#39;s more useful to have a Monoid instance
+<i>34</i>&nbsp;    * available than a MonoidK given the functionality is the same for both instances.
+<i>35</i>&nbsp;    */
+<b class="fc"><i>36</i>&nbsp;  implicit def ListVectorMonoid[A]: Monoid[ListVector[A]] = new Monoid[ListVector[A]] {</b>
+<b class="fc"><i>37</i>&nbsp;    override def empty: ListVector[A] = ListVector.empty[A]</b>
+<i>38</i>&nbsp;
+<i>39</i>&nbsp;    override def combine(as0: ListVector[A], as1: ListVector[A]): ListVector[A] =
+<b class="fc"><i>40</i>&nbsp;      as0 concat as1</b>
+<i>41</i>&nbsp;  }
+<i>42</i>&nbsp;
+<b class="fc"><i>43</i>&nbsp;  implicit object ListVectorApplicative extends Applicative[ListVector] {</b>
+<b class="fc"><i>44</i>&nbsp;    override def pure[A](x: A): ListVector[A] = ListVector(x)</b>
+<i>45</i>&nbsp;
+<i>46</i>&nbsp;    override def ap[A, B](ff: ListVector[A =&gt; B])(fa: ListVector[A]): ListVector[B] =
+<b class="fc"><i>47</i>&nbsp;      ff foldMap (fa map _)</b>
+<i>48</i>&nbsp;  }
+<i>49</i>&nbsp;
+<b class="nc"><i>50</i>&nbsp;  implicit def ListVectorShow[A: Show]: Show[ListVector[A]] = { as =&gt;</b>
+<b class="nc"><i>51</i>&nbsp;    s&quot;ListVector(${as.map(_.show).intercalate(&quot;, &quot;)})&quot;</b>
+<i>52</i>&nbsp;  }
+<i>53</i>&nbsp;
+<b class="fc"><i>54</i>&nbsp;  implicit def ListVectorHash[A: Hash]: Hash[ListVector[A]] = new Hash[ListVector[A]] {</b>
+<b class="fc"><i>55</i>&nbsp;    override def hash(x: ListVector[A]): Int = x.hashCode</b>
+<i>56</i>&nbsp;
+<b class="fc"><i>57</i>&nbsp;    override def eqv(x: ListVector[A], y: ListVector[A]): Boolean = ListVectorEq[A].eqv(x, y)</b>
+<i>58</i>&nbsp;  }
+<i>59</i>&nbsp;
+<i>60</i>&nbsp;  /**
+<i>61</i>&nbsp;    * Strict equality for two list vectors. The implementation is O(n) as we
+<i>62</i>&nbsp;    * go through each of the list elements and compare them.
+<i>63</i>&nbsp;    *
+<i>64</i>&nbsp;    * @note Could be implemented with foldRight
+<i>65</i>&nbsp;    */
+<b class="fc"><i>66</i>&nbsp;  implicit def ListVectorEq[A: Eq]: Eq[ListVector[A]] = { (as, bs) =&gt;</b>
+<i>67</i>&nbsp;    @annotation.tailrec
+<i>68</i>&nbsp;    def iter(as: ListVector[A], bs: ListVector[A]): Boolean =
+<b class="fc"><i>69</i>&nbsp;      if (as.isEmpty &amp;&amp; bs.isEmpty) true else as.head === bs.head &amp;&amp; iter(as.tail, bs.tail)</b>
+<i>70</i>&nbsp;
+<i>71</i>&nbsp;    // If the sizes are the same and the hash codes are the same then check individual elements
+<b class="fc"><i>72</i>&nbsp;    as.size == bs.size &amp;&amp; as.hashCode == bs.hashCode &amp;&amp; iter(as, bs)</b>
+<i>73</i>&nbsp;  }
+<i>74</i>&nbsp;
+<b class="fc"><i>75</i>&nbsp;  implicit def toSeq[A](as: ListVector[A]): Seq[A] = as.toSeq</b>
+<i>76</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2018-03-08 10:21</div>
+</div>
+</body>
+</html>

@@ -25,45 +25,9 @@
 <table class="coverageStats">
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
-<th class="coverageStat 
-">
-  Method, %
-</th>
-<th class="coverageStat 
-">
-  Line, %
-</th>
 </tr>
 <tr>
   <td class="name">AllImplicits</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/ 1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    50%
-  </span>
-  <span class="absValue">
-    (1/ 2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    50%
-  </span>
-  <span class="absValue">
-    (1/ 2)
-  </span>
-</td>
 </tr>
 
 </table>
@@ -74,20 +38,16 @@
 
 <div class="sourceCode"><i>1</i>&nbsp;package lzwpack.implicits
 <i>2</i>&nbsp;
-<i>3</i>&nbsp;import java.nio.charset.Charset
-<i>4</i>&nbsp;
-<i>5</i>&nbsp;/**
-<i>6</i>&nbsp;  * Mixins all implicits into a single trait.
-<i>7</i>&nbsp;  */
-<b class="fc"><i>8</i>&nbsp;trait AllImplicits extends ByteImplicits with ByteListImplicits with LongImplicits with StringImplicits {</b>
-<b class="nc"><i>9</i>&nbsp;  implicit lazy val ASCII: Charset = Charset.forName(&quot;US-ASCII&quot;)</b>
-<i>10</i>&nbsp;}
+<i>3</i>&nbsp;/**
+<i>4</i>&nbsp;  * Mixins all implicits into a single trait.
+<i>5</i>&nbsp;  */
+<i>6</i>&nbsp;trait AllImplicits extends ByteImplicits with LongImplicits with StringImplicits
 </div>
 </div>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2018-02-17 20:57</div>
+    <div style="float:right;">generated on 2018-03-08 10:21</div>
 </div>
 </body>
 </html>
