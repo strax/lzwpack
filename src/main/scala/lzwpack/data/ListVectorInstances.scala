@@ -20,7 +20,7 @@ trait ListVectorInstances {
       fa.foldLeft(b)(f)
 
     /**
-      * Lazy right fold. Using [[Eval]] is enforced by the typeclass, but it allows us to short-circuit some
+      * Lazy right fold. Using [[cats.Eval]] is enforced by the typeclass, but it allows us to short-circuit some
       * folds if necessary.
       */
     override def foldRight[A, B](fa: ListVector[A], init: Eval[B])(f: (A, Eval[B]) => Eval[B]): Eval[B] = fa match {

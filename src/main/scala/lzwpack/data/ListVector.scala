@@ -25,23 +25,27 @@ class ListVector[@specialized A] private[data](private[data] val trie: SparseVec
   def concat(as1: ListVector[A]): ListVector[A] = as1.foldLeft(this)(_ + _)
 
   /**
-    * Returns the first element `a` in this [[ListVector]] for which `f(a)` returns true, wrapped in an [[Option]].
-    * If no element matches `f`, then a [[None]] is returned.
+    * Returns the first element `a` in this [[ListVector]] for which `f(a)` returns true, wrapped in an [[scala.Option]].
+    * If no element matches `f`, then a [[scala.None]] is returned.
     */
   def find(f: A => Boolean): Option[A] = foldRight(none[A]) { (a, rest) => if (f(a)) a.some else rest }
 
   /**
     * Unsafe version of [[get]].
-    * @throws IndexOutOfBoundsException if this [[ListVector]] does not contain the given index
+    * @throws scala.IndexOutOfBoundsException if this [[ListVector]] does not contain the given index
     */
   def apply(i: Int): A = get(i).getOrElse(throw new IndexOutOfBoundsException(s"$i > $size (offset $offset)"))
 
   /**
     * Returns the first element of this [[ListVector]].
-    * @throws IndexOutOfBoundsException if this [[ListVector]] is empty
+    * @throws scala.IndexOutOfBoundsException if this [[ListVector]] is empty
     */
   lazy val head: A = this(0)
 
+  /**
+    * Like [[head]], but returns an [[scala.Option]] determining the success of the operation instead of throwing
+    * an exception.
+    */
   lazy val headOption: Option[A] = get(0)
 
   /**
@@ -72,7 +76,7 @@ class ListVector[@specialized A] private[data](private[data] val trie: SparseVec
   def append(a: A) = new ListVector(trie.updated(offset + size, a), size + 1)
 
   /**
-    * If there exists an element with the given index, returns an [[Option]] containing the element or
+    * If there exists an element with the given index, returns an [[scala.Option]] containing the element or
     * an empty option otherwise.
     * Complexity: O(log n)
     */
@@ -115,9 +119,13 @@ class ListVector[@specialized A] private[data](private[data] val trie: SparseVec
     */
   def foldLeft[B](init: B)(f: (B, A) => B): B = foldl(0, size, init, f)
 
-  def foldRight[B](init: => B)(f: (A, => B) => B): B = foldr(0, size, init, f)
   /**
-    * Returns an [[Iterator]] for this [[ListVector]].
+    * Right folds the elements of this ListVector.
+    */
+  def foldRight[B](init: => B)(f: (A, => B) => B): B = foldr(0, size, init, f)
+
+  /**
+    * Returns an [[scala.Iterator]] for this [[ListVector]].
     * @note we do not implement the Iterable trait in order to make our own data structure methods
     */
   def iterator: Iterator[A] = new Iterator[A] {
@@ -145,6 +153,9 @@ class ListVector[@specialized A] private[data](private[data] val trie: SparseVec
     */
   override lazy val hashCode: Int = foldLeft(1)((acc, e) => 31 * acc + e.hashCode())
 
+  /**
+    * Converts this ListVector to a [[scala.Seq]].
+    */
   lazy val toSeq: Seq[A] = iterator.toSeq
 }
 

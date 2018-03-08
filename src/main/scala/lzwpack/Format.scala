@@ -8,7 +8,7 @@ import lzwpack.data.BitBuffer
   */
 object Format {
   /**
-    * Returns a new [[Pipe]] that packs input [[BitBuffer]]s across byte boundaries.
+    * Returns a new [[fs2.Pipe]] that packs input [[lzwpack.data.BitBuffer]]s across byte boundaries.
     */
   def pack[F[_]]: Pipe[F, BitBuffer, Byte] = stream => {
     stream.scanSegments(BitBuffer.empty) { case (buffer, segment) =>

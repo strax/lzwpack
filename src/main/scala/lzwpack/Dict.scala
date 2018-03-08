@@ -32,18 +32,18 @@ trait Dict[K] {
 
   /**
     * Returns the associated code for the given value.
-    * @throws NoSuchElementException if the key does not exist in this Dict
+    * @throws scala.NoSuchElementException if the key does not exist in this Dict
     */
   def get(key: K): Code
 
   /**
-    * Returns the key with the given code or [[None]] if the code does not exist in this Dict.
+    * Returns the key with the given code or [[scala.None]] if the code does not exist in this Dict.
     */
   def find(code: Code): Option[K]
 }
 
 /**
-  * The [[MakeDict]] trait provides generic dictionary constructors; given a [[MakeDict[T]] we can construct
+  * The [[MakeDict]] trait provides generic dictionary constructors; given a `MakeDict` we can construct
   * an empty T[A] or a T[A] that contains the given alphabet.
   */
 trait MakeDict[T[_]] {

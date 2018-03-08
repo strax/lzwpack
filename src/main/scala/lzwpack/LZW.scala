@@ -75,11 +75,21 @@ object LZW {
     stream => go(stream, CompressionState(makeDict[DictT], ListVector.empty)).stream
   }
 
-  def makeDict[T[_]: MakeDict](implicit alphabet: Alphabet[Byte]) =
+  private def makeDict[T[_]: MakeDict](implicit alphabet: Alphabet[Byte]) =
     implicitly[MakeDict[T]].fromAlphabet(alphabet.pure[ListVector])
 
+  /**
+    * Returns a [[fs2.Pipe]] that performs compression from a byte stream.
+    */
   def compress[F[_]](implicit alphabet: Alphabet[Byte]): Pipe[F, Byte, BitBuffer] =
     codec[CompressionDict, Byte, BitBuffer](emit)
+
+  /**
+    * Returns a [[fs2.Pipe]] that performs decompression from a code stream.
+    * @param alphabet
+    * @tparam F
+    * @return
+    */
   def decompress[F[_]](implicit alphabet: Alphabet[Byte]): Pipe[F, Code, Byte] =
     codec[DecompressionDict, Code, Byte](infer)
 }
