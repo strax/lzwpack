@@ -2,7 +2,7 @@ package lzwpack.implicits
 
 import java.lang.{Long => JavaLong}
 
-import lzwpack.data.Binary
+import lzwpack.data.{Binary, ListVector}
 
 trait LongImplicits {
   implicit class LongOps(n: Long) {

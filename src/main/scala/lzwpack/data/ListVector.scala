@@ -154,6 +154,21 @@ object ListVector {
   def apply[A](as: A*): ListVector[A] = seq(as)
 
   def seq[A](as: Seq[A]): ListVector[A] = as.foldLeft(empty[A])(_ + _)
+
+  def unfold[A, S](init: S)(f: S => Option[(A, S)]): ListVector[A] = {
+    @annotation.tailrec
+    def iter(acc: ListVector[A], s1: S): ListVector[A] = f(s1) match {
+      case None => acc
+      case Some((a, s2)) => iter(acc + a, s2)
+    }
+    iter(empty[A], init)
+  }
+
+  def range[A: Integral](from: A, to: A)(implicit integral: Integral[A]): ListVector[A] = {
+    import integral._
+    // We need to append the upper bound explicitly in order to avoid numeric overflows when comparing values.
+    unfold(from)(_.some.filter(_ < to).map(n => (n, n + one))) + to
+  }
 }
 
 object :: {

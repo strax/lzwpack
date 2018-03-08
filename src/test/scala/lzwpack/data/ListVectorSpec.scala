@@ -67,6 +67,20 @@ class ListVectorSpec extends UnitSpec with ArbitraryInstances {
     }
   }
 
+  describe("range") {
+    it("returns a ListVector of integers start..end (inclusive)") {
+      assert(ListVector.range(1, 3) === ListVector(1,2,3))
+    }
+
+    it("returns a ListVector of chars start to end") {
+      assert(ListVector.range('a', 'c') === ListVector('a', 'b', 'c'))
+    }
+
+    it("works with large ranges") {
+      ListVector.range(Char.MinValue, Char.MaxValue)
+    }
+  }
+
   properties { EqTests[ListVector[String]].eqv }
   properties { MonoidTests[ListVector[String]].monoid }
   properties { TraverseTests[ListVector].traverse[Int, Int, Int, Int, Option, Option] }
