@@ -3,6 +3,7 @@ package lzwpack.data
 import cats.{Applicative, Eq, Eval, Monoid, Show, Traverse, ~>}
 import lzwpack.data.ListVector.empty
 import cats.implicits._
+import cats.kernel.Hash
 
 import scala.collection.{GenTraversable, TraversableLike}
 import scala.collection.generic.{IsSeqLike, IsTraversableLike}
@@ -48,6 +49,12 @@ trait ListVectorInstances {
 
   implicit def ListVectorShow[A: Show]: Show[ListVector[A]] = { as =>
     s"ListVector(${as.map(_.show).intercalate(", ")})"
+  }
+
+  implicit def ListVectorHash[A: Hash]: Hash[ListVector[A]] = new Hash[ListVector[A]] {
+    override def hash(x: ListVector[A]): Int = x.hashCode
+
+    override def eqv(x: ListVector[A], y: ListVector[A]): Boolean = ListVectorEq[A].eqv(x, y)
   }
 
   /**

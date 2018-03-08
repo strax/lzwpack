@@ -1,6 +1,6 @@
 package lzwpack.data
 
-import cats.{Eq, Eval, Later, Now}
+import cats.{Eval, Now, Hash}
 import cats.implicits._
 
 /**
@@ -9,13 +9,11 @@ import cats.implicits._
   * [[SparseVector]], but instead of an integer key we can use any JVM object with
   * `hashCode` implemented as the key.
   */
-class HashMapVector[K: Eq, @specialized V] private[data](private val vector: SparseVector[HashMapVector[K, V]#Bucket]) {
+class HashMapVector[K: Hash, @specialized V] private[data](private val vector: SparseVector[HashMapVector[K, V]#Bucket]) {
   // Use overflow lists ("buckets") to handle hashCode collisions
   type Bucket = ListVector[(K, V)]
 
-  private def hash(key: K): Int = key.hashCode
-
-  private def bucketForKey(key: K): Bucket = vector.get(hash(key)).getOrElse(ListVector.empty)
+  private def bucketForKey(key: K): Bucket = vector.get(key.hash).getOrElse(ListVector.empty)
 
   // Sets (k -> v) in the given bucket
   private def addOrReplaceInBucket(bucket: Bucket)(kv: (K, V)): Bucket = kv match {
@@ -31,7 +29,7 @@ class HashMapVector[K: Eq, @specialized V] private[data](private val vector: Spa
   } yield value
 
   def updated(kv: (K, V)): HashMapVector[K, V] =
-    new HashMapVector(vector.updated(hash(kv._1), addOrReplaceInBucket(bucketForKey(kv._1))(kv)))
+    new HashMapVector(vector.updated(kv._1.hash, addOrReplaceInBucket(bucketForKey(kv._1))(kv)))
 
   def +(kv: (K, V)): HashMapVector[K, V] = updated(kv)
 
@@ -51,9 +49,9 @@ class HashMapVector[K: Eq, @specialized V] private[data](private val vector: Spa
 }
 
 object HashMapVector {
-  def apply[K: Eq, V](kvs: (K, V)*): HashMapVector[K, V] = {
+  def apply[K: Hash, V](kvs: (K, V)*): HashMapVector[K, V] = {
     kvs.foldLeft(empty[K, V])((map, kv) => map + kv)
   }
 
-  def empty[K: Eq, V] = new HashMapVector[K, V](SparseVector.empty)
+  def empty[K: Hash, V] = new HashMapVector[K, V](SparseVector.empty)
 }

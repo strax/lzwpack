@@ -4,7 +4,7 @@ import lzwpack.UnitSpec
 import org.scalacheck.{Arbitrary, Gen, Properties}
 import Arbitrary._
 import cats.Applicative
-import cats.kernel.laws.discipline.{EqTests, MonoidTests}
+import cats.kernel.laws.discipline.{EqTests, HashTests, MonoidTests}
 import cats.laws.discipline.{ApplicativeTests, SemigroupalTests, TraverseTests}
 import org.scalacheck.Prop._
 import org.scalacheck.Prop.BooleanOperators

@@ -3,7 +3,7 @@ package lzwpack.data
 import lzwpack.UnitSpec
 import cats.syntax.option._
 import cats.instances.all._
-import cats.Eq
+import cats.{Eq, Hash}
 
 class HashMapVectorSpec extends UnitSpec {
   describe("contains") {
@@ -33,6 +33,7 @@ class HashMapVectorSpec extends UnitSpec {
       val b = new Mock {
         override def hashCode(): Int = 2
       }
+      implicit val mockHash: Hash[Mock] = Hash.fromUniversalHashCode
       implicit val mockEq: Eq[Mock] = Eq.fromUniversalEquals
       val map = HashMapVector(a -> "a", b -> "b")
       assert(map.get(a) === "a".some)

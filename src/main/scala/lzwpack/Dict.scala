@@ -1,6 +1,6 @@
 package lzwpack
 
-import cats.Eq
+import cats.{Eq, Hash}
 import cats.implicits._
 import lzwpack.data.{HashMapVector, SparseVector}
 
@@ -47,8 +47,8 @@ trait Dict[K] {
   * an empty T[A] or a T[A] that contains the given alphabet.
   */
 trait MakeDict[T[_]] {
-  def empty[A: Eq]: Dict[A]
-  def fromAlphabet[A: Eq](alphabet: Alphabet[A]): Dict[A] = alphabet.foldLeft(empty[A])((z, a) => z.add(a))
+  def empty[A: Hash]: Dict[A]
+  def fromAlphabet[A: Hash](alphabet: Alphabet[A]): Dict[A] = alphabet.foldLeft(empty[A])((z, a) => z.add(a))
 }
 
 /**
@@ -66,7 +66,7 @@ case class CompressionDict[K](map: HashMapVector[K, Code], currentCode: Int) ext
 }
 
 object CompressionDict extends MakeDict[CompressionDict] {
-  def empty[K: Eq]: Dict[K] = CompressionDict(HashMapVector.empty[K, Code], 0)
+  def empty[K: Hash]: Dict[K] = CompressionDict(HashMapVector.empty[K, Code], 0)
 }
 
 /**
@@ -74,7 +74,7 @@ object CompressionDict extends MakeDict[CompressionDict] {
   * This is essentially the dual of [[CompressionDict]], so key lookup is O(n) while
   * code lookup and add are O(1) amortized.
   */
-case class DecompressionDict[K: Eq](map: SparseVector[K], currentCode: Int) extends Dict[K] {
+case class DecompressionDict[K: Hash](map: SparseVector[K], currentCode: Int) extends Dict[K] {
   override def contains(key: K): Boolean = getOption(key).nonEmpty
 
   override def add(key: K): Dict[K] = DecompressionDict(map + (nextCode -> key), nextCode)
@@ -87,7 +87,7 @@ case class DecompressionDict[K: Eq](map: SparseVector[K], currentCode: Int) exte
 }
 
 object DecompressionDict extends MakeDict[DecompressionDict] {
-  override def empty[K: Eq]: Dict[K] = DecompressionDict(SparseVector.empty[K], 0)
+  override def empty[K: Hash]: Dict[K] = DecompressionDict(SparseVector.empty[K], 0)
 }
 
 // Provide implicit MakeDict instances to support generic Dict creation
