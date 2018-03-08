@@ -25,7 +25,7 @@ vastaa pakkausta tai purkua annetulla syötteellä. Näin ollen `nopeus (MB/s)` 
 `(1 / t) * S`, jossa `t` on yhden operaation viemä aika sekunneissa ja `S` on operaatiolle annetun syötteen
 koko.
 
-Päivitetty 17.2.
+Tulokset 17.2:
 
 | Testi | Syötteen koko (MB) | Nopeus (s/op), n = 10 | Nopeus (MB/s) |
 | ----- | ------------- | --------------------- | ------------- |
@@ -37,6 +37,21 @@ Päivitetty 17.2.
 Tällä hetkellä suorituskyky näyttäisi olevan hyvin heikkoa moneen "oikeaan"
 pakkausalgoritmiin verrattuna. Toisaalta pakkausnopeudessa ei vaikuta olevan eroa
 syötteen kokoon nähden, joten empiirisesti tarkasteltuna O(n) aikavaativuus voisi toteutua sekä pakkaukselle että purkamiselle.
+
+Pakkauksen ja purkamisen tehokkuussuhde on noin 1:2.5.
+
+Tulokset 3.3:
+
+| Testi | Syötteen koko (MB) | Nopeus (s/op), n = 10 | Nopeus (MB/s) |
+| ----- | ------------- | --------------------- | ------------- |
+| `compressAlice29` | 0,149 | 1,110 ± 0,091 | ~0,134 |
+| `decompressAlice29` | 0,061 | 0,718 ± 0,063 | ~0,084 |
+| `compressPtt5` | 0,501 | 4,773 ± 0,123 | ~0,104 |
+| `decompressPtt5` | 0,061 | 0,706 ± 0,065 | ~0,086 |
+
+Vaikuttaa siltä, että omien tietorakenteiden käyttö on heikentänyt suorituskykyä jonkin verran erityisesti pakkauksen
+osalta. Pakkauksen ja purkamisen tehokkuussuhde on nyt paljon pienempi, noin 1:1.3. Vaikuttaa siis siltä, että omat
+tietorakenteet ovat hidastaneet pakkausta enemmän.
 
 [1]: http://www.scalatest.org/user_guide
 [2]: https://www.scalacheck.org/

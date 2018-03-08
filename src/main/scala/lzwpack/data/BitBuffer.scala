@@ -40,7 +40,7 @@ case class BitBuffer(private[data] val data: Long, size: Int) {
     * Returns a new buffer that contains this buffer preceded by the other buffer.
     */
   def append(other: BitBuffer): BitBuffer = {
-    assert(other.size + size < JavaLong.SIZE)
+    require(other.size + size < JavaLong.SIZE, s"${other.size} + ${size} < 64")
     val bb = other.data
     BitBuffer((bb << size) ^ data, other.size + size)
   }

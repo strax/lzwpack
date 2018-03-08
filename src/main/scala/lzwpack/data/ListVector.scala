@@ -28,7 +28,7 @@ class ListVector[@specialized A] private[data](private[data] val trie: SparseVec
     * Returns the first element `a` in this [[ListVector]] for which `f(a)` returns true, wrapped in an [[Option]].
     * If no element matches `f`, then a [[None]] is returned.
     */
-  def find(f: A => Boolean): Option[A] = foldLeft(None : Option[A]) { (found, a) => found orElse (Some(a) filter f) }
+  def find(f: A => Boolean): Option[A] = foldRight(none[A]) { (a, rest) => if (f(a)) a.some else rest }
 
   /**
     * Unsafe version of [[get]].
@@ -40,9 +40,9 @@ class ListVector[@specialized A] private[data](private[data] val trie: SparseVec
     * Returns the first element of this [[ListVector]].
     * @throws IndexOutOfBoundsException if this [[ListVector]] is empty
     */
-  def head: A = this(0)
+  lazy val head: A = this(0)
 
-  def headOption: Option[A] = get(0)
+  lazy val headOption: Option[A] = get(0)
 
   /**
     * Returns a [[ListVector]] with all the elements from this vector except the first one (see [[head]]).
@@ -51,7 +51,7 @@ class ListVector[@specialized A] private[data](private[data] val trie: SparseVec
     *   ListVector(1,2,3).tail.get(0) == Some(2)
     * }}}
     */
-  def tail: ListVector[A] = drop(1)
+  lazy val tail: ListVector[A] = drop(1)
 
   /**
     * Returns a new [[ListVector]] without the first `n` items.
@@ -98,18 +98,24 @@ class ListVector[@specialized A] private[data](private[data] val trie: SparseVec
     */
   def isEmpty: Boolean = size == 0
 
+  // Uses random access for speed (?)
+  @annotation.tailrec
+  private def foldl[B](start: Int, end: Int, init: B, f: (B, A) => B): B = {
+    if (start == end) init
+    else foldl(start + 1, end, f(init, this(start)), f)
+  }
+
+  private def foldr[B](start: Int, end: Int, init: => B, f: (A, => B) => B): B = {
+    if (start == end) init
+    else f(this(start), foldr(start + 1, end, init, f))
+  }
+
   /**
     * Left folds the elements of this [[ListVector]].
     */
-  def foldLeft[B](init: B)(f: (B, A) => B): B = {
-    @annotation.tailrec
-    def iter(as: ListVector[A], acc: B): B = as match {
-      case h :: t => iter(t, f(acc, h))
-      case _ => acc
-    }
-    iter(this, init)
-  }
+  def foldLeft[B](init: B)(f: (B, A) => B): B = foldl(0, size, init, f)
 
+  def foldRight[B](init: => B)(f: (A, => B) => B): B = foldr(0, size, init, f)
   /**
     * Returns an [[Iterator]] for this [[ListVector]].
     * @note we do not implement the Iterable trait in order to make our own data structure methods
@@ -132,14 +138,14 @@ class ListVector[@specialized A] private[data](private[data] val trie: SparseVec
   def map[B](f: A => B): ListVector[B] =
     foldLeft(empty[B])((acc, a) => acc + f(a))
 
-  override def toString: String = s"ListVector(${this.map(_.toString).intercalate(", ")})"
+  override lazy val toString: String = s"ListVector(${this.map(_.toString).intercalate(", ")})"
 
   /**
     * Hash code calculated as in [[java.util.List]].
     */
-  override def hashCode(): Int = foldLeft(1)((acc, e) => 31 * acc + e.hashCode())
+  override lazy val hashCode: Int = foldLeft(1)((acc, e) => 31 * acc + e.hashCode())
 
-  def toSeq: Seq[A] = iterator.toSeq
+  lazy val toSeq: Seq[A] = iterator.toSeq
 }
 
 object ListVector {

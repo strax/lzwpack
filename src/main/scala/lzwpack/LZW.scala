@@ -10,7 +10,7 @@ object LZW extends Debugging {
 
   type Output = Code
 
-  case class CompressionState(dict: Dict[Bytes], buffered: Bytes)
+  case class CompressionState(dict: Dict[ListVector[Byte]], buffered: ListVector[Byte])
 
   private def makeBitBuffer(code: Code, dict: Dict[_]) = BitBuffer(code, dict.currentCode.bitsize)
 
@@ -20,28 +20,28 @@ object LZW extends Debugging {
     *
     * @todo Refactor: can remove Option from output type?
     */
-  private def emit(state: CompressionState, head: Option[Byte]): (CompressionState, Segment[BitBuffer, Unit]) = {
+  private def emit(state: CompressionState, head: Option[Byte]): (CompressionState, Chunk[BitBuffer]) = {
     val dict = state.dict
 
     head match {
       case None =>
         val code = dict.get(state.buffered)
         val bb = makeBitBuffer(code, dict)
-        (CompressionState(dict, Bytes.empty), Segment(bb))
+        (CompressionState(dict, ListVector.empty), Chunk(bb))
 
       case Some(byte) if dict.contains(state.buffered :+ byte) =>
-        (CompressionState(dict, state.buffered :+ byte), Segment.empty)
+        (CompressionState(dict, state.buffered :+ byte), Chunk.empty)
 
       case Some(byte) =>
         val nextDict = dict.add(state.buffered :+ byte)
         val code = nextDict.get(state.buffered)
-        (CompressionState(nextDict, Bytes(byte)), Segment(makeBitBuffer(code, dict)))
+        (CompressionState(nextDict, ListVector(byte)), Chunk(makeBitBuffer(code, dict)))
     }
   }
 
-  private def infer(state: CompressionState, code: Option[Code]): (CompressionState, Segment[Byte, Unit]) = code match {
+  private def infer(state: CompressionState, code: Option[Code]): (CompressionState, Chunk[Byte]) = code match {
     case None =>
-      (CompressionState(state.dict, Bytes.empty), Segment.empty)
+      (CompressionState(state.dict, ListVector.empty), Chunk.empty)
 
     case Some(code) =>
       state.dict.find(code) match {
@@ -49,36 +49,36 @@ object LZW extends Debugging {
           // Handle cases where the code is not yet inferred by the decoder;
           // if the previous value is xω then we can infer the next code to be xωx
           val inferred = state.buffered |+| state.buffered.take(1)
-          (CompressionState(state.dict.add(inferred), inferred), Segment.seq(inferred))
+          (CompressionState(state.dict.add(inferred), inferred), Chunk.seq(inferred))
 
         case Some(block) =>
           if (!state.buffered.isEmpty) {
             // New dictionary entry is conjecture + first byte of the current key
-            (CompressionState(state.dict.add(state.buffered |+| block.take(1)), block), Segment.seq(block))
+            (CompressionState(state.dict.add(state.buffered |+| block.take(1)), block), Chunk.seq(block))
           } else {
-            (CompressionState(state.dict, block), Segment.seq(block))
+            (CompressionState(state.dict, block), Chunk.seq(block))
           }
       }
   }
 
-  type CodecF[I, O] = (CompressionState, Option[I]) => (CompressionState, Segment[O, Unit])
+  type CodecF[I, O] = (CompressionState, Option[I]) => (CompressionState, Chunk[O])
 
   private def codec[DictT[_]: MakeDict, I, O](f: => CodecF[I, O])(implicit alphabet: Alphabet[Byte]): Pipe[Pure, I, O] = {
     def go(stream: Stream[Pure, I], s0: CompressionState): Pull[Pure, O, Unit] = {
       stream.pull.uncons1.flatMap {
         case Some((head, tail)) =>
           f(s0, Some(head)) match {
-            case (s1, segment) => Pull.segment(segment) >> go(tail, s1)
+            case (s1, chunk) => Pull.outputChunk(chunk) >> go(tail, s1)
           }
 
         case None =>
           f(s0, None) match {
             case (_, segment) =>
-              Pull.segment(segment)
+              Pull.outputChunk(segment)
           }
       }
     }
-    stream => go(stream, CompressionState(makeDict[DictT], Bytes.empty)).stream
+    stream => go(stream, CompressionState(makeDict[DictT], ListVector.empty)).stream
   }
 
   def makeDict[T[_]: MakeDict](implicit alphabet: Alphabet[Byte]) =

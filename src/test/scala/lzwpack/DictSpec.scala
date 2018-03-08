@@ -5,10 +5,6 @@ import cats.implicits._
 
 class CompressionDictSpec extends UnitSpec {
   describe("empty") {
-    it("returns a CompressionDict which contains no elements") {
-      assert(CompressionDict.empty[Int].size == 0)
-    }
-
     it("returns a CompressionDict for which headIndex = 0") {
       assert(CompressionDict.empty[Int].currentCode == 0)
     }

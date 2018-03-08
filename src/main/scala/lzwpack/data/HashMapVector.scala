@@ -1,7 +1,7 @@
 package lzwpack.data
 
-import cats.Eq
-import cats.syntax.eq._
+import cats.{Eq, Eval, Later, Now}
+import cats.implicits._
 
 /**
   * A [[HashMapVector]] is a hash map implementation on top of a bit-indexed trie.
@@ -19,7 +19,7 @@ class HashMapVector[K: Eq, @specialized V] private[data](private val vector: Spa
 
   // Sets (k -> v) in the given bucket
   private def addOrReplaceInBucket(bucket: Bucket)(kv: (K, V)): Bucket = kv match {
-    case (key, _) => bucket.filter(_._1 != key) + kv
+    case (key, _) => bucket.filter(_._1 =!= key) + kv
   }
 
   def apply(key: K): V = get(key).getOrElse(throw new NoSuchElementException)
@@ -35,16 +35,16 @@ class HashMapVector[K: Eq, @specialized V] private[data](private val vector: Spa
 
   def +(kv: (K, V)): HashMapVector[K, V] = updated(kv)
 
-  def size: Int = vector.size
+  lazy val size: Int = vector.fold(0) { case ((_, xs), acc) => xs.size + acc }
 
   def isEmpty: Boolean = vector.isEmpty
 
-  def fold[B](init: B)(f: (B, (K, V)) => B): B =
-    vector.fold(init) { case (acc, (_, kvs)) => kvs.foldLeft(acc)(f) }
+  def fold[B](init: => B)(f: ((K, V), => B) => B): B =
+    vector.fold(init) { case ((_, kvs), rest) => kvs.foldRight(Eval.later(rest))((h, t) => Now(f(h, t.value))).value }
 
   def find(f: (K, V) => Boolean): Option[(K, V)] = fold(Option.empty[(K, V)]) {
-    case (None, (k, v)) if f(k, v) => Some((k, v))
-    case (acc, _) => acc
+    case ((k, v), acc) if f(k, v) => Some((k, v))
+    case (_, acc) => acc
   }
 
   override def toString: String = s"HashMapVector($size elements)"

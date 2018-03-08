@@ -40,8 +40,6 @@ trait Dict[K] {
     * Returns the key with the given code or [[None]] if the code does not exist in this Dict.
     */
   def find(code: Code): Option[K]
-
-  def size: Int
 }
 
 /**
@@ -65,8 +63,6 @@ case class CompressionDict[K](map: HashMapVector[K, Code], currentCode: Int) ext
   override def get(key: K): Code = map(key)
 
   override def find(code: Code): Option[K] = map find { case (_, other) => code === other } map (_._1)
-
-  override def size: Code = map.size
 }
 
 object CompressionDict extends MakeDict[CompressionDict] {
@@ -86,8 +82,6 @@ case class DecompressionDict[K: Eq](map: SparseVector[K], currentCode: Int) exte
   override def get(key: K): Code = getOption(key) getOrElse (throw new NoSuchElementException())
 
   override def find(code: Code): Option[K] = map get code
-
-  override def size: Code = map.size
 
   def getOption(key: K): Option[Code] = map find { case (_, k) => k === key } map (_._1)
 }

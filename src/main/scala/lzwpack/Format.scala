@@ -1,9 +1,6 @@
 package lzwpack
 
-import cats.data.{State, StateT}
-import fs2.{Chunk, Pipe, Pull, Segment, Stream}
-import cats.implicits._
-import cats.kernel.Monoid
+import fs2.{Pipe, Segment}
 import lzwpack.data.BitBuffer
 
 /**
@@ -23,7 +20,7 @@ object Format extends Debugging {
   }
 
   case class UnpackState(buffer: BitBuffer, counter: Int) {
-    def codeSize: Int = Math.min((counter).bitsize, MaxCodeSize)
+    def codeSize: Int = Math.min(counter.bitsize, MaxCodeSize)
     def set(bb: BitBuffer) = UnpackState(bb, counter)
   }
 

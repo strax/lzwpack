@@ -61,7 +61,8 @@ trait ListVectorInstances {
     def iter(as: ListVector[A], bs: ListVector[A]): Boolean =
       if (as.isEmpty && bs.isEmpty) true else as.head === bs.head && iter(as.tail, bs.tail)
 
-    as.size == bs.size && iter(as, bs)
+    // If the sizes are the same and the hash codes are the same then check individual elements
+    as.size == bs.size && as.hashCode == bs.hashCode && iter(as, bs)
   }
 
   implicit def toSeq[A](as: ListVector[A]): Seq[A] = as.toSeq

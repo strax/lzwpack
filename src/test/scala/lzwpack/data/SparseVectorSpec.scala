@@ -34,8 +34,8 @@ class SparseVectorSpec extends UnitSpec {
     it("finds an entry with a zero index") {
       assert(vec find ((k, _) => k == 0) contains (0 -> "x"))
     }
-    it("returns the first entry for which f(entry) returns true") {
-      assert(vec find ((_, _ ) => true) contains (0 -> "x"))
+    it("returns the first entry for which f(entry); order is not defined") {
+      assert(vec find ((_, _ ) => true) contains (10001 -> "foo"))
     }
     it("returns None when no element was found") {
       assert(vec.find((k, _) => k == -1) == None)

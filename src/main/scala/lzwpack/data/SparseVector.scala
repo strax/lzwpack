@@ -4,6 +4,7 @@ import lzwpack._
 
 import scala.annotation.unchecked.uncheckedVariance
 import SparseVector._
+import cats.Eval
 
 /**
   * A [[SparseVector]] is a bit-mapped trie with 32 branches at each node.
@@ -22,14 +23,14 @@ sealed trait SparseVector[@specialized +A] {
     case (k, v) => updated(k, v)
   }
 
-  def fold[B](init: B)(f: (B, (Int, A)) => B): B
+  def fold[B](init: => B)(f: ((Int, A), => B) => B): B
 
-  // Note: O(n) complexity
-  def size: Int = fold(0)((n, _) => n + 1)
+  // Note: O(n) complexity because we don't really keep track of the bounds
+  lazy val size: Int = fold(0)((_, n) => n + 1)
 
   def find(f: (Int, A) => Boolean): Option[(Int, A)] = fold(Option.empty[(Int, A)]) {
-    case (None, (k, v)) if f(k, v) => Some((k, v))
-    case (acc, _) => acc
+    case ((k, v), _) if f(k, v) => Some((k, v))
+    case (_, acc) => acc
   }
 
   def isEmpty: Boolean
@@ -55,18 +56,18 @@ private[data] case class Branch[+A](private val subforest: Array[SparseVector[A 
   /**
     * Folds this trie in a depth-first manner.
     */
-  override def fold[B](init: B)(f: (B, (Int, A)) => B): B = {
+  override def fold[B](init: => B)(f: ((Int, A), => B) => B): B = {
     var acc = init
     for ((subtree, prefix) <- subforest.zipWithIndex if !subtree.isEmpty) {
-      acc = subtree.fold(acc) { case (acc, (suffix, v)) =>
+      acc = subtree.fold(acc) { case ((suffix, v), acc) =>
         val key = (suffix << ChunkSize) ^ prefix
-        f(acc, (key, v))
+        f((key, v), acc)
       }
     }
     acc
   }
 
-  override def isEmpty: Boolean = false
+  override val isEmpty: Boolean = false
 }
 
 private[data] case class Leaf[+A](key: Int, value: A) extends SparseVector[A] {
@@ -82,18 +83,18 @@ private[data] case class Leaf[+A](key: Int, value: A) extends SparseVector[A] {
   }
 
 
-  override def fold[B](init: B)(f: (B, (Int, A)) => B): B = f(init, (key, value))
+  override def fold[B](init: => B)(f: ((Int, A), => B) => B): B = f((key, value), init)
 
-  override def isEmpty: Boolean = false
+  override val isEmpty: Boolean = false
 }
 
 private[data] case object Empty extends SparseVector[Nothing] {
   def get(i: Int): Option[Nothing] = None
   def updated[A](i: Int, a: A): SparseVector[A] = Leaf(i, a)
 
-  override def isEmpty: Boolean = true
+  override val isEmpty: Boolean = true
 
-  override def fold[B](init: B)(f: (B, (Int, Nothing)) => B): B = init
+  override def fold[B](init: => B)(f: ((Int, Nothing), => B) => B): B = init
 }
 
 object SparseVector {

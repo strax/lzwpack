@@ -14,13 +14,6 @@ package object lzwpack extends AllImplicits with DictInstances with AlphabetSynt
     */
   type Code = Int
 
-  type Bytes = ListVector[Byte]
-
-  object Bytes {
-    def apply(b: Byte): Bytes = ListVector(b)
-    def empty: Bytes = ListVector()
-  }
-
   /**
     * An alphabet for a given input S is the set of possible members an input sequence can be composed from.
     *

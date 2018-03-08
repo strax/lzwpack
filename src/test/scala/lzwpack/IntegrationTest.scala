@@ -20,7 +20,6 @@ class IntegrationTest extends UnitSpec with Fixtures {
       val actual = Tobe
         .through(compressAdaptive)
         .through(CompressHeader.encode)
-        .buffer(4)
         .through(fs2.hash.md5)
         .compile
         .toVector
