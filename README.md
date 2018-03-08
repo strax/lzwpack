@@ -11,6 +11,8 @@ available options.
 
 ## Documentation (Finnish)
 
+[Scaladoc](https://strax.github.io/lzwpack/scaladoc/lzwpack)
+
 [Test coverage](https://strax.github.io/lzwpack/coverage)
 
 [Specification](doc/maarittelydokumentti.pdf)
