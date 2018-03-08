@@ -1,8 +1,6 @@
 package lzwpack.data
 
 import lzwpack.UnitSpec
-import cats.syntax.option._
-import cats.instances.all._
 import cats.{Eq, Hash}
 
 class HashMapVectorSpec extends UnitSpec {
@@ -13,6 +11,55 @@ class HashMapVectorSpec extends UnitSpec {
 
     it("returns false if this HashMapVector does not contain a value with the given key") {
       assert(!HashMapVector("foo" -> "bar", "barr" -> "baz").contains("bar"))
+    }
+  }
+
+  describe("apply") {
+    it("returns the value for the given key if it exists") {
+      assert(HashMapVector("foo" -> "bar").apply("foo") === "bar")
+    }
+
+    it("throws a NoSuchElementException otherwise") {
+      assertThrows[NoSuchElementException](HashMapVector("foo" -> "bar").apply("bar"))
+    }
+  }
+
+  describe("get") {
+    it("returns a Some value for the given key if it exists") {
+      assert(HashMapVector("foo" -> "bar").get("foo") === Some("bar"))
+    }
+
+    it("returns None otherwise") {
+      assert(HashMapVector("foo" -> "bar").get("bar") === None)
+    }
+  }
+
+  describe("size") {
+    it("returns the number of values in the hash map") {
+      assert(HashMapVector(1 -> true, 2 -> true, 3 -> true).size === 3)
+    }
+  }
+
+  describe("isEmpty") {
+    it("returns true for empty hash maps") {
+      assert(HashMapVector[Int, Int]().isEmpty)
+      assert(HashMapVector.empty[Int, Int].isEmpty)
+    }
+
+    it("returns false for hash maps with at least one value") {
+      assert(!HashMapVector(1 -> true).isEmpty)
+    }
+  }
+
+  describe("fold") {
+    it("reduces all values with a given function and initial value") {
+      assert(HashMapVector(1 -> 2, 2 -> 3, 3 -> 4).fold(100) { case ((_, v), acc) => acc + v } === 100 + 4 + 3+ 2)
+    }
+  }
+
+  describe("find") {
+    it("returns the key and value the given predicate returns true for") {
+      assert(HashMapVector(1 -> 2, 2 -> 3, 3 -> 4).find((_, v) => v === 3) === Some((2, 3)))
     }
   }
 
