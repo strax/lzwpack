@@ -50,16 +50,36 @@ $$v = \frac{n}{t}$$
 jossa $t$ on yhden operaation viemä aika sekunneissa ja $n$ on operaatiolle annetun syötteen
 koko.
 
+## Suorituskykytulokset
+
+Suorituskykytestit on suoritettu seuraavalla laitteistolla:
+Apple MacBook Pro (2016); Intel i7 3,3GHz, 16GB DDR3, SSD.
+
 ---
+
+#### Tulokset 9.3.
+
+| Testi | Syötteen koko (MB) | Nopeus (s/op), n = 10 | Nopeus (MB/s) |
+| ----- | ------------- | --------------------- | ------------- |
+| `compressAlice29` | 0,149 | 1,122 ± 0,186 (16%) | ~0,132 |
+| `decompressAlice29` | 0,061 | 0,625 ± 0,039 (6%) | ~0,097 |
+| `compressPtt5` | 0,501 | 4,687 ± 0,113 (2,5%) | ~0,106 |
+| `decompressPtt5` | 0,061 | 0,784 ± 0,334 (42%) | ~0,077 |
+
+`compressAlice29`- ja `decompressPtt5`-testeillä on tässä mittauksessa korkea varianssi, mutta ottamalla huomioon edellisen testien samat tulokset pienemmillä variansseilla voidaan tulosten olettaa olevan tarpeeksi luotettavia.
+
+Tulokset graafisessa muodossa:
+
+![Tulokset](benchmarks.png)
 
 #### Tulokset 3.3.
 
 | Testi | Syötteen koko (MB) | Nopeus (s/op), n = 10 | Nopeus (MB/s) |
 | ----- | ------------- | --------------------- | ------------- |
-| `compressAlice29` | 0,149 | 1,110 ± 0,091 | ~0,134 |
-| `decompressAlice29` | 0,061 | 0,718 ± 0,063 | ~0,084 |
-| `compressPtt5` | 0,501 | 4,773 ± 0,123 | ~0,104 |
-| `decompressPtt5` | 0,061 | 0,706 ± 0,065 | ~0,086 |
+| `compressAlice29` | 0,149 | 1,110 ± 0,091 (8%) | ~0,134 |
+| `decompressAlice29` | 0,061 | 0,718 ± 0,063 (9%) | ~0,084 |
+| `compressPtt5` | 0,501 | 4,773 ± 0,123 (2,5%) | ~0,104 |
+| `decompressPtt5` | 0,061 | 0,706 ± 0,065 (9%) | ~0,086 |
 
 Vaikuttaa siltä, että omien tietorakenteiden käyttö on heikentänyt suorituskykyä jonkin verran erityisesti pakkauksen
 osalta. Pakkauksen ja purkamisen tehokkuussuhde on nyt paljon pienempi, noin 1:1.3. Vaikuttaa siis siltä, että omat
