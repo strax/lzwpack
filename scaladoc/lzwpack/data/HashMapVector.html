@@ -302,7 +302,8 @@ As such, it provides the same functionality and performance characteristics as
         <span title="gt4s: $plus" class="name">+</span><span class="params">(<span name="kv">kv: (<span class="extype" name="lzwpack.data.HashMapVector.K">K</span>, <span class="extype" name="lzwpack.data.HashMapVector.V">V</span>)</span>)</span><span class="result">: <a href="" class="extype" name="lzwpack.data.HashMapVector">HashMapVector</a>[<span class="extype" name="lzwpack.data.HashMapVector.K">K</span>, <span class="extype" name="lzwpack.data.HashMapVector.V">V</span>]</span>
       </span>
       
-      
+      <p class="shortcomment cmt">Alias for <a href="#updated(kv:(K,V)):lzwpack.data.HashMapVector[K,V]" class="extmbr" name="lzwpack.data.HashMapVector#updated">updated</a>
+</p>
     </li><li name="scala.AnyRef#==" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="==(x$1:Any):Boolean"></a><a id="==(Any):Boolean"></a>
       <span class="permalink">
@@ -319,7 +320,7 @@ As such, it provides the same functionality and performance characteristics as
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="lzwpack.data.HashMapVector#apply" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="lzwpack.data.HashMapVector#apply" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="apply(key:K):V"></a><a id="apply(K):V"></a>
       <span class="permalink">
       <a href="../../lzwpack/data/HashMapVector.html#apply(key:K):V" title="Permalink">
@@ -334,7 +335,8 @@ As such, it provides the same functionality and performance characteristics as
         <span class="name">apply</span><span class="params">(<span name="key">key: <span class="extype" name="lzwpack.data.HashMapVector.K">K</span></span>)</span><span class="result">: <span class="extype" name="lzwpack.data.HashMapVector.V">V</span></span>
       </span>
       
-      
+      <p class="shortcomment cmt">Returns a value for a given key.</p><div class="fullcomment"><div class="comment cmt"><p>Returns a value for a given key.
+</p></div><dl class="attributes block"> <dt>Exceptions thrown</dt><dd><span class="cmt"><p><a href="http://www.scala-lang.org/api/2.12.4/scala/index.html#NoSuchElementException=java.util.NoSuchElementException" class="extype" name="scala"><code>scala.NoSuchElementException</code></a> if there's no mapping from the given key to a value</p></span></dd></dl></div>
     </li><li name="scala.Any#asInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
       <span class="permalink">
@@ -392,7 +394,7 @@ As such, it provides the same functionality and performance characteristics as
         <span class="name">contains</span><span class="params">(<span name="key">key: <span class="extype" name="lzwpack.data.HashMapVector.K">K</span></span>)</span><span class="result">: <a href="http://www.scala-lang.org/api/2.12.4/scala/Boolean.html#scala.Boolean" class="extype" name="scala.Boolean">Boolean</a></span>
       </span>
       
-      
+      <p class="shortcomment cmt">Returns whether this HashMapVector contains a value for a given key.</p>
     </li><li name="scala.AnyRef#eq" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a><a id="eq(AnyRef):Boolean"></a>
       <span class="permalink">
@@ -425,7 +427,7 @@ As such, it provides the same functionality and performance characteristics as
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="lzwpack.data.HashMapVector#find" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="lzwpack.data.HashMapVector#find" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="find(f:(K,V)=&gt;Boolean):Option[(K,V)]"></a><a id="find((K,V)⇒Boolean):Option[(K,V)]"></a>
       <span class="permalink">
       <a href="../../lzwpack/data/HashMapVector.html#find(f:(K,V)=&gt;Boolean):Option[(K,V)]" title="Permalink">
@@ -440,8 +442,10 @@ As such, it provides the same functionality and performance characteristics as
         <span class="name">find</span><span class="params">(<span name="f">f: (<span class="extype" name="lzwpack.data.HashMapVector.K">K</span>, <span class="extype" name="lzwpack.data.HashMapVector.V">V</span>) ⇒ <a href="http://www.scala-lang.org/api/2.12.4/scala/Boolean.html#scala.Boolean" class="extype" name="scala.Boolean">Boolean</a></span>)</span><span class="result">: <a href="http://www.scala-lang.org/api/2.12.4/scala/Option.html#scala.Option" class="extype" name="scala.Option">Option</a>[(<span class="extype" name="lzwpack.data.HashMapVector.K">K</span>, <span class="extype" name="lzwpack.data.HashMapVector.V">V</span>)]</span>
       </span>
       
-      
-    </li><li name="lzwpack.data.HashMapVector#fold" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <p class="shortcomment cmt">Returns the first element that <code>f</code> returns true for.</p><div class="fullcomment"><div class="comment cmt"><p>Returns the first element that <code>f</code> returns true for. If no element matches <code>f</code> then <a href="http://www.scala-lang.org/api/2.12.4/scala/None$.html" class="extype" name="scala.None">scala.None</a> is returned.
+The order for traversing the values is unspecified.
+</p></div></div>
+    </li><li name="lzwpack.data.HashMapVector#fold" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="fold[B](init:=&gt;B)(f:((K,V),=&gt;B)=&gt;B):B"></a><a id="fold[B](⇒B)(((K,V),⇒B)⇒B):B"></a>
       <span class="permalink">
       <a href="../../lzwpack/data/HashMapVector.html#fold[B](init:=&gt;B)(f:((K,V),=&gt;B)=&gt;B):B" title="Permalink">
@@ -456,7 +460,9 @@ As such, it provides the same functionality and performance characteristics as
         <span class="name">fold</span><span class="tparams">[<span name="B">B</span>]</span><span class="params">(<span name="init">init: ⇒ <span class="extype" name="lzwpack.data.HashMapVector.fold.B">B</span></span>)</span><span class="params">(<span name="f">f: ((<span class="extype" name="lzwpack.data.HashMapVector.K">K</span>, <span class="extype" name="lzwpack.data.HashMapVector.V">V</span>), ⇒ <span class="extype" name="lzwpack.data.HashMapVector.fold.B">B</span>) ⇒ <span class="extype" name="lzwpack.data.HashMapVector.fold.B">B</span></span>)</span><span class="result">: <span class="extype" name="lzwpack.data.HashMapVector.fold.B">B</span></span>
       </span>
       
-      
+      <p class="shortcomment cmt">Folds the values of this HashMapVector with the given initial value and function.</p><div class="fullcomment"><div class="comment cmt"><p>Folds the values of this HashMapVector with the given initial value and function.
+The order for traversing the values is unspecified.
+</p></div></div>
     </li><li name="lzwpack.data.HashMapVector#get" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="get(key:K):Option[V]"></a><a id="get(K):Option[V]"></a>
       <span class="permalink">
@@ -472,7 +478,7 @@ As such, it provides the same functionality and performance characteristics as
         <span class="name">get</span><span class="params">(<span name="key">key: <span class="extype" name="lzwpack.data.HashMapVector.K">K</span></span>)</span><span class="result">: <a href="http://www.scala-lang.org/api/2.12.4/scala/Option.html#scala.Option" class="extype" name="scala.Option">Option</a>[<span class="extype" name="lzwpack.data.HashMapVector.V">V</span>]</span>
       </span>
       
-      
+      <p class="shortcomment cmt">Returns an <span class="extype" name="scala.Some">scala.Some</span> with the value for the given key, or <a href="http://www.scala-lang.org/api/2.12.4/scala/None$.html" class="extype" name="scala.None">scala.None</a> if there's no value.</p>
     </li><li name="scala.AnyRef#getClass" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getClass():Class[_]"></a>
       <span class="permalink">
@@ -530,7 +536,7 @@ As such, it provides the same functionality and performance characteristics as
         <span class="name">isEmpty</span><span class="result">: <a href="http://www.scala-lang.org/api/2.12.4/scala/Boolean.html#scala.Boolean" class="extype" name="scala.Boolean">Boolean</a></span>
       </span>
       
-      
+      <p class="shortcomment cmt">Returns true if this HashMapVector contains no elements, false otherwise.</p>
     </li><li name="scala.Any#isInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="isInstanceOf[T0]:Boolean"></a>
       <span class="permalink">
@@ -620,7 +626,7 @@ As such, it provides the same functionality and performance characteristics as
         <span class="name">size</span><span class="result">: <a href="http://www.scala-lang.org/api/2.12.4/scala/Int.html#scala.Int" class="extype" name="scala.Int">Int</a></span>
       </span>
       
-      
+      <p class="shortcomment cmt">Returns the number of key-value mappings in this HashMapVector.</p>
     </li><li name="scala.AnyRef#synchronized" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a><a id="synchronized[T0](⇒T0):T0"></a>
       <span class="permalink">
@@ -668,7 +674,7 @@ As such, it provides the same functionality and performance characteristics as
         <span class="name">updated</span><span class="params">(<span name="kv">kv: (<span class="extype" name="lzwpack.data.HashMapVector.K">K</span>, <span class="extype" name="lzwpack.data.HashMapVector.V">V</span>)</span>)</span><span class="result">: <a href="" class="extype" name="lzwpack.data.HashMapVector">HashMapVector</a>[<span class="extype" name="lzwpack.data.HashMapVector.K">K</span>, <span class="extype" name="lzwpack.data.HashMapVector.V">V</span>]</span>
       </span>
       
-      
+      <p class="shortcomment cmt">Returns a new HashMapVector with the given key-value mapping changed.</p>
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait():Unit"></a>
       <span class="permalink">
