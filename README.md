@@ -19,7 +19,7 @@ available options.
 
 [Testing document](doc/testausdokumentti.md)
 
-[Implementation document](doc/toteutusdokumentti.md)
+[Implementation document](doc/toteutusdokumentti.pdf)
 
 [Week 1 recap](doc/viikkoraportti1.md)
 
