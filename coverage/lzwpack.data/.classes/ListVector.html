@@ -315,161 +315,172 @@
 <b class="pc"><i>25</i>&nbsp;  def concat(as1: ListVector[A]): ListVector[A] = as1.foldLeft(this)(_ + _)</b>
 <i>26</i>&nbsp;
 <i>27</i>&nbsp;  /**
-<i>28</i>&nbsp;    * Returns the first element `a` in this [[ListVector]] for which `f(a)` returns true, wrapped in an [[Option]].
-<i>29</i>&nbsp;    * If no element matches `f`, then a [[None]] is returned.
+<i>28</i>&nbsp;    * Returns the first element `a` in this [[ListVector]] for which `f(a)` returns true, wrapped in an [[scala.Option]].
+<i>29</i>&nbsp;    * If no element matches `f`, then a [[scala.None]] is returned.
 <i>30</i>&nbsp;    */
 <b class="pc"><i>31</i>&nbsp;  def find(f: A =&gt; Boolean): Option[A] = foldRight(none[A]) { (a, rest) =&gt; if (f(a)) a.some else rest }</b>
 <i>32</i>&nbsp;
 <i>33</i>&nbsp;  /**
 <i>34</i>&nbsp;    * Unsafe version of [[get]].
-<i>35</i>&nbsp;    * @throws IndexOutOfBoundsException if this [[ListVector]] does not contain the given index
+<i>35</i>&nbsp;    * @throws scala.IndexOutOfBoundsException if this [[ListVector]] does not contain the given index
 <i>36</i>&nbsp;    */
 <b class="pc"><i>37</i>&nbsp;  def apply(i: Int): A = get(i).getOrElse(throw new IndexOutOfBoundsException(s&quot;$i &gt; $size (offset $offset)&quot;))</b>
 <i>38</i>&nbsp;
 <i>39</i>&nbsp;  /**
 <i>40</i>&nbsp;    * Returns the first element of this [[ListVector]].
-<i>41</i>&nbsp;    * @throws IndexOutOfBoundsException if this [[ListVector]] is empty
+<i>41</i>&nbsp;    * @throws scala.IndexOutOfBoundsException if this [[ListVector]] is empty
 <i>42</i>&nbsp;    */
 <b class="pc"><i>43</i>&nbsp;  lazy val head: A = this(0)</b>
 <i>44</i>&nbsp;
-<b class="fc"><i>45</i>&nbsp;  lazy val headOption: Option[A] = get(0)</b>
-<i>46</i>&nbsp;
-<i>47</i>&nbsp;  /**
-<i>48</i>&nbsp;    * Returns a [[ListVector]] with all the elements from this vector except the first one (see [[head]]).
-<i>49</i>&nbsp;    * The first index is dropped so that
-<i>50</i>&nbsp;    * {{{
-<i>51</i>&nbsp;    *   ListVector(1,2,3).tail.get(0) == Some(2)
-<i>52</i>&nbsp;    * }}}
-<i>53</i>&nbsp;    */
-<b class="pc"><i>54</i>&nbsp;  lazy val tail: ListVector[A] = drop(1)</b>
-<i>55</i>&nbsp;
-<i>56</i>&nbsp;  /**
-<i>57</i>&nbsp;    * Returns a new [[ListVector]] without the first `n` items.
-<i>58</i>&nbsp;    */
-<b class="pc"><i>59</i>&nbsp;  def drop(n: Int): ListVector[A] = {</b>
-<b class="pc"><i>60</i>&nbsp;    if (n &gt; size) empty[A] else new ListVector(trie, size - n, offset + n)</b>
-<i>61</i>&nbsp;  }
-<i>62</i>&nbsp;
-<i>63</i>&nbsp;  /**
-<i>64</i>&nbsp;    * Returns a new [[ListVector]] with only the first `n` items present.
-<i>65</i>&nbsp;    */
-<b class="pc"><i>66</i>&nbsp;  def take(n: Int): ListVector[A] = new ListVector[A](trie, Math.min(n, size), offset)</b>
-<i>67</i>&nbsp;
-<i>68</i>&nbsp;  /**
-<i>69</i>&nbsp;    * Appends the given value to the end of this [[ListVector]].
-<i>70</i>&nbsp;    * Complexity: O(log n)
-<i>71</i>&nbsp;    */
-<b class="pc"><i>72</i>&nbsp;  def append(a: A) = new ListVector(trie.updated(offset + size, a), size + 1)</b>
-<i>73</i>&nbsp;
-<i>74</i>&nbsp;  /**
-<i>75</i>&nbsp;    * If there exists an element with the given index, returns an [[Option]] containing the element or
-<i>76</i>&nbsp;    * an empty option otherwise.
-<i>77</i>&nbsp;    * Complexity: O(log n)
-<i>78</i>&nbsp;    */
-<b class="fc"><i>79</i>&nbsp;  def get(i: Int): Option[A] = if (i &lt; size) trie get (offset + i) else none[A]</b>
-<i>80</i>&nbsp;
-<i>81</i>&nbsp;  /**
-<i>82</i>&nbsp;    * Returns true if this [[ListVector]] contains an element at index `i`, `false` otherwise.
-<i>83</i>&nbsp;    */
-<b class="fc"><i>84</i>&nbsp;  def contains(i: Int): Boolean = get(i).isDefined</b>
-<i>85</i>&nbsp;
-<i>86</i>&nbsp;  /**
-<i>87</i>&nbsp;    * Alias for [[append]].
-<i>88</i>&nbsp;    */
-<b class="pc"><i>89</i>&nbsp;  def +(a: A): ListVector[A] = append(a)</b>
-<i>90</i>&nbsp;
-<i>91</i>&nbsp;  /**
-<i>92</i>&nbsp;    * Alias for [[append]].
-<i>93</i>&nbsp;    */
-<b class="pc"><i>94</i>&nbsp;  def :+(a: A): ListVector[A] = append(a)</b>
-<i>95</i>&nbsp;
-<i>96</i>&nbsp;  /**
-<i>97</i>&nbsp;    * Returns `true` if this [[ListVector]] is empty (i.e. contains no elements), `false` otherwise.
-<i>98</i>&nbsp;    */
-<b class="fc"><i>99</i>&nbsp;  def isEmpty: Boolean = size == 0</b>
-<i>100</i>&nbsp;
-<i>101</i>&nbsp;  // Uses random access for speed (?)
-<i>102</i>&nbsp;  @annotation.tailrec
-<b class="nc"><i>103</i>&nbsp;  private def foldl[B](start: Int, end: Int, init: B, f: (B, A) =&gt; B): B = {</b>
-<b class="pc"><i>104</i>&nbsp;    if (start == end) init</b>
-<b class="pc"><i>105</i>&nbsp;    else foldl(start + 1, end, f(init, this(start)), f)</b>
-<i>106</i>&nbsp;  }
-<i>107</i>&nbsp;
-<b class="nc"><i>108</i>&nbsp;  private def foldr[B](start: Int, end: Int, init: =&gt; B, f: (A, =&gt; B) =&gt; B): B = {</b>
-<b class="pc"><i>109</i>&nbsp;    if (start == end) init</b>
-<b class="pc"><i>110</i>&nbsp;    else f(this(start), foldr(start + 1, end, init, f))</b>
-<i>111</i>&nbsp;  }
-<i>112</i>&nbsp;
-<i>113</i>&nbsp;  /**
-<i>114</i>&nbsp;    * Left folds the elements of this [[ListVector]].
-<i>115</i>&nbsp;    */
-<b class="pc"><i>116</i>&nbsp;  def foldLeft[B](init: B)(f: (B, A) =&gt; B): B = foldl(0, size, init, f)</b>
-<i>117</i>&nbsp;
-<b class="pc"><i>118</i>&nbsp;  def foldRight[B](init: =&gt; B)(f: (A, =&gt; B) =&gt; B): B = foldr(0, size, init, f)</b>
-<i>119</i>&nbsp;  /**
-<i>120</i>&nbsp;    * Returns an [[Iterator]] for this [[ListVector]].
-<i>121</i>&nbsp;    * @note we do not implement the Iterable trait in order to make our own data structure methods
-<i>122</i>&nbsp;    */
-<b class="fc"><i>123</i>&nbsp;  def iterator: Iterator[A] = new Iterator[A] {</b>
-<b class="fc"><i>124</i>&nbsp;    private var i = offset</b>
-<i>125</i>&nbsp;
-<b class="fc"><i>126</i>&nbsp;    override def hasNext: Boolean = ListVector.this.contains(i)</b>
-<i>127</i>&nbsp;
-<i>128</i>&nbsp;    override def next(): A = {
-<b class="fc"><i>129</i>&nbsp;      val a = ListVector.this(i)</b>
-<b class="fc"><i>130</i>&nbsp;      i += 1</b>
-<b class="fc"><i>131</i>&nbsp;      a</b>
-<i>132</i>&nbsp;    }
-<i>133</i>&nbsp;  }
-<i>134</i>&nbsp;
-<i>135</i>&nbsp;  /**
-<i>136</i>&nbsp;    * Returns a new [[ListVector]] with each element applied to `f`.
-<i>137</i>&nbsp;    */
-<b class="pc"><i>138</i>&nbsp;  def map[B](f: A =&gt; B): ListVector[B] =</b>
-<b class="pc"><i>139</i>&nbsp;    foldLeft(empty[B])((acc, a) =&gt; acc + f(a))</b>
-<i>140</i>&nbsp;
-<b class="nc"><i>141</i>&nbsp;  override lazy val toString: String = s&quot;ListVector(${this.map(_.toString).intercalate(&quot;, &quot;)})&quot;</b>
+<i>45</i>&nbsp;  /**
+<i>46</i>&nbsp;    * Like [[head]], but returns an [[scala.Option]] determining the success of the operation instead of throwing
+<i>47</i>&nbsp;    * an exception.
+<i>48</i>&nbsp;    */
+<b class="fc"><i>49</i>&nbsp;  lazy val headOption: Option[A] = get(0)</b>
+<i>50</i>&nbsp;
+<i>51</i>&nbsp;  /**
+<i>52</i>&nbsp;    * Returns a [[ListVector]] with all the elements from this vector except the first one (see [[head]]).
+<i>53</i>&nbsp;    * The first index is dropped so that
+<i>54</i>&nbsp;    * {{{
+<i>55</i>&nbsp;    *   ListVector(1,2,3).tail.get(0) == Some(2)
+<i>56</i>&nbsp;    * }}}
+<i>57</i>&nbsp;    */
+<b class="pc"><i>58</i>&nbsp;  lazy val tail: ListVector[A] = drop(1)</b>
+<i>59</i>&nbsp;
+<i>60</i>&nbsp;  /**
+<i>61</i>&nbsp;    * Returns a new [[ListVector]] without the first `n` items.
+<i>62</i>&nbsp;    */
+<b class="pc"><i>63</i>&nbsp;  def drop(n: Int): ListVector[A] = {</b>
+<b class="pc"><i>64</i>&nbsp;    if (n &gt; size) empty[A] else new ListVector(trie, size - n, offset + n)</b>
+<i>65</i>&nbsp;  }
+<i>66</i>&nbsp;
+<i>67</i>&nbsp;  /**
+<i>68</i>&nbsp;    * Returns a new [[ListVector]] with only the first `n` items present.
+<i>69</i>&nbsp;    */
+<b class="pc"><i>70</i>&nbsp;  def take(n: Int): ListVector[A] = new ListVector[A](trie, Math.min(n, size), offset)</b>
+<i>71</i>&nbsp;
+<i>72</i>&nbsp;  /**
+<i>73</i>&nbsp;    * Appends the given value to the end of this [[ListVector]].
+<i>74</i>&nbsp;    * Complexity: O(log n)
+<i>75</i>&nbsp;    */
+<b class="pc"><i>76</i>&nbsp;  def append(a: A) = new ListVector(trie.updated(offset + size, a), size + 1)</b>
+<i>77</i>&nbsp;
+<i>78</i>&nbsp;  /**
+<i>79</i>&nbsp;    * If there exists an element with the given index, returns an [[scala.Option]] containing the element or
+<i>80</i>&nbsp;    * an empty option otherwise.
+<i>81</i>&nbsp;    * Complexity: O(log n)
+<i>82</i>&nbsp;    */
+<b class="fc"><i>83</i>&nbsp;  def get(i: Int): Option[A] = if (i &lt; size) trie get (offset + i) else none[A]</b>
+<i>84</i>&nbsp;
+<i>85</i>&nbsp;  /**
+<i>86</i>&nbsp;    * Returns true if this [[ListVector]] contains an element at index `i`, `false` otherwise.
+<i>87</i>&nbsp;    */
+<b class="fc"><i>88</i>&nbsp;  def contains(i: Int): Boolean = get(i).isDefined</b>
+<i>89</i>&nbsp;
+<i>90</i>&nbsp;  /**
+<i>91</i>&nbsp;    * Alias for [[append]].
+<i>92</i>&nbsp;    */
+<b class="pc"><i>93</i>&nbsp;  def +(a: A): ListVector[A] = append(a)</b>
+<i>94</i>&nbsp;
+<i>95</i>&nbsp;  /**
+<i>96</i>&nbsp;    * Alias for [[append]].
+<i>97</i>&nbsp;    */
+<b class="pc"><i>98</i>&nbsp;  def :+(a: A): ListVector[A] = append(a)</b>
+<i>99</i>&nbsp;
+<i>100</i>&nbsp;  /**
+<i>101</i>&nbsp;    * Returns `true` if this [[ListVector]] is empty (i.e. contains no elements), `false` otherwise.
+<i>102</i>&nbsp;    */
+<b class="fc"><i>103</i>&nbsp;  def isEmpty: Boolean = size == 0</b>
+<i>104</i>&nbsp;
+<i>105</i>&nbsp;  // Uses random access for speed (?)
+<i>106</i>&nbsp;  @annotation.tailrec
+<b class="nc"><i>107</i>&nbsp;  private def foldl[B](start: Int, end: Int, init: B, f: (B, A) =&gt; B): B = {</b>
+<b class="pc"><i>108</i>&nbsp;    if (start == end) init</b>
+<b class="pc"><i>109</i>&nbsp;    else foldl(start + 1, end, f(init, this(start)), f)</b>
+<i>110</i>&nbsp;  }
+<i>111</i>&nbsp;
+<b class="nc"><i>112</i>&nbsp;  private def foldr[B](start: Int, end: Int, init: =&gt; B, f: (A, =&gt; B) =&gt; B): B = {</b>
+<b class="pc"><i>113</i>&nbsp;    if (start == end) init</b>
+<b class="pc"><i>114</i>&nbsp;    else f(this(start), foldr(start + 1, end, init, f))</b>
+<i>115</i>&nbsp;  }
+<i>116</i>&nbsp;
+<i>117</i>&nbsp;  /**
+<i>118</i>&nbsp;    * Left folds the elements of this [[ListVector]].
+<i>119</i>&nbsp;    */
+<b class="pc"><i>120</i>&nbsp;  def foldLeft[B](init: B)(f: (B, A) =&gt; B): B = foldl(0, size, init, f)</b>
+<i>121</i>&nbsp;
+<i>122</i>&nbsp;  /**
+<i>123</i>&nbsp;    * Right folds the elements of this ListVector.
+<i>124</i>&nbsp;    */
+<b class="pc"><i>125</i>&nbsp;  def foldRight[B](init: =&gt; B)(f: (A, =&gt; B) =&gt; B): B = foldr(0, size, init, f)</b>
+<i>126</i>&nbsp;
+<i>127</i>&nbsp;  /**
+<i>128</i>&nbsp;    * Returns an [[scala.Iterator]] for this [[ListVector]].
+<i>129</i>&nbsp;    * @note we do not implement the Iterable trait in order to make our own data structure methods
+<i>130</i>&nbsp;    */
+<b class="fc"><i>131</i>&nbsp;  def iterator: Iterator[A] = new Iterator[A] {</b>
+<b class="fc"><i>132</i>&nbsp;    private var i = offset</b>
+<i>133</i>&nbsp;
+<b class="fc"><i>134</i>&nbsp;    override def hasNext: Boolean = ListVector.this.contains(i)</b>
+<i>135</i>&nbsp;
+<i>136</i>&nbsp;    override def next(): A = {
+<b class="fc"><i>137</i>&nbsp;      val a = ListVector.this(i)</b>
+<b class="fc"><i>138</i>&nbsp;      i += 1</b>
+<b class="fc"><i>139</i>&nbsp;      a</b>
+<i>140</i>&nbsp;    }
+<i>141</i>&nbsp;  }
 <i>142</i>&nbsp;
 <i>143</i>&nbsp;  /**
-<i>144</i>&nbsp;    * Hash code calculated as in [[java.util.List]].
+<i>144</i>&nbsp;    * Returns a new [[ListVector]] with each element applied to `f`.
 <i>145</i>&nbsp;    */
-<b class="fc"><i>146</i>&nbsp;  override lazy val hashCode: Int = foldLeft(1)((acc, e) =&gt; 31 * acc + e.hashCode())</b>
-<i>147</i>&nbsp;
-<b class="fc"><i>148</i>&nbsp;  lazy val toSeq: Seq[A] = iterator.toSeq</b>
-<i>149</i>&nbsp;}
+<b class="pc"><i>146</i>&nbsp;  def map[B](f: A =&gt; B): ListVector[B] =</b>
+<b class="pc"><i>147</i>&nbsp;    foldLeft(empty[B])((acc, a) =&gt; acc + f(a))</b>
+<i>148</i>&nbsp;
+<b class="nc"><i>149</i>&nbsp;  override lazy val toString: String = s&quot;ListVector(${this.map(_.toString).intercalate(&quot;, &quot;)})&quot;</b>
 <i>150</i>&nbsp;
-<b class="fc"><i>151</i>&nbsp;object ListVector {</b>
-<b class="fc"><i>152</i>&nbsp;  def empty[A] = new ListVector(SparseVector.empty[A], 0)</b>
-<i>153</i>&nbsp;
-<b class="fc"><i>154</i>&nbsp;  def apply[A](as: A*): ListVector[A] = seq(as)</b>
+<i>151</i>&nbsp;  /**
+<i>152</i>&nbsp;    * Hash code calculated as in [[java.util.List]].
+<i>153</i>&nbsp;    */
+<b class="fc"><i>154</i>&nbsp;  override lazy val hashCode: Int = foldLeft(1)((acc, e) =&gt; 31 * acc + e.hashCode())</b>
 <i>155</i>&nbsp;
-<b class="fc"><i>156</i>&nbsp;  def seq[A](as: Seq[A]): ListVector[A] = as.foldLeft(empty[A])(_ + _)</b>
-<i>157</i>&nbsp;
-<i>158</i>&nbsp;  def unfold[A, S](init: S)(f: S =&gt; Option[(A, S)]): ListVector[A] = {
-<i>159</i>&nbsp;    @annotation.tailrec
-<b class="fc"><i>160</i>&nbsp;    def iter(acc: ListVector[A], s1: S): ListVector[A] = f(s1) match {</b>
-<b class="fc"><i>161</i>&nbsp;      case None =&gt; acc</b>
-<b class="fc"><i>162</i>&nbsp;      case Some((a, s2)) =&gt; iter(acc + a, s2)</b>
-<i>163</i>&nbsp;    }
-<b class="fc"><i>164</i>&nbsp;    iter(empty[A], init)</b>
-<i>165</i>&nbsp;  }
+<i>156</i>&nbsp;  /**
+<i>157</i>&nbsp;    * Converts this ListVector to a [[scala.Seq]].
+<i>158</i>&nbsp;    */
+<b class="fc"><i>159</i>&nbsp;  lazy val toSeq: Seq[A] = iterator.toSeq</b>
+<i>160</i>&nbsp;}
+<i>161</i>&nbsp;
+<b class="fc"><i>162</i>&nbsp;object ListVector {</b>
+<b class="fc"><i>163</i>&nbsp;  def empty[A] = new ListVector(SparseVector.empty[A], 0)</b>
+<i>164</i>&nbsp;
+<b class="fc"><i>165</i>&nbsp;  def apply[A](as: A*): ListVector[A] = seq(as)</b>
 <i>166</i>&nbsp;
-<i>167</i>&nbsp;  def range[A: Integral](from: A, to: A)(implicit integral: Integral[A]): ListVector[A] = {
-<i>168</i>&nbsp;    import integral._
-<i>169</i>&nbsp;    // We need to append the upper bound explicitly in order to avoid numeric overflows when comparing values.
-<b class="fc"><i>170</i>&nbsp;    unfold(from)(_.some.filter(_ &lt; to).map(n =&gt; (n, n + one))) + to</b>
-<i>171</i>&nbsp;  }
-<i>172</i>&nbsp;}
-<i>173</i>&nbsp;
-<b class="fc"><i>174</i>&nbsp;object :: {</b>
-<i>175</i>&nbsp;  def unapply[A](as: ListVector[A]): Option[(A, ListVector[A])] = as.headOption.map((_, as.tail))
-<i>176</i>&nbsp;}
+<b class="fc"><i>167</i>&nbsp;  def seq[A](as: Seq[A]): ListVector[A] = as.foldLeft(empty[A])(_ + _)</b>
+<i>168</i>&nbsp;
+<i>169</i>&nbsp;  def unfold[A, S](init: S)(f: S =&gt; Option[(A, S)]): ListVector[A] = {
+<i>170</i>&nbsp;    @annotation.tailrec
+<b class="fc"><i>171</i>&nbsp;    def iter(acc: ListVector[A], s1: S): ListVector[A] = f(s1) match {</b>
+<b class="fc"><i>172</i>&nbsp;      case None =&gt; acc</b>
+<b class="fc"><i>173</i>&nbsp;      case Some((a, s2)) =&gt; iter(acc + a, s2)</b>
+<i>174</i>&nbsp;    }
+<b class="fc"><i>175</i>&nbsp;    iter(empty[A], init)</b>
+<i>176</i>&nbsp;  }
+<i>177</i>&nbsp;
+<i>178</i>&nbsp;  def range[A: Integral](from: A, to: A)(implicit integral: Integral[A]): ListVector[A] = {
+<i>179</i>&nbsp;    import integral._
+<i>180</i>&nbsp;    // We need to append the upper bound explicitly in order to avoid numeric overflows when comparing values.
+<b class="fc"><i>181</i>&nbsp;    unfold(from)(_.some.filter(_ &lt; to).map(n =&gt; (n, n + one))) + to</b>
+<i>182</i>&nbsp;  }
+<i>183</i>&nbsp;}
+<i>184</i>&nbsp;
+<b class="fc"><i>185</i>&nbsp;object :: {</b>
+<i>186</i>&nbsp;  def unapply[A](as: ListVector[A]): Option[(A, ListVector[A])] = as.headOption.map((_, as.tail))
+<i>187</i>&nbsp;}
 </div>
 </div>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2018-03-08 10:21</div>
+    <div style="float:right;">generated on 2018-03-08 14:16</div>
 </div>
 </body>
 </html>

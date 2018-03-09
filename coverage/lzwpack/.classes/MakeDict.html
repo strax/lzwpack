@@ -106,18 +106,18 @@
 <i>32</i>&nbsp;
 <i>33</i>&nbsp;  /**
 <i>34</i>&nbsp;    * Returns the associated code for the given value.
-<i>35</i>&nbsp;    * @throws NoSuchElementException if the key does not exist in this Dict
+<i>35</i>&nbsp;    * @throws scala.NoSuchElementException if the key does not exist in this Dict
 <i>36</i>&nbsp;    */
 <i>37</i>&nbsp;  def get(key: K): Code
 <i>38</i>&nbsp;
 <i>39</i>&nbsp;  /**
-<i>40</i>&nbsp;    * Returns the key with the given code or [[None]] if the code does not exist in this Dict.
+<i>40</i>&nbsp;    * Returns the key with the given code or [[scala.None]] if the code does not exist in this Dict.
 <i>41</i>&nbsp;    */
 <i>42</i>&nbsp;  def find(code: Code): Option[K]
 <i>43</i>&nbsp;}
 <i>44</i>&nbsp;
 <i>45</i>&nbsp;/**
-<i>46</i>&nbsp;  * The [[MakeDict]] trait provides generic dictionary constructors; given a [[MakeDict[T]] we can construct
+<i>46</i>&nbsp;  * The [[MakeDict]] trait provides generic dictionary constructors; given a `MakeDict` we can construct
 <i>47</i>&nbsp;  * an empty T[A] or a T[A] that contains the given alphabet.
 <i>48</i>&nbsp;  */
 <b class="fc"><i>49</i>&nbsp;trait MakeDict[T[_]] {</b>
@@ -175,7 +175,7 @@
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2018-03-08 10:21</div>
+    <div style="float:right;">generated on 2018-03-08 14:16</div>
 </div>
 </body>
 </html>

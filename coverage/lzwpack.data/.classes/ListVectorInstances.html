@@ -196,7 +196,7 @@
 <b class="fc"><i>20</i>&nbsp;      fa.foldLeft(b)(f)</b>
 <i>21</i>&nbsp;
 <i>22</i>&nbsp;    /**
-<i>23</i>&nbsp;      * Lazy right fold. Using [[Eval]] is enforced by the typeclass, but it allows us to short-circuit some
+<i>23</i>&nbsp;      * Lazy right fold. Using [[cats.Eval]] is enforced by the typeclass, but it allows us to short-circuit some
 <i>24</i>&nbsp;      * folds if necessary.
 <i>25</i>&nbsp;      */
 <b class="fc"><i>26</i>&nbsp;    override def foldRight[A, B](fa: ListVector[A], init: Eval[B])(f: (A, Eval[B]) =&gt; Eval[B]): Eval[B] = fa match {</b>
@@ -255,7 +255,7 @@
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2018-03-08 10:21</div>
+    <div style="float:right;">generated on 2018-03-08 14:16</div>
 </div>
 </body>
 </html>

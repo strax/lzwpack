@@ -39,18 +39,18 @@
   <td class="name">HashMapVector</td>
 <td class="coverageStat">
   <span class="percent">
-    55.6%
+    88.9%
   </span>
   <span class="absValue">
-    (10/ 18)
+    (16/ 18)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    55%
+    90%
   </span>
   <span class="absValue">
-    (11/ 20)
+    (18/ 20)
   </span>
 </td>
 </tr>
@@ -248,18 +248,18 @@
   <td class="name"><strong>total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    10.8%
+    15.8%
   </span>
   <span class="absValue">
-    (13/ 120)
+    (19/ 120)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    10.6%
+    15.6%
   </span>
   <span class="absValue">
-    (15/ 141)
+    (22/ 141)
   </span>
 </td>
 </tr>
@@ -291,47 +291,84 @@
 <b class="pc"><i>20</i>&nbsp;    case (key, _) =&gt; bucket.filter(_._1 =!= key) + kv</b>
 <i>21</i>&nbsp;  }
 <i>22</i>&nbsp;
-<b class="pc"><i>23</i>&nbsp;  def apply(key: K): V = get(key).getOrElse(throw new NoSuchElementException)</b>
-<i>24</i>&nbsp;
-<b class="fc"><i>25</i>&nbsp;  def contains(key: K): Boolean = get(key).nonEmpty</b>
-<i>26</i>&nbsp;
-<i>27</i>&nbsp;  def get(key: K): Option[V] = for {
-<b class="fc"><i>28</i>&nbsp;    (_, value) &lt;- bucketForKey(key).find(_._1 === key)</b>
-<b class="fc"><i>29</i>&nbsp;  } yield value</b>
-<i>30</i>&nbsp;
-<b class="nc"><i>31</i>&nbsp;  def updated(kv: (K, V)): HashMapVector[K, V] =</b>
-<b class="pc"><i>32</i>&nbsp;    new HashMapVector(vector.updated(kv._1.hash, addOrReplaceInBucket(bucketForKey(kv._1))(kv)))</b>
-<i>33</i>&nbsp;
-<b class="pc"><i>34</i>&nbsp;  def +(kv: (K, V)): HashMapVector[K, V] = updated(kv)</b>
-<i>35</i>&nbsp;
-<b class="nc"><i>36</i>&nbsp;  lazy val size: Int = vector.fold(0) { case ((_, xs), acc) =&gt; xs.size + acc }</b>
-<i>37</i>&nbsp;
-<b class="nc"><i>38</i>&nbsp;  def isEmpty: Boolean = vector.isEmpty</b>
-<i>39</i>&nbsp;
-<b class="nc"><i>40</i>&nbsp;  def fold[B](init: =&gt; B)(f: ((K, V), =&gt; B) =&gt; B): B =</b>
-<b class="nc"><i>41</i>&nbsp;    vector.fold(init) { case ((_, kvs), rest) =&gt; kvs.foldRight(Eval.later(rest))((h, t) =&gt; Now(f(h, t.value))).value }</b>
-<i>42</i>&nbsp;
-<b class="nc"><i>43</i>&nbsp;  def find(f: (K, V) =&gt; Boolean): Option[(K, V)] = fold(Option.empty[(K, V)]) {</b>
-<b class="nc"><i>44</i>&nbsp;    case ((k, v), acc) if f(k, v) =&gt; Some((k, v))</b>
-<b class="nc"><i>45</i>&nbsp;    case (_, acc) =&gt; acc</b>
-<i>46</i>&nbsp;  }
+<i>23</i>&nbsp;  /**
+<i>24</i>&nbsp;    * Returns a value for a given key.
+<i>25</i>&nbsp;    *
+<i>26</i>&nbsp;    * @throws scala.NoSuchElementException if there&#39;s no mapping from the given key to a value
+<i>27</i>&nbsp;    */
+<b class="pc"><i>28</i>&nbsp;  def apply(key: K): V = get(key).getOrElse(throw new NoSuchElementException)</b>
+<i>29</i>&nbsp;
+<i>30</i>&nbsp;  /**
+<i>31</i>&nbsp;    * Returns whether this HashMapVector contains a value for a given key.
+<i>32</i>&nbsp;    */
+<b class="fc"><i>33</i>&nbsp;  def contains(key: K): Boolean = get(key).nonEmpty</b>
+<i>34</i>&nbsp;
+<i>35</i>&nbsp;  /**
+<i>36</i>&nbsp;    * Returns an [[scala.Some]] with the value for the given key, or [[scala.None]] if there&#39;s no value.
+<i>37</i>&nbsp;    */
+<i>38</i>&nbsp;  def get(key: K): Option[V] = for {
+<b class="fc"><i>39</i>&nbsp;    (_, value) &lt;- bucketForKey(key).find(_._1 === key)</b>
+<b class="fc"><i>40</i>&nbsp;  } yield value</b>
+<i>41</i>&nbsp;
+<i>42</i>&nbsp;  /**
+<i>43</i>&nbsp;    * Returns a new HashMapVector with the given key-value mapping changed.
+<i>44</i>&nbsp;    */
+<b class="nc"><i>45</i>&nbsp;  def updated(kv: (K, V)): HashMapVector[K, V] =</b>
+<b class="pc"><i>46</i>&nbsp;    new HashMapVector(vector.updated(kv._1.hash, addOrReplaceInBucket(bucketForKey(kv._1))(kv)))</b>
 <i>47</i>&nbsp;
-<b class="nc"><i>48</i>&nbsp;  override def toString: String = s&quot;HashMapVector($size elements)&quot;</b>
-<i>49</i>&nbsp;}
-<i>50</i>&nbsp;
-<b class="fc"><i>51</i>&nbsp;object HashMapVector {</b>
-<i>52</i>&nbsp;  def apply[K: Hash, V](kvs: (K, V)*): HashMapVector[K, V] = {
-<b class="fc"><i>53</i>&nbsp;    kvs.foldLeft(empty[K, V])((map, kv) =&gt; map + kv)</b>
-<i>54</i>&nbsp;  }
-<i>55</i>&nbsp;
-<b class="fc"><i>56</i>&nbsp;  def empty[K: Hash, V] = new HashMapVector[K, V](SparseVector.empty)</b>
-<b class="fc"><i>57</i>&nbsp;}</b>
+<i>48</i>&nbsp;  /**
+<i>49</i>&nbsp;    * Alias for [[updated]]
+<i>50</i>&nbsp;    */
+<b class="pc"><i>51</i>&nbsp;  def +(kv: (K, V)): HashMapVector[K, V] = updated(kv)</b>
+<i>52</i>&nbsp;
+<i>53</i>&nbsp;  /**
+<i>54</i>&nbsp;    * Returns the number of key-value mappings in this HashMapVector.
+<i>55</i>&nbsp;    */
+<b class="fc"><i>56</i>&nbsp;  lazy val size: Int = vector.fold(0) { case ((_, xs), acc) =&gt; xs.size + acc }</b>
+<i>57</i>&nbsp;
+<i>58</i>&nbsp;  /**
+<i>59</i>&nbsp;    * Returns true if this HashMapVector contains no elements, false otherwise.
+<i>60</i>&nbsp;    */
+<b class="fc"><i>61</i>&nbsp;  def isEmpty: Boolean = vector.isEmpty</b>
+<i>62</i>&nbsp;
+<i>63</i>&nbsp;  /**
+<i>64</i>&nbsp;    * Folds the values of this HashMapVector with the given initial value and function.
+<i>65</i>&nbsp;    * The order for traversing the values is unspecified.
+<i>66</i>&nbsp;    */
+<b class="pc"><i>67</i>&nbsp;  def fold[B](init: =&gt; B)(f: ((K, V), =&gt; B) =&gt; B): B =</b>
+<b class="pc"><i>68</i>&nbsp;    vector.fold(init) { case ((_, kvs), rest) =&gt; kvs.foldRight(Eval.later(rest))((h, t) =&gt; Now(f(h, t.value))).value }</b>
+<i>69</i>&nbsp;
+<i>70</i>&nbsp;  /**
+<i>71</i>&nbsp;    * Returns the first element that `f` returns true for. If no element matches `f` then [[scala.None]] is returned.
+<i>72</i>&nbsp;    * The order for traversing the values is unspecified.
+<i>73</i>&nbsp;    */
+<b class="pc"><i>74</i>&nbsp;  def find(f: (K, V) =&gt; Boolean): Option[(K, V)] = fold(Option.empty[(K, V)]) {</b>
+<b class="pc"><i>75</i>&nbsp;    case ((k, v), acc) if f(k, v) =&gt; Some((k, v))</b>
+<b class="pc"><i>76</i>&nbsp;    case (_, acc) =&gt; acc</b>
+<i>77</i>&nbsp;  }
+<i>78</i>&nbsp;
+<b class="nc"><i>79</i>&nbsp;  override def toString: String = s&quot;HashMapVector($size elements)&quot;</b>
+<i>80</i>&nbsp;}
+<i>81</i>&nbsp;
+<b class="fc"><i>82</i>&nbsp;object HashMapVector {</b>
+<i>83</i>&nbsp;  /**
+<i>84</i>&nbsp;    * Given a sequence of key-value tuples, constructs a new HashMapVector from them.
+<i>85</i>&nbsp;    */
+<i>86</i>&nbsp;  def apply[K: Hash, V](kvs: (K, V)*): HashMapVector[K, V] = {
+<b class="fc"><i>87</i>&nbsp;    kvs.foldLeft(empty[K, V])((map, kv) =&gt; map + kv)</b>
+<i>88</i>&nbsp;  }
+<i>89</i>&nbsp;
+<i>90</i>&nbsp;  /**
+<i>91</i>&nbsp;    * Returns an empty HashMapVector.
+<i>92</i>&nbsp;    */
+<b class="fc"><i>93</i>&nbsp;  def empty[K: Hash, V] = new HashMapVector[K, V](SparseVector.empty)</b>
+<b class="fc"><i>94</i>&nbsp;}</b>
 </div>
 </div>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2018-03-08 10:21</div>
+    <div style="float:right;">generated on 2018-03-08 14:16</div>
 </div>
 </body>
 </html>

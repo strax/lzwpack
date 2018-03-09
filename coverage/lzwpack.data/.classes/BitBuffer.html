@@ -47,10 +47,10 @@
 </td>
 <td class="coverageStat">
   <span class="percent">
-    86.7%
+    83.9%
   </span>
   <span class="absValue">
-    (26/ 30)
+    (26/ 31)
   </span>
 </td>
 </tr>
@@ -85,10 +85,10 @@
 </td>
 <td class="coverageStat">
   <span class="percent">
-    86.5%
+    84.2%
   </span>
   <span class="absValue">
-    (32/ 37)
+    (32/ 38)
   </span>
 </td>
 </tr>
@@ -107,98 +107,147 @@
 <i>7</i>&nbsp;
 <i>8</i>&nbsp;import scala.util.Try
 <i>9</i>&nbsp;
-<b class="pc"><i>10</i>&nbsp;case class BitBuffer(private[data] val data: Long, size: Int) {</b>
-<b class="fc"><i>11</i>&nbsp;  assert(size &gt;= 0)</b>
-<i>12</i>&nbsp;
-<i>13</i>&nbsp;  /**
-<i>14</i>&nbsp;    * Reads n bits from input and returns a tuple of (read bits, remaining bits).
-<i>15</i>&nbsp;    */
-<b class="fc"><i>16</i>&nbsp;  def read(bits: Int, allowFewer: Boolean = false): (BitBuffer, Int) = {</b>
-<b class="fc"><i>17</i>&nbsp;    if (!allowFewer &amp;&amp; bits &gt; size) throw new IndexOutOfBoundsException(s&quot;Tried to read $bits bits from a buffer with $size bits&quot;)</b>
-<b class="fc"><i>18</i>&nbsp;    (drop(bits), take(bits).toInt)</b>
-<i>19</i>&nbsp;  }
-<i>20</i>&nbsp;
-<b class="fc"><i>21</i>&nbsp;  def readOption(bits: Int): Option[(BitBuffer, Int)] = Try(read(bits)).toOption</b>
-<i>22</i>&nbsp;
-<b class="nc"><i>23</i>&nbsp;  def readByte: (BitBuffer, Byte) = read(8).map(_.toByte)</b>
-<i>24</i>&nbsp;
-<i>25</i>&nbsp;  def drop(n: Int): BitBuffer = {
-<b class="fc"><i>26</i>&nbsp;    val tail = data &gt;&gt;&gt; n</b>
-<b class="fc"><i>27</i>&nbsp;    BitBuffer(tail, Math.max(size - n, 0))</b>
-<i>28</i>&nbsp;  }
-<i>29</i>&nbsp;
-<i>30</i>&nbsp;  def take(n: Int): BitBuffer = {
-<b class="fc"><i>31</i>&nbsp;    val mask = (1 &lt;&lt; n) - 1</b>
-<b class="fc"><i>32</i>&nbsp;    val head = data &amp; mask</b>
-<b class="fc"><i>33</i>&nbsp;    BitBuffer(head, Math.min(size, n))</b>
-<i>34</i>&nbsp;  }
-<i>35</i>&nbsp;
-<b class="fc"><i>36</i>&nbsp;  def toInt: Int = data.toInt</b>
-<b class="nc"><i>37</i>&nbsp;  def toByte: Byte = data.toByte</b>
-<i>38</i>&nbsp;
-<i>39</i>&nbsp;  /**
-<i>40</i>&nbsp;    * Returns a new buffer that contains this buffer preceded by the other buffer.
-<i>41</i>&nbsp;    */
-<i>42</i>&nbsp;  def append(other: BitBuffer): BitBuffer = {
-<b class="fc"><i>43</i>&nbsp;    require(other.size + size &lt; JavaLong.SIZE, s&quot;${other.size} + ${size} &lt; 64&quot;)</b>
-<b class="fc"><i>44</i>&nbsp;    val bb = other.data</b>
-<b class="fc"><i>45</i>&nbsp;    BitBuffer((bb &lt;&lt; size) ^ data, other.size + size)</b>
-<i>46</i>&nbsp;  }
-<i>47</i>&nbsp;
-<b class="fc"><i>48</i>&nbsp;  def ++(other: BitBuffer): BitBuffer = this append other</b>
-<i>49</i>&nbsp;
-<i>50</i>&nbsp;  /**
-<i>51</i>&nbsp;    * Extracts as many values from this buffer as possible. Trailing zero-filled chunks are discarded.
-<i>52</i>&nbsp;    * @param chunkSize the size of each read value in bytes
-<i>53</i>&nbsp;    * @return an array of values
-<i>54</i>&nbsp;    */
-<i>55</i>&nbsp;  def drain(chunkSize: Int): (BitBuffer, Array[Int]) = {
-<b class="fc"><i>56</i>&nbsp;    assert(chunkSize &gt; 0)</b>
-<b class="fc"><i>57</i>&nbsp;    val chunkCount = size / chunkSize</b>
-<b class="fc"><i>58</i>&nbsp;    val values = new Array[Int](chunkCount)</b>
+<i>10</i>&nbsp;/**
+<i>11</i>&nbsp;  * A `BitBuffer` is a bit sequence backed by a 64-bit [[scala.Long]]. This means that it can hold at most 64 bits.
+<i>12</i>&nbsp;  * It provides sequential access (head, append etc.) to manipulate variable-sized chunks.
+<i>13</i>&nbsp;  */
+<b class="pc"><i>14</i>&nbsp;case class BitBuffer(private[data] val data: Long, size: Int) {</b>
+<b class="fc"><i>15</i>&nbsp;  assert(size &gt;= 0)</b>
+<i>16</i>&nbsp;
+<i>17</i>&nbsp;  /**
+<i>18</i>&nbsp;    * Reads n bits from input and returns a tuple of (read bits, remaining bits).
+<i>19</i>&nbsp;    *
+<i>20</i>&nbsp;    * @param bits amount of bits to read
+<i>21</i>&nbsp;    * @param allowFewer whether to successfully read and return a value with fewer read bits than requested
+<i>22</i>&nbsp;    * @throws scala.IndexOutOfBoundsException if this BitBuffer does not contain enough bits to be read
+<i>23</i>&nbsp;    */
+<b class="fc"><i>24</i>&nbsp;  def read(bits: Int, allowFewer: Boolean = false): (BitBuffer, Code) = {</b>
+<b class="fc"><i>25</i>&nbsp;    if (!allowFewer &amp;&amp; bits &gt; size) throw new IndexOutOfBoundsException(s&quot;Tried to read $bits bits from a buffer with $size bits&quot;)</b>
+<b class="fc"><i>26</i>&nbsp;    (drop(bits), take(bits).toInt)</b>
+<i>27</i>&nbsp;  }
+<i>28</i>&nbsp;
+<i>29</i>&nbsp;  /**
+<i>30</i>&nbsp;    * Like [[read]], but returns [[scala.None]] instead of throwing an exception if the read failed.
+<i>31</i>&nbsp;    */
+<b class="fc"><i>32</i>&nbsp;  def readOption(bits: Int): Option[(BitBuffer, Int)] = Try(read(bits)).toOption</b>
+<i>33</i>&nbsp;
+<i>34</i>&nbsp;  /**
+<i>35</i>&nbsp;    * Reads a [[scala.Byte]] from this BitBuffer.
+<i>36</i>&nbsp;    * @return a tuple of remaining and read bytes
+<i>37</i>&nbsp;    * @throws scala.IndexOutOfBoundsException if this BitBuffer does not contain enough bits to be read
+<i>38</i>&nbsp;    */
+<b class="nc"><i>39</i>&nbsp;  def readByte: (BitBuffer, Byte) = read(8) match {</b>
+<b class="nc"><i>40</i>&nbsp;    case (remaining, read) =&gt; (remaining, read.toByte)</b>
+<i>41</i>&nbsp;  }
+<i>42</i>&nbsp;
+<i>43</i>&nbsp;  /**
+<i>44</i>&nbsp;    * Returns a new BitBuffer with `n` bits discarded from the beginning of the buffer.
+<i>45</i>&nbsp;    */
+<i>46</i>&nbsp;  def drop(n: Int): BitBuffer = {
+<b class="fc"><i>47</i>&nbsp;    val tail = data &gt;&gt;&gt; n</b>
+<b class="fc"><i>48</i>&nbsp;    BitBuffer(tail, Math.max(size - n, 0))</b>
+<i>49</i>&nbsp;  }
+<i>50</i>&nbsp;
+<i>51</i>&nbsp;  /**
+<i>52</i>&nbsp;    * Returns a new BitBuffer with all but the first `n` bits discarded from the buffer.
+<i>53</i>&nbsp;    */
+<i>54</i>&nbsp;  def take(n: Int): BitBuffer = {
+<b class="fc"><i>55</i>&nbsp;    val mask = (1 &lt;&lt; n) - 1</b>
+<b class="fc"><i>56</i>&nbsp;    val head = data &amp; mask</b>
+<b class="fc"><i>57</i>&nbsp;    BitBuffer(head, Math.min(size, n))</b>
+<i>58</i>&nbsp;  }
 <i>59</i>&nbsp;
-<i>60</i>&nbsp;    @annotation.tailrec
-<i>61</i>&nbsp;    def go(i: Int, buffer: BitBuffer): Unit = {
-<b class="fc"><i>62</i>&nbsp;      if (i &lt; chunkCount) {</b>
-<b class="fc"><i>63</i>&nbsp;        buffer.read(chunkSize) match {</b>
-<b class="fc"><i>64</i>&nbsp;          case (rest, value) =&gt;</b>
-<b class="fc"><i>65</i>&nbsp;            values(i) = value</b>
-<b class="fc"><i>66</i>&nbsp;            if (rest.data &gt; 0) go(i + 1, rest)</b>
-<b class="nc"><i>67</i>&nbsp;          case _ =&gt;</b>
-<i>68</i>&nbsp;        }
-<i>69</i>&nbsp;      }
-<i>70</i>&nbsp;    }
+<i>60</i>&nbsp;  /**
+<i>61</i>&nbsp;    * Converts this BitBuffer to an [[scala.Int]].
+<i>62</i>&nbsp;    * Note that if the data exceeds 32 bits then it will be truncated to fit an integer.
+<i>63</i>&nbsp;    */
+<b class="fc"><i>64</i>&nbsp;  def toInt: Int = data.toInt</b>
+<i>65</i>&nbsp;
+<i>66</i>&nbsp;  /**
+<i>67</i>&nbsp;    * Converts this BitBuffer to a [[scala.Byte]].
+<i>68</i>&nbsp;    * Note that if the data exceeds 8 bits then it will be truncated to fit a byte.
+<i>69</i>&nbsp;    */
+<b class="nc"><i>70</i>&nbsp;  def toByte: Byte = data.toByte</b>
 <i>71</i>&nbsp;
-<b class="fc"><i>72</i>&nbsp;    go(0, this)</b>
-<b class="fc"><i>73</i>&nbsp;    (drop(chunkCount * chunkSize), values)</b>
-<i>74</i>&nbsp;  }
-<i>75</i>&nbsp;
-<b class="nc"><i>76</i>&nbsp;  override def toString(): String = s&quot;BitBuffer(${data.bin(size)}, $size bits)&quot;</b>
-<i>77</i>&nbsp;}
-<i>78</i>&nbsp;
-<i>79</i>&nbsp;trait BufferInstances {
-<i>80</i>&nbsp;  implicit object BufferMonoid extends Monoid[BitBuffer] {
-<i>81</i>&nbsp;    override def empty: BitBuffer = BitBuffer.empty
-<i>82</i>&nbsp;    override def combine(a: BitBuffer, b: BitBuffer): BitBuffer = a append b
-<i>83</i>&nbsp;  }
-<i>84</i>&nbsp;
-<i>85</i>&nbsp;  implicit val bitBufferShow: Show[BitBuffer] = Show.fromToString[BitBuffer]
-<i>86</i>&nbsp;}
-<i>87</i>&nbsp;
-<b class="fc"><i>88</i>&nbsp;object BitBuffer {</b>
-<b class="fc"><i>89</i>&nbsp;  @inline def apply(b: Byte): BitBuffer = BitBuffer(b.unsigned, 8)</b>
-<b class="fc"><i>90</i>&nbsp;  @inline def apply(data: Int): BitBuffer = BitBuffer(data, data.bitsize)</b>
-<i>91</i>&nbsp;
-<b class="fc"><i>92</i>&nbsp;  def tupled(t: (Int, Int)): BitBuffer = BitBuffer(t._1, t._2)</b>
-<i>93</i>&nbsp;
-<b class="fc"><i>94</i>&nbsp;  def empty: BitBuffer = BitBuffer(0, 0)</b>
-<b class="fc"><i>95</i>&nbsp;}</b>
+<i>72</i>&nbsp;  /**
+<i>73</i>&nbsp;    * Returns a new buffer that contains this buffer preceded by the other buffer.
+<i>74</i>&nbsp;    */
+<i>75</i>&nbsp;  def append(other: BitBuffer): BitBuffer = {
+<b class="fc"><i>76</i>&nbsp;    require(other.size + size &lt; JavaLong.SIZE, s&quot;${other.size} + ${size} &lt; 64&quot;)</b>
+<b class="fc"><i>77</i>&nbsp;    val bb = other.data</b>
+<b class="fc"><i>78</i>&nbsp;    BitBuffer((bb &lt;&lt; size) ^ data, other.size + size)</b>
+<i>79</i>&nbsp;  }
+<i>80</i>&nbsp;
+<i>81</i>&nbsp;  /**
+<i>82</i>&nbsp;    * Alias for [[append]]
+<i>83</i>&nbsp;    */
+<b class="fc"><i>84</i>&nbsp;  def ++(other: BitBuffer): BitBuffer = this append other</b>
+<i>85</i>&nbsp;
+<i>86</i>&nbsp;  /**
+<i>87</i>&nbsp;    * Extracts as many values from this buffer as possible. Trailing zero-filled chunks are discarded.
+<i>88</i>&nbsp;    * @param chunkSize the size of each read value in bytes
+<i>89</i>&nbsp;    * @return an array of values
+<i>90</i>&nbsp;    */
+<i>91</i>&nbsp;  def drain(chunkSize: Int): (BitBuffer, Array[Int]) = {
+<b class="fc"><i>92</i>&nbsp;    assert(chunkSize &gt; 0)</b>
+<b class="fc"><i>93</i>&nbsp;    val chunkCount = size / chunkSize</b>
+<b class="fc"><i>94</i>&nbsp;    val values = new Array[Int](chunkCount)</b>
+<i>95</i>&nbsp;
+<i>96</i>&nbsp;    @annotation.tailrec
+<i>97</i>&nbsp;    def go(i: Int, buffer: BitBuffer): Unit = {
+<b class="fc"><i>98</i>&nbsp;      if (i &lt; chunkCount) {</b>
+<b class="fc"><i>99</i>&nbsp;        buffer.read(chunkSize) match {</b>
+<b class="fc"><i>100</i>&nbsp;          case (rest, value) =&gt;</b>
+<b class="fc"><i>101</i>&nbsp;            values(i) = value</b>
+<b class="fc"><i>102</i>&nbsp;            if (rest.data &gt; 0) go(i + 1, rest)</b>
+<b class="nc"><i>103</i>&nbsp;          case _ =&gt;</b>
+<i>104</i>&nbsp;        }
+<i>105</i>&nbsp;      }
+<i>106</i>&nbsp;    }
+<i>107</i>&nbsp;
+<b class="fc"><i>108</i>&nbsp;    go(0, this)</b>
+<b class="fc"><i>109</i>&nbsp;    (drop(chunkCount * chunkSize), values)</b>
+<i>110</i>&nbsp;  }
+<i>111</i>&nbsp;
+<b class="nc"><i>112</i>&nbsp;  override def toString(): String = s&quot;BitBuffer(${data.bin(size)}, $size bits)&quot;</b>
+<i>113</i>&nbsp;}
+<i>114</i>&nbsp;
+<i>115</i>&nbsp;trait BufferInstances {
+<i>116</i>&nbsp;  /**
+<i>117</i>&nbsp;    * A BitBuffer forms a monoid under concatenation and an empty buffer.
+<i>118</i>&nbsp;    */
+<i>119</i>&nbsp;  implicit object BufferMonoid extends Monoid[BitBuffer] {
+<i>120</i>&nbsp;    override def empty: BitBuffer = BitBuffer.empty
+<i>121</i>&nbsp;    override def combine(a: BitBuffer, b: BitBuffer): BitBuffer = a append b
+<i>122</i>&nbsp;  }
+<i>123</i>&nbsp;
+<i>124</i>&nbsp;  implicit val bitBufferShow: Show[BitBuffer] = Show.fromToString[BitBuffer]
+<i>125</i>&nbsp;}
+<i>126</i>&nbsp;
+<b class="fc"><i>127</i>&nbsp;object BitBuffer {</b>
+<i>128</i>&nbsp;  /**
+<i>129</i>&nbsp;    * Creates a buffer from a [[scala.Byte]] with an initial size of 8.
+<i>130</i>&nbsp;    */
+<b class="fc"><i>131</i>&nbsp;  @inline def apply(b: Byte): BitBuffer = BitBuffer(b.unsigned, 8)</b>
+<i>132</i>&nbsp;
+<i>133</i>&nbsp;  /**
+<i>134</i>&nbsp;    * Creates a buffer from a [[scala.Int]] with an initial size of the bytes required to represent the integer.
+<i>135</i>&nbsp;    */
+<b class="fc"><i>136</i>&nbsp;  @inline def apply(data: Int): BitBuffer = BitBuffer(data, data.bitsize)</b>
+<i>137</i>&nbsp;
+<b class="fc"><i>138</i>&nbsp;  def tupled(t: (Int, Int)): BitBuffer = BitBuffer(t._1, t._2)</b>
+<i>139</i>&nbsp;
+<i>140</i>&nbsp;  /**
+<i>141</i>&nbsp;    * Returns an empty BitBuffer.
+<i>142</i>&nbsp;    */
+<b class="fc"><i>143</i>&nbsp;  lazy val empty: BitBuffer = BitBuffer(0, 0)</b>
+<b class="fc"><i>144</i>&nbsp;}</b>
 </div>
 </div>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2018-03-08 10:21</div>
+    <div style="float:right;">generated on 2018-03-08 14:16</div>
 </div>
 </body>
 </html>
