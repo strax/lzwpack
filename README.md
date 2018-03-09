@@ -15,6 +15,8 @@ available options.
 
 [Test coverage](https://strax.github.io/lzwpack/coverage)
 
+[Manual](doc/kayttoohje.md)
+
 [Specification](doc/maarittelydokumentti.pdf)
 
 [Testing document](doc/testausdokumentti.md)
