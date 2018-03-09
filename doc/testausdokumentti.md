@@ -11,8 +11,13 @@ Yksikkö- ja integraatiotestit on toteutettu [ScalaTest][1]-testauskirjastolla. 
 ne tietorakenteet, jotka muodostavat jonkin algebrallisen rakenteen, sisältävät
 [ScalaCheck][2]-kirjastolla toteutetut aksioomatestit. Nämä testit on pitkälti toimitettu `cats`-kirjastossa, eikä
 niitä ole kirjoitettu itse. Testikattavuusraportti generoidaan IntelliJ:n sisäänrakennetulla
-kattavuustyökalulla. Tällä hetkellä testikattavuus on hieman harhaanjohtava, sillä se sisältää
-sekä yksikkötestien että integraatiotestien kattavuuden. Tämä pitää korjata tulevaisuudessa.
+kattavuustyökalulla ja se sisältää kattavuustiedon sekä integraatio- että yksikkötesteistä.
+
+Testikattavuusraportti kertoo virheellisen prosenttiluvun testien kattavuudesta, sillä osa koodista on erikoistettu JVM:n primitiivityypeille "boxingin" välttämiseksi. Järkevämpää onkin siis tarkastella yksittäisten luokkien kattavuusprosentteja koko järjestelmän kattavuusprosentin sijaan.
+
+## Testien suorittaminen
+
+Testit voidaan suorittaa komentoriviltä komennolla `sbt test`. Suorituskykytestien suorittamiseen vaadittavat komennot löytyvät testiluokkien kommenteista.
 
 ## Algoritmin hyötysuhde
 
