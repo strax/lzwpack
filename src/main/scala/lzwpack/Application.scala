@@ -1,11 +1,18 @@
 package lzwpack
 
 import java.nio.file.{Path, Paths}
+import java.util.concurrent.Executors
 
-import cats.effect.{IO, Sync}
+import cats.effect.{ExitCode, IO, IOApp, Sync}
 import fs2.{Sink, Stream}
+import cats.syntax._
+import cats.implicits._
 
-object Application {
+import scala.concurrent.ExecutionContext
+
+object Application extends IOApp {
+  val ec = ExecutionContext.fromExecutor(Executors.newCachedThreadPool())
+
   sealed trait OperationMode
   object OperationMode {
     case object Compress extends OperationMode
@@ -34,9 +41,9 @@ object Application {
   // Use compress(1) compatible alphabet by default
   import Alphabet.Compress
 
-  def inputStream(path: Path): Stream[IO, Byte] = fs2.io.file.readAll[IO](path, 32768)
+  def inputStream(path: Path): Stream[IO, Byte] = fs2.io.file.readAll[IO](path, ec, 32768)
 
-  def runCompress(path: Path, maxCodeSize: Int, sink: Sink[IO, Byte] = fs2.io.stdout): IO[Unit] = {
+  def runCompress(path: Path, maxCodeSize: Int, sink: Sink[IO, Byte] = fs2.io.stdout(ec)): IO[Unit] = {
     inputStream(path)
       .through(compressAdaptive)
       .through(CompressHeader.encode)
@@ -45,7 +52,7 @@ object Application {
       .drain
   }
 
-  def runDecompress(path: Path, maxCodeSize: Int, sink: Sink[IO, Byte] = fs2.io.stdout): IO[Unit] = {
+  def runDecompress(path: Path, maxCodeSize: Int, sink: Sink[IO, Byte] = fs2.io.stdout(ec)): IO[Unit] = {
     inputStream(path)
       .through(CompressHeader.decode)
       .through(decompressAdaptive)
@@ -69,5 +76,5 @@ object Application {
     case None => IO.unit
   }
 
-  def main(args: Array[String]): Unit = program(args).unsafeRunSync()
+  override def run(args: List[String]): IO[ExitCode] = program(args) *> IO.pure(ExitCode.Success)
 }

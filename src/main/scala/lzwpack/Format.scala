@@ -1,7 +1,12 @@
 package lzwpack
 
-import fs2.{Pipe, Segment}
+import fs2.{Chunk, Pipe}
+import cats._
+import cats.data._
+import cats.implicits._
 import lzwpack.data.BitBuffer
+
+import scala.annotation.tailrec
 
 /**
   * Packs a stream of bits into a byte sequence so that a byte can contain multiple bit sequences.
@@ -11,11 +16,9 @@ object Format {
     * Returns a new [[fs2.Pipe]] that packs input [[lzwpack.data.BitBuffer]]s across byte boundaries.
     */
   def pack[F[_]]: Pipe[F, BitBuffer, Byte] = stream => {
-    stream.scanSegments(BitBuffer.empty) { case (buffer, segment) =>
-      combinedBuffer(segment)(buffer) flatMapResult { buffer =>
-        val (rest, bytes) = buffer.drain(8)
-        Segment.array(bytes.map(_.toByte)).asResult(rest)
-      }
+    stream.scanChunks(BitBuffer.empty) { case (buffer, segment) =>
+      val (rest, bytes) = combinedBuffer(segment)(buffer).drain(8)
+      (rest, Chunk.array(bytes.map(_.toByte)))
     }
   }
 
@@ -30,24 +33,29 @@ object Format {
     }
   }
 
-  def unpackSegment(state: UnpackState): Segment[Code, Option[UnpackState]] =
+/*  def unpackSegment(state: UnpackState): (Option[UnpackState], Code) =
     unpack1(state).fold(Segment.pure[Code, Option[UnpackState]](None)) { case (state_, code) =>
       Segment(code).asResult(Some(state_))
-    }
+    }*/
 
-  def combinedBuffer(segment: Segment[BitBuffer, _])(init: BitBuffer = BitBuffer.empty): Segment[Nothing, BitBuffer] =
-    segment.fold(init)(_ ++ _).mapResult(_._2)
+  /**
+    * Concatenates all BitBuffers from a chunk into the existing buffer.
+    */
+  def combinedBuffer(chunk: Chunk[BitBuffer])(init: BitBuffer = BitBuffer.empty): BitBuffer =
+    init |+| chunk.fold
 
   def unpack[F[_]](implicit alphabet: Alphabet[Byte]): Pipe[F, Byte, Code] = stream => {
     stream
       .buffer(4)
       .map(b => BitBuffer(b))
-      .scanSegments(UnpackState(BitBuffer.empty, alphabet.size)) { case (state, segment) =>
-        def drain(state: UnpackState): Segment[Code, UnpackState] = {
-          unpackSegment(state).flatMapResult(_.fold(Segment.pure[Code, UnpackState](state))(drain))
-        }
+      .scanChunks(UnpackState(BitBuffer.empty, alphabet.size)) { case (state, chunk) =>
+        def consume(s: UnpackState): (UnpackState, Chain[Code]) =
+          s.buffer.readOption(s.codeSize) match {
+            case Some((rest, code)) => consume(UnpackState(rest, s.counter + 1)).map(Chain(code) ++ _)
+            case None => (s, Chain.empty)
+          }
 
-        combinedBuffer(segment)(state.buffer) flatMapResult (bb => drain(state.set(bb)))
+        consume(state.set(state.buffer |+| chunk.fold)).map(Chunk.chain(_))
       }
   }
 }

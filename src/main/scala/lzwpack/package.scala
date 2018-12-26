@@ -23,11 +23,11 @@ package object lzwpack extends AllImplicits with DictInstances with AlphabetSynt
     * Returns a [[Pipe]] that performs a compression and adaptive packing in one pass.
     */
   def compressAdaptive[F[_]](implicit alphabet: Alphabet[Byte]): Pipe[F, Byte, Byte] =
-    stream => stream.throughPure(LZW.compress).throughPure(Format.pack)
+    stream => stream.through(LZW.compress).through(Format.pack)
 
   /**
     * Returns a [[Pipe]] that performs an adaptive unpacking and decompression in one pass.
     */
   def decompressAdaptive[F[_]](implicit alphabet: Alphabet[Byte]): Pipe[F, Byte, Byte] =
-    stream => stream.throughPure(Format.unpack).throughPure(LZW.decompress)
+    stream => stream.through(Format.unpack).through(LZW.decompress)
 }

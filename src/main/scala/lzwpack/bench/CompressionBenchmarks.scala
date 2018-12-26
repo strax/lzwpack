@@ -1,19 +1,25 @@
 package lzwpack.bench
 
 import java.nio.file.{Path, Paths}
-import java.util.concurrent.TimeUnit
+import java.util.concurrent.{Executors, TimeUnit}
 
-import cats.effect.IO
+import cats.effect.{ContextShift, IO, IOApp}
 import fs2.Sink
 import lzwpack._
 import org.openjdk.jmh.annotations._
+
+import scala.concurrent.ExecutionContext
 
 // jmh:run -i 10 -wi 10 -f1 -t1 lzwpack.bench.*
 @BenchmarkMode(Array(Mode.AverageTime))
 @OutputTimeUnit(TimeUnit.SECONDS)
 @State(Scope.Thread)
 class CompressionBenchmarks {
-  val sink: Sink[IO, Byte] = fs2.io.file.writeAll(Paths.get("/dev/null"))
+  implicit val contextShift: ContextShift[IO] = IO.contextShift(ExecutionContext.global)
+
+  val ec = ExecutionContext.fromExecutor(Executors.newCachedThreadPool())
+
+  val sink: Sink[IO, Byte] = fs2.io.file.writeAll(Paths.get("/dev/null"), ec)
 
   import Alphabet.Compress
 
@@ -31,7 +37,7 @@ class CompressionBenchmarks {
   }
 
   @Benchmark def compressAlice29WithoutPack(): Unit = {
-    fs2.io.file.readAll[IO](Paths.get("fixtures/alice29.txt"), 4028)
+    fs2.io.file.readAll[IO](Paths.get("fixtures/alice29.txt"), ec, 4028)
         .through(LZW.compress)
         .compile.drain.unsafeRunSync()
   }
@@ -41,7 +47,7 @@ class CompressionBenchmarks {
   }
 
   @Benchmark def unpackAlice29(): Unit = {
-    fs2.io.file.readAll[IO](Paths.get("fixtures/alice29.noheader.txt.Z"), 4028)
+    fs2.io.file.readAll[IO](Paths.get("fixtures/alice29.noheader.txt.Z"), ec, 4028)
         .through(Format.unpack)
       .compile.drain.unsafeRunSync()
   }

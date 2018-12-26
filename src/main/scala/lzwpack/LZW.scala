@@ -62,13 +62,13 @@ object LZW {
       stream.pull.uncons1.flatMap {
         case Some((head, tail)) =>
           f(s0, Some(head)) match {
-            case (s1, chunk) => Pull.outputChunk(chunk) >> go(tail, s1)
+            case (s1, chunk) => Pull.output(chunk) >> go(tail, s1)
           }
 
         case None =>
           f(s0, None) match {
-            case (_, segment) =>
-              Pull.outputChunk(segment)
+            case (_, chunk) =>
+              Pull.output(chunk)
           }
       }
     }
