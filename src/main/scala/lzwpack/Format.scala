@@ -1,7 +1,6 @@
 package lzwpack
 
 import fs2.{Chunk, Pipe}
-import cats._
 import cats.data._
 import cats.implicits._
 import lzwpack.data.BitBuffer
@@ -27,17 +26,6 @@ object Format {
     def set(bb: BitBuffer) = UnpackState(bb, counter)
   }
 
-  def unpack1(state: UnpackState): Option[(UnpackState, Code)] = {
-    state.buffer.readOption(state.codeSize).map { case (bb, code) =>
-      (UnpackState(bb, state.counter + 1), code)
-    }
-  }
-
-/*  def unpackSegment(state: UnpackState): (Option[UnpackState], Code) =
-    unpack1(state).fold(Segment.pure[Code, Option[UnpackState]](None)) { case (state_, code) =>
-      Segment(code).asResult(Some(state_))
-    }*/
-
   /**
     * Concatenates all BitBuffers from a chunk into the existing buffer.
     */
@@ -45,17 +33,19 @@ object Format {
     init |+| chunk.fold
 
   def unpack[F[_]](implicit alphabet: Alphabet[Byte]): Pipe[F, Byte, Code] = stream => {
+    @tailrec
+    def consume(s: UnpackState, acc: Chain[Code]): (UnpackState, Chain[Code]) =
+      s.buffer.readOption(s.codeSize) match {
+        case Some((rest, code)) => consume(UnpackState(rest, s.counter + 1), acc ++ Chain(code))
+        case None => (s, acc)
+      }
+
     stream
       .buffer(4)
       .map(b => BitBuffer(b))
-      .scanChunks(UnpackState(BitBuffer.empty, alphabet.size)) { case (state, chunk) =>
-        def consume(s: UnpackState): (UnpackState, Chain[Code]) =
-          s.buffer.readOption(s.codeSize) match {
-            case Some((rest, code)) => consume(UnpackState(rest, s.counter + 1)).map(Chain(code) ++ _)
-            case None => (s, Chain.empty)
-          }
-
-        consume(state.set(state.buffer |+| chunk.fold)).map(Chunk.chain(_))
+      .scanChunks(UnpackState(BitBuffer.empty, alphabet.size)) { case (state, chunk) => {
+        consume(state.set(state.buffer |+| chunk.fold), Chain.empty) map Chunk.chain
       }
+    }
   }
 }
