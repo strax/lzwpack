@@ -1,9 +1,9 @@
 package lzwpack
 
-import cats.data.Chain
 import fs2.{Chunk, Stream}
+import cats._
+import cats.kernel.instances.list._
 import cats.implicits._
-import cats.syntax._
 
 /**
   * Provides compress(1) compatible file header coding and decoding.

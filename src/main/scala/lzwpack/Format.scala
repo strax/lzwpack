@@ -15,9 +15,8 @@ object Format {
     * Returns a new [[fs2.Pipe]] that packs input [[lzwpack.data.BitBuffer]]s across byte boundaries.
     */
   def pack[F[_]]: Pipe[F, BitBuffer, Byte] = stream => {
-    stream.scanChunks(BitBuffer.empty) { case (buffer, segment) =>
-      val (rest, bytes) = combinedBuffer(segment)(buffer).drain(8)
-      (rest, Chunk.array(bytes.map(_.toByte)))
+    stream.scanChunks(BitBuffer.empty) { case (buffer, chunk) =>
+      (buffer |+| chunk.fold).drain(8).map(xs => Chunk.seq(xs.map(_.toByte)))
     }
   }
 
@@ -25,12 +24,6 @@ object Format {
     def codeSize: Int = Math.min(counter.bitsize, MaxCodeSize)
     def set(bb: BitBuffer) = UnpackState(bb, counter)
   }
-
-  /**
-    * Concatenates all BitBuffers from a chunk into the existing buffer.
-    */
-  def combinedBuffer(chunk: Chunk[BitBuffer])(init: BitBuffer = BitBuffer.empty): BitBuffer =
-    init |+| chunk.fold
 
   def unpack[F[_]](implicit alphabet: Alphabet[Byte]): Pipe[F, Byte, Code] = stream => {
     @tailrec
@@ -42,9 +35,9 @@ object Format {
 
     stream
       .buffer(4)
-      .map(b => BitBuffer(b))
+      .map(BitBuffer(_))
       .scanChunks(UnpackState(BitBuffer.empty, alphabet.size)) { case (state, chunk) => {
-        consume(state.set(state.buffer |+| chunk.fold), Chain.empty) map Chunk.chain
+        consume(state.copy(buffer = state.buffer |+| chunk.fold), Chain.empty) map Chunk.chain
       }
     }
   }
